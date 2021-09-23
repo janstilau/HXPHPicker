@@ -11,9 +11,9 @@ import AVFoundation
 // MARK: ViewControllers function
 extension PhotoPickerController {
     func finishCallback() {
-        #if HXPICKER_ENABLE_EDITOR
+#if HXPICKER_ENABLE_EDITOR
         removeAllEditedPhotoAsset()
-        #endif
+#endif
         let result = PickerResult(
             photoAssets: selectedAssetArray,
             isOriginal: isOriginal
@@ -28,9 +28,9 @@ extension PhotoPickerController {
         }
     }
     func singleFinishCallback(for photoAsset: PhotoAsset) {
-        #if HXPICKER_ENABLE_EDITOR
+#if HXPICKER_ENABLE_EDITOR
         removeAllEditedPhotoAsset()
-        #endif
+#endif
         let result = PickerResult(
             photoAssets: [photoAsset],
             isOriginal: isOriginal
@@ -45,13 +45,13 @@ extension PhotoPickerController {
         }
     }
     func cancelCallback() {
-        #if HXPICKER_ENABLE_EDITOR
+#if HXPICKER_ENABLE_EDITOR
         for photoAsset in editedPhotoAssetArray {
             photoAsset.photoEdit = photoAsset.initialPhotoEdit
             photoAsset.videoEdit = photoAsset.initialVideoEdit
         }
         editedPhotoAssetArray.removeAll()
-        #endif
+#endif
         cancelHandler?(self)
         pickerDelegate?.pickerController(didCancel: self)
         if autoDismiss {
@@ -178,7 +178,7 @@ extension PhotoPickerController {
         let operation = BlockOperation.init {
             var totalFileSize = 0
             var total: Int = 0
-             
+            
             func calculationCompletion(_ totalSize: Int) {
                 if isPreview {
                     if let operation =
@@ -199,7 +199,7 @@ extension PhotoPickerController {
                     completion(
                         totalSize,
                         PhotoTools.transformBytesToString(
-                                bytes: totalSize
+                            bytes: totalSize
                         )
                     )
                 }
@@ -426,7 +426,7 @@ extension PhotoPickerController {
             }
             if config.maximumSelectedVideoDuration > 0 {
                 if round(photoAsset.videoDuration) > Double(config.maximumSelectedVideoDuration) {
-                    #if HXPICKER_ENABLE_EDITOR
+#if HXPICKER_ENABLE_EDITOR
                     if !config.editorOptions.contains(.video) {
                         text = String(
                             format: "视频最大时长为%d秒，无法选择".localized,
@@ -443,13 +443,13 @@ extension PhotoPickerController {
                             canSelect = false
                         }
                     }
-                    #else
+#else
                     text = String(
                         format: "视频最大时长为%d秒，无法选择".localized,
                         arguments: [config.maximumSelectedVideoDuration]
                     )
                     canSelect = false
-                    #endif
+#endif
                 }
             }
             if config.minimumSelectedVideoDuration > 0 {
@@ -515,7 +515,7 @@ extension PhotoPickerController {
         return false
     }
     
-    #if HXPICKER_ENABLE_EDITOR
+#if HXPICKER_ENABLE_EDITOR
     func addedEditedPhotoAsset(_ photoAsset: PhotoAsset) {
         if editedPhotoAssetArray.contains(photoAsset) {
             return
@@ -532,5 +532,5 @@ extension PhotoPickerController {
         }
         editedPhotoAssetArray.removeAll()
     }
-    #endif
+#endif
 }

@@ -17,6 +17,9 @@ open class PhotoEditorViewController: BaseViewController {
     public weak var delegate: PhotoEditorViewControllerDelegate?
     
     /// 配置
+    /*
+        这种必传项, 应该在 init 方法内, 进行赋值.
+     */
     public let config: PhotoEditorConfiguration
     
     /// 当前编辑的图片
@@ -53,7 +56,10 @@ open class PhotoEditorViewController: BaseViewController {
         super.init(nibName: nil, bundle: nil)
     }
     
-    #if HXPICKER_ENABLE_PICKER
+    /*
+     通过宏, 对于接口进行了控制.
+     */
+#if HXPICKER_ENABLE_PICKER
     /// 当前编辑的PhotoAsset对象
     public private(set) var photoAsset: PhotoAsset!
     
@@ -77,9 +83,9 @@ open class PhotoEditorViewController: BaseViewController {
         self.photoAsset = photoAsset
         super.init(nibName: nil, bundle: nil)
     }
-    #endif
+#endif
     
-    #if canImport(Kingfisher)
+#if canImport(Kingfisher)
     /// 当前编辑的网络图片地址
     public private(set) var networkImageURL: URL?
     
@@ -103,7 +109,8 @@ open class PhotoEditorViewController: BaseViewController {
         self.editResult = editResult
         super.init(nibName: nil, bundle: nil)
     }
-    #endif
+#endif
+    
     var filterHDImage: UIImage?
     var mosaicImage: UIImage?
     var thumbnailImage: UIImage!
@@ -113,12 +120,88 @@ open class PhotoEditorViewController: BaseViewController {
     required public init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
     lazy var imageView: PhotoEditorView = {
         let imageView = PhotoEditorView.init(config: config)
         imageView.editorDelegate = self
         return imageView
     }()
+    /// 裁剪确认视图
+    public lazy var cropConfirmView: EditorCropConfirmView = {
+        let cropConfirmView = EditorCropConfirmView.init(config: config.cropConfimView, showReset: true)
+        cropConfirmView.alpha = 0
+        cropConfirmView.isHidden = true
+        cropConfirmView.delegate = self
+        return cropConfirmView
+    }()
+    public lazy var toolView: EditorToolView = {
+        let toolView = EditorToolView.init(config: config.toolView)
+        toolView.delegate = self
+        toolView.addBorderline(inWidth: 2, color: .red)
+        toolView.addTip("工具栏")
+        return toolView
+    }()
+    public lazy var topView: UIView = {
+        let view = UIView.init(frame: CGRect(x: 0, y: 0, width: 0, height: 44))
+        let cancelBtn = UIButton.init(frame: CGRect(x: 0, y: 0, width: 57, height: 44))
+        cancelBtn.setImage(UIImage.image(for: "hx_editor_back"), for: .normal)
+        cancelBtn.addTarget(self, action: #selector(didBackButtonClick), for: .touchUpInside)
+        view.addSubview(cancelBtn)
+        return view
+    }()
+    public lazy var topMaskLayer: CAGradientLayer = {
+        let layer = PhotoTools.getGradientShadowLayer(true)
+        return layer
+    }()
+    
+    public lazy var brushColorView: PhotoEditorBrushColorView = {
+        let view = PhotoEditorBrushColorView.init(frame: .zero)
+        view.delegate = self
+        view.brushColors = config.brushColors
+        view.currentColorIndex = config.defaultBrushColorIndex
+        view.alpha = 0
+        view.isHidden = true
+        return view
+    }()
+    public lazy var cropToolView: PhotoEditorCropToolView = {
+        var showRatios = true
+        if config.cropping.fixedRatio || config.cropping.isRoundCrop {
+            showRatios = false
+        }
+        let view = PhotoEditorCropToolView.init(showRatios: showRatios)
+        view.delegate = self
+        view.themeColor = config.cropping.aspectRatioSelectedColor
+        view.alpha = 0
+        view.isHidden = true
+        return view
+    }()
+    lazy var mosaicToolView: PhotoEditorMosaicToolView = {
+        let view = PhotoEditorMosaicToolView(selectedColor: config.toolView.toolSelectedColor)
+        view.delegate = self
+        view.alpha = 0
+        view.isHidden = true
+        return view
+    }()
+    lazy var filterView: PhotoEditorFilterView = {
+        let filter = editResult?.editedData.filter
+        let value = editResult?.editedData.filterValue
+        let view = PhotoEditorFilterView.init(filterConfig: config.filter,
+                                              sourceIndex: filter?.sourceIndex ?? -1,
+                                              value: value ?? 0)
+        view.delegate = self
+        return view
+    }()
+    lazy var chartletView: EditorChartletView = {
+        let view = EditorChartletView(
+            config: config.chartlet,
+            editorType: .photo
+        )
+        view.delegate = self
+        return view
+    }()
+    
     var topViewIsHidden: Bool = false
+    
     @objc func singleTap() {
         if state == .cropping {
             return
@@ -154,29 +237,6 @@ open class PhotoEditorViewController: BaseViewController {
         }
     }
     
-    /// 裁剪确认视图
-    public lazy var cropConfirmView: EditorCropConfirmView = {
-        let cropConfirmView = EditorCropConfirmView.init(config: config.cropConfimView, showReset: true)
-        cropConfirmView.alpha = 0
-        cropConfirmView.isHidden = true
-        cropConfirmView.delegate = self
-        return cropConfirmView
-    }()
-    public lazy var toolView: EditorToolView = {
-        let toolView = EditorToolView.init(config: config.toolView)
-        toolView.delegate = self
-        return toolView
-    }()
-    
-    public lazy var topView: UIView = {
-        let view = UIView.init(frame: CGRect(x: 0, y: 0, width: 0, height: 44))
-        let cancelBtn = UIButton.init(frame: CGRect(x: 0, y: 0, width: 57, height: 44))
-        cancelBtn.setImage(UIImage.image(for: "hx_editor_back"), for: .normal)
-        cancelBtn.addTarget(self, action: #selector(didBackButtonClick), for: .touchUpInside)
-        view.addSubview(cancelBtn)
-        return view
-    }()
-    
     @objc func didBackButtonClick() {
         didBackClick(true)
     }
@@ -194,68 +254,20 @@ open class PhotoEditorViewController: BaseViewController {
         }
     }
     
-    public lazy var topMaskLayer: CAGradientLayer = {
-        let layer = PhotoTools.getGradientShadowLayer(true)
-        return layer
-    }()
-    
-    public lazy var brushColorView: PhotoEditorBrushColorView = {
-        let view = PhotoEditorBrushColorView.init(frame: .zero)
-        view.delegate = self
-        view.brushColors = config.brushColors
-        view.currentColorIndex = config.defaultBrushColorIndex
-        view.alpha = 0
-        view.isHidden = true
-        return view
-    }()
     var showChartlet: Bool = false
-    lazy var chartletView: EditorChartletView = {
-        let view = EditorChartletView(
-            config: config.chartlet,
-            editorType: .photo
-        )
-        view.delegate = self
-        return view
-    }()
     
-    public lazy var cropToolView: PhotoEditorCropToolView = {
-        var showRatios = true
-        if config.cropping.fixedRatio || config.cropping.isRoundCrop {
-            showRatios = false
-        }
-        let view = PhotoEditorCropToolView.init(showRatios: showRatios)
-        view.delegate = self
-        view.themeColor = config.cropping.aspectRatioSelectedColor
-        view.alpha = 0
-        view.isHidden = true
-        return view
-    }()
-    lazy var mosaicToolView: PhotoEditorMosaicToolView = {
-        let view = PhotoEditorMosaicToolView(selectedColor: config.toolView.toolSelectedColor)
-        view.delegate = self
-        view.alpha = 0
-        view.isHidden = true
-        return view
-    }()
     var isFilter = false
     var filterImage: UIImage?
-    lazy var filterView: PhotoEditorFilterView = {
-        let filter = editResult?.editedData.filter
-        let value = editResult?.editedData.filterValue
-        let view = PhotoEditorFilterView.init(filterConfig: config.filter,
-                                              sourceIndex: filter?.sourceIndex ?? -1,
-                                              value: value ?? 0)
-        view.delegate = self
-        return view
-    }()
     
     var imageInitializeCompletion = false
     var orientationDidChange: Bool = false
     var imageViewDidChange: Bool = true
     var currentToolOption: EditorToolOptions?
     var toolOptions: EditorToolView.Options = []
+    
     open override func viewDidLoad() {
         super.viewDidLoad()
+        
         for options in config.toolView.toolOptions {
             switch options.type {
             case .graffiti:
@@ -274,6 +286,7 @@ open class PhotoEditorViewController: BaseViewController {
                 toolOptions.insert(.music)
             }
         }
+        
         let singleTap = UITapGestureRecognizer.init(target: self, action: #selector(singleTap))
         singleTap.delegate = self
         view.addGestureRecognizer(singleTap)
@@ -311,13 +324,13 @@ open class PhotoEditorViewController: BaseViewController {
         view.addSubview(topView)
         if needRequest {
             if requestType == 1 {
-                #if HXPICKER_ENABLE_PICKER
+#if HXPICKER_ENABLE_PICKER
                 requestImage()
-                #endif
+#endif
             }else if requestType == 2 {
-                #if canImport(Kingfisher)
+#if canImport(Kingfisher)
                 requestNetworkImage()
-                #endif
+#endif
             }
         }else {
             if !config.fixedCropState {
@@ -401,7 +414,7 @@ open class PhotoEditorViewController: BaseViewController {
         if !imageInitializeCompletion {
             if !needRequest || image != nil {
                 imageView.setImage(image)
-//                setFilterImage()
+                //                setFilterImage()
                 if let editedData = editResult?.editedData {
                     imageView.setEditedData(editedData: editedData)
                     if toolOptions.contains(.graffiti) {
@@ -495,10 +508,15 @@ open class PhotoEditorViewController: BaseViewController {
     }
 }
 
+/*
+    ToolView 的回调方法.
+ */
 extension PhotoEditorViewController: EditorToolViewDelegate {
+    
     func toolView(didFinishButtonClick toolView: EditorToolView) {
         exportResources()
     }
+    
     func toolView(_ toolView: EditorToolView, didSelectItemAt model: EditorToolOptions) {
         switch model.type {
         case .graffiti:
@@ -687,6 +705,7 @@ extension PhotoEditorViewController: PhotoEditorMosaicToolViewDelegate {
     }
 }
 extension PhotoEditorViewController: PhotoEditorFilterViewDelegate {
+    
     func filterView(shouldSelectFilter filterView: PhotoEditorFilterView) -> Bool {
         true
     }
@@ -765,6 +784,9 @@ extension PhotoEditorViewController: UIGestureRecognizerDelegate {
     }
 }
 
+/*
+    增加完 Text 的回调.
+ */
 extension PhotoEditorViewController: EditorStickerTextViewControllerDelegate {
     func stickerTextViewController(
         _ controller: EditorStickerTextViewController,
@@ -797,12 +819,12 @@ extension PhotoEditorViewController: EditorChartletViewDelegate {
                 loadTitleChartlet: response
             )
         }else {
-            #if canImport(Kingfisher)
+#if canImport(Kingfisher)
             let titles = PhotoTools.defaultTitleChartlet()
             response(titles)
-            #else
+#else
             response([])
-            #endif
+#endif
         }
     }
     func chartletView(backClick chartletView: EditorChartletView) {
@@ -823,12 +845,12 @@ extension PhotoEditorViewController: EditorChartletViewDelegate {
             )
         }else {
             /// 默认加载这些贴图
-            #if canImport(Kingfisher)
+#if canImport(Kingfisher)
             let chartletList = PhotoTools.defaultNetworkChartlet()
             response(titleIndex, chartletList)
-            #else
+#else
             response(titleIndex, [])
-            #endif
+#endif
         }
     }
     func chartletView(

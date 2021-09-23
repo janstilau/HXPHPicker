@@ -220,9 +220,9 @@ open class PhotoPickerController: UINavigationController {
     }
     var interactiveTransition: PickerInteractiveTransition?
     
-    #if HXPICKER_ENABLE_EDITOR
+#if HXPICKER_ENABLE_EDITOR
     lazy var editedPhotoAssetArray: [PhotoAsset] = []
-    #endif
+#endif
     
     public override func viewDidLoad() {
         super.viewDidLoad()
@@ -312,8 +312,8 @@ open class PhotoPickerController: UINavigationController {
 extension PhotoPickerController {
     func configBackgroundColor() {
         view.backgroundColor = PhotoManager.isDark ?
-            config.navigationViewBackgroudDarkColor :
-            config.navigationViewBackgroundColor
+        config.navigationViewBackgroudDarkColor :
+        config.navigationViewBackgroundColor
     }
     private func setOptions() {
         if !selectOptions.mediaTypes.contains(.image) {
@@ -342,8 +342,8 @@ extension PhotoPickerController {
         let isDark = PhotoManager.isDark
         let titleTextAttributes = [NSAttributedString.Key.foregroundColor: isDark ?
                                    config.navigationTitleDarkColor :
-                                   config.navigationTitleColor
-                               ]
+                                    config.navigationTitleColor
+        ]
         navigationBar.titleTextAttributes = titleTextAttributes
         let tintColor = isDark ? config.navigationDarkTintColor : config.navigationTintColor
         navigationBar.tintColor = tintColor
@@ -404,24 +404,24 @@ extension PhotoPickerController {
         for photoAsset in selectedAssetArray {
             if photoAsset.mediaType == .photo {
                 selectedPhotoAssetArray.append(photoAsset)
-                #if HXPICKER_ENABLE_EDITOR
+#if HXPICKER_ENABLE_EDITOR
                 if let photoEdit = photoAsset.photoEdit {
                     photoAsset.initialPhotoEdit = photoEdit
                 }
                 addedEditedPhotoAsset(photoAsset)
-                #endif
+#endif
             }else if photoAsset.mediaType == .video {
                 if singleVideo {
                     selectedAssetArray.remove(at: selectedAssetArray.firstIndex(of: photoAsset)!)
                 }else {
                     selectedVideoAssetArray.append(photoAsset)
                 }
-                #if HXPICKER_ENABLE_EDITOR
+#if HXPICKER_ENABLE_EDITOR
                 if let videoEdit = photoAsset.videoEdit {
                     photoAsset.initialVideoEdit = videoEdit
                 }
                 addedEditedPhotoAsset(photoAsset)
-                #endif
+#endif
             }
         }
     }
@@ -434,9 +434,9 @@ extension PhotoPickerController {
         return nil
     }
     private func didDismiss() {
-        #if HXPICKER_ENABLE_EDITOR
+#if HXPICKER_ENABLE_EDITOR
         removeAllEditedPhotoAsset()
-        #endif
+#endif
         var cameraAssetArray: [PhotoAsset] = []
         for photoAsset in localCameraAssetArray {
             cameraAssetArray.append(photoAsset.copyCamera())

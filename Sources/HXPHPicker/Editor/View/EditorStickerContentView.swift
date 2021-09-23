@@ -18,11 +18,13 @@ struct EditorStickerText {
 }
 
 struct EditorStickerItem {
+    
     let image: UIImage
     let imageData: Data?
     let text: EditorStickerText?
     let music: VideoEditorMusic?
     let videoSize: CGSize?
+    
     var frame: CGRect {
         var width = UIScreen.main.bounds.width - 80
         if music != nil {
@@ -56,6 +58,7 @@ struct EditorStickerItem {
         }
         return CGRect(x: 0, y: 0, width: itemWidth, height: itemHeight)
     }
+    
     init(image: UIImage,
          imageData: Data?,
          text: EditorStickerText?,
@@ -217,12 +220,10 @@ class EditorStickerContentView: UIView {
                         self?.textLayer.string = lyric?.lyric
                         self?.updateText()
                         CATransaction.commit()
-//                        print(player.currentTime)
                     }else {
                         timer.invalidate()
                         self?.timer = nil
                     }
-//                    print("正在循环")
             })
             RunLoop.current.add(timer, forMode: .common)
             self.timer = timer
@@ -264,9 +265,6 @@ class EditorStickerContentView: UIView {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-//    deinit {
-//        print("deinit: \(self)")
-//    }
 }
 
 extension EditorStickerContentView: UIGestureRecognizerDelegate {

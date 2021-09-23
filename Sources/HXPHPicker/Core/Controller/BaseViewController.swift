@@ -7,7 +7,11 @@
 
 import UIKit
 
+/*
+    基类, 仅仅是提供了公共的对于机器方向改变的监听.
+ */
 open class BaseViewController: UIViewController {
+    
     open override func viewDidLoad() {
         super.viewDidLoad()
         

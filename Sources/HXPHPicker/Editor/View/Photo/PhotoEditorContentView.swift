@@ -58,6 +58,8 @@ class PhotoEditorContentView: UIView {
     lazy var stickerView: EditorStickerView = {
         let view = EditorStickerView(frame: .zero)
         view.delegate = self
+        view.addBorderline(inWidth: 2, color: .green)
+        view.addTip("StickerView")
         return view
     }()
     

@@ -196,6 +196,7 @@ class EditorStickerView: UIView {
             itemView.center = convert(keyWindow.center, from: keyWindow)
         }
         itemView.firstTouch = isSelected
+        itemView.addBorderLine()
         addSubview(itemView)
         itemView.update(pinchScale: pScale / self.scale, rotation: radians, isMirror: true)
         if isSelected {
@@ -233,8 +234,8 @@ class EditorStickerView: UIView {
     func readdItemView(itemView: EditorStickerItemView) {
         guard let superview = itemView.superview,
               superview != self else {
-            return
-        }
+                  return
+              }
         let arg = itemView.radian - currentItemArg
         if superview == UIApplication.shared.keyWindow {
             let rect = superview.convert(itemView.frame, to: self)
@@ -355,7 +356,7 @@ class EditorStickerView: UIView {
                 self.trashView.alpha = 1
             }
         }
-
+        
     }
     
     func stickerData() -> EditorStickerData? {
@@ -419,14 +420,14 @@ class EditorStickerView: UIView {
             if let itemView = subView as? EditorStickerItemView {
                 let image: UIImage
                 if let imageData = itemView.item.imageData {
-                    #if canImport(Kingfisher)
+#if canImport(Kingfisher)
                     image = DefaultImageProcessor.default.process(
                         item: .data(imageData),
                         options: .init([])
                     )!
-                    #else
+#else
                     image = UIImage.init(data: imageData)!
-                    #endif
+#endif
                 }else {
                     image = itemView.item.image
                 }

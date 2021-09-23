@@ -8,14 +8,10 @@
 import UIKit
 
 protocol EditorStickerTextViewControllerDelegate: AnyObject {
-    func stickerTextViewController(
-        _ controller: EditorStickerTextViewController,
-        didFinish stickerText: EditorStickerText
-    )
-    func stickerTextViewController(
-        _ controller: EditorStickerTextViewController,
-        didFinish stickerItem: EditorStickerItem
-    )
+    func stickerTextViewController( _ controller: EditorStickerTextViewController,
+                                    didFinish stickerText: EditorStickerText )
+    func stickerTextViewController( _ controller: EditorStickerTextViewController,
+                                    didFinish stickerItem: EditorStickerItem )
 }
 
 class EditorStickerTextController: UINavigationController {
@@ -71,8 +67,8 @@ class EditorStickerTextViewController: BaseViewController {
         button.setBackgroundImage(
             UIImage.image(
                 for: config.tintColor,
-                havingSize: button.size,
-                radius: 3
+                   havingSize: button.size,
+                   radius: 3
             ),
             for: .normal
         )
@@ -122,12 +118,12 @@ class EditorStickerTextViewController: BaseViewController {
         super.viewWillAppear(animated)
         navigationController?.navigationBar.shadowImage = UIImage.image(
             for: UIColor.clear,
-            havingSize: .zero
+               havingSize: .zero
         )
         navigationController?.navigationBar.setBackgroundImage(
             UIImage.image(
                 for: UIColor.clear,
-                havingSize: .zero
+                   havingSize: .zero
             ),
             for: .default
         )

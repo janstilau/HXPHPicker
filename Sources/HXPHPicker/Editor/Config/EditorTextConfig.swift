@@ -8,6 +8,7 @@
 import UIKit
 
 public class EditorTextConfig {
+    
     /// 文本颜色数组
     public lazy var colors: [String] = PhotoTools.defaultColors()
     /// 确定按钮背景颜色、文本光标颜色

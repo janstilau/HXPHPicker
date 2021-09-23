@@ -76,6 +76,7 @@ class EditorImageResizerView: UIView {
     }()
     
     let mosaicConfig: PhotoEditorConfiguration.MosaicConfig
+    
     lazy var imageView: PhotoEditorContentView = {
         let imageView = PhotoEditorContentView.init(mosaicConfig: mosaicConfig)
         imageView.itemViewMoveToCenter = { [weak self] rect -> Bool in

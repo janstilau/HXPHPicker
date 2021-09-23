@@ -22,6 +22,7 @@ protocol EditorStickerItemViewDelegate: AnyObject {
 
 class EditorStickerItemView: UIView {
     weak var delegate: EditorStickerItemViewDelegate?
+    
     lazy var contentView: EditorStickerContentView = {
         let view = EditorStickerContentView(item: item)
         view.center = center
@@ -29,9 +30,9 @@ class EditorStickerItemView: UIView {
     }()
     lazy var externalBorder: CALayer = {
         let externalBorder = CALayer()
-        
         return externalBorder
     }()
+    
     var item: EditorStickerItem
     var isEnabled: Bool = true {
         didSet {
@@ -47,9 +48,6 @@ class EditorStickerItemView: UIView {
             if isSelected == newValue {
                 return
             }
-//            if item.text != nil {
-//                layer.shadowColor = newValue ? UIColor.black.withAlphaComponent(0.8).cgColor : UIColor.clear.cgColor
-//            }
             if item.music == nil {
                 externalBorder.cornerRadius = newValue ? 1 / scale : 0
                 externalBorder.borderWidth = newValue ? 1 / scale : 0
@@ -83,9 +81,6 @@ class EditorStickerItemView: UIView {
         )
         layer.addSublayer(externalBorder)
         addSubview(contentView)
-//        if item.text != nil {
-//            layer.shadowColor = UIColor.black.withAlphaComponent(0.8).cgColor
-//        }
         if item.music == nil {
             externalBorder.borderColor = UIColor.white.cgColor
         }
