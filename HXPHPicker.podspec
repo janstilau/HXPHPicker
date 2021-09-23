@@ -27,6 +27,7 @@ Pod::Spec.new do |spec|
     spec.subspec 'Editor' do |editor|
         editor.source_files   = "Sources/HXPHPicker/Editor/**/*.{swift}"
         editor.dependency 'HXPHPicker/Core'
+        # 增加以下的命令, 可以在 Xcode 里面, 使用条件编译.
         editor.pod_target_xcconfig = { 'SWIFT_ACTIVE_COMPILATION_CONDITIONS' => 'HXPICKER_ENABLE_EDITOR' }
     end
     
@@ -35,27 +36,20 @@ Pod::Spec.new do |spec|
         camera.dependency 'HXPHPicker/Core'
         camera.pod_target_xcconfig = { 'SWIFT_ACTIVE_COMPILATION_CONDITIONS' => 'HXPICKER_ENABLE_CAMERA' }
     end
+
+    spec.subspec 'Debug' do |core|
+        core.source_files   = "Sources/HXPHPicker/Debug/**/*.{swift,h,m}"
+    end
     
     spec.subspec 'Lite' do |lite|
         lite.dependency 'HXPHPicker/Picker'
         lite.dependency 'HXPHPicker/Editor'
         lite.dependency 'HXPHPicker/Camera'
+        lite.dependency 'HXPHPicker/Debug'
     end
     
     spec.subspec 'Full' do |full|
         full.dependency 'HXPHPicker/Lite'
         full.dependency 'Kingfisher', '~> 6.0'
     end
-    
-#    spec.subspec 'GPUCamera' do |camera|
-#        camera.dependency 'HXPHPicker/Camera'
-#        camera.dependency 'GPUImage'
-#    end
-    
-#    spec.subspec 'Full_GPUImage' do |full|
-#        full.dependency 'HXPHPicker/Picker'
-#        full.dependency 'HXPHPicker/Editor'
-#        full.dependency 'HXPHPicker/GPUCamera'
-#        full.dependency 'Kingfisher', '~> 6.0'
-#    end
 end

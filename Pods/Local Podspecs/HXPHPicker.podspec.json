@@ -70,6 +70,10 @@
       }
     },
     {
+      "name": "Debug",
+      "source_files": "Sources/HXPHPicker/Debug/**/*.{swift,h,m}"
+    },
+    {
       "name": "Lite",
       "dependencies": {
         "HXPHPicker/Picker": [
@@ -79,6 +83,9 @@
 
         ],
         "HXPHPicker/Camera": [
+
+        ],
+        "HXPHPicker/Debug": [
 
         ]
       }

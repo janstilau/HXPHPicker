@@ -10,6 +10,9 @@
 #endif
 #endif
 
+#import "MCDebug.h"
+#import "UIColor+Debug.h"
+#import "UIView+Debug.h"
 
 FOUNDATION_EXPORT double HXPHPickerVersionNumber;
 FOUNDATION_EXPORT const unsigned char HXPHPickerVersionString[];
