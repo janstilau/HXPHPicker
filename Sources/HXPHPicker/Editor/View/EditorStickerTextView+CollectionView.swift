@@ -40,8 +40,8 @@ extension EditorStickerTextView: UICollectionViewDataSource,
         let color = config.colors[indexPath.item].color
         currentSelectedColor = color
         currentSelectedIndex = indexPath.item
-        if showBackgroudColor {
-            useBgColor = color
+        if showBgColor {
+            textBgColor = color
             if color.isWhite {
                 changeTextColor(color: .black)
             }else {

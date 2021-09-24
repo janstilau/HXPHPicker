@@ -80,13 +80,17 @@ class EditorStickerTextViewController: BaseViewController {
         return button
     }()
     
+    /*
+        当完成按钮按下之后, 会根据 TextView 的当前信息, 构建出一个新的 EditorStickerText 出来.
+        TextView 内部, 没有将这部分逻辑进行封装. 感觉应该是转移过去.
+     */
     @objc func didFinishButtonClick() {
         if let image = textView.textImage(), !textView.text.isEmpty {
             let stickerText = EditorStickerText(
                 image: image,
                 text: textView.text,
                 textColor: textView.currentSelectedColor,
-                showBackgroud: textView.showBackgroudColor
+                showBackgroud: textView.showBgColor
             )
             if stickerItem != nil {
                 let stickerItem = EditorStickerItem(image: image, imageData: nil, text: stickerText)

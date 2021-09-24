@@ -22,14 +22,20 @@ class EditorStickerTextView: UIView {
             )
         }
     }
+        
+    /*
+        这个值, 仅仅是为了确定下面的各个属性值的.
+        在初始化的时候, 如果传过来了 initText, 那么根据里面的值, 修改 View 的信息.
+        在需要构建 TextModel 的之后, 是根据 View 的各个属性值, 进行新的数据的构建.
+     */
+    var initialStickerText: EditorStickerText?
+    
     var currentSelectedColor: UIColor = .clear
     var typingAttributes: [NSAttributedString.Key: Any] = [:]
-    var stickerText: EditorStickerText?
-    
-    var showBackgroudColor: Bool = false
-    var useBgColor: UIColor = .clear
+    var showBgColor: Bool = false
+    var textBgColor: UIColor = .clear
     var textIsDelete: Bool = false
-    var textLayer: EditorStickerTextLayer?
+    var textBgLayer: EditorStickerTextLayer?
     var rectArray: [CGRect] = []
     var blankWidth: CGFloat = 22
     var layerRadius: CGFloat = 8
@@ -38,7 +44,7 @@ class EditorStickerTextView: UIView {
     
     init(config: EditorTextConfig, stickerText: EditorStickerText?) {
         self.config = config
-        self.stickerText = stickerText
+        self.initialStickerText = stickerText
         super.init(frame: .zero)
         
         addSubview(textView)
@@ -63,8 +69,8 @@ class EditorStickerTextView: UIView {
     }
     
     func setupStickerText() {
-        if let text = stickerText {
-            showBackgroudColor = text.showBackgroud
+        if let text = initialStickerText {
+            showBgColor = text.showBackgroud
             textView.text = text.text
             textButton.isSelected = text.showBackgroud
         }
@@ -82,14 +88,19 @@ class EditorStickerTextView: UIView {
         let attributes = [NSAttributedString.Key.font: config.font,
                           NSAttributedString.Key.paragraphStyle: paragraphStyle]
         typingAttributes = attributes
-        textView.attributedText = NSAttributedString(string: stickerText?.text ?? "",
+        textView.attributedText = NSAttributedString(string: initialStickerText?.text ?? "",
                                                      attributes: attributes)
     }
     
     func setupTextColors() {
+        /*
+            这里的逻辑有点问题, 不应该使用遍历.
+            其实就是两种情况, 如果有 Init 值, 使用 Init 的值, 确定当前的值.
+            如果没有, 使用第一分数据.
+         */
         for (index, colorHex) in config.colors.enumerated() {
             let color = colorHex.color
-            if let text = stickerText {
+            if let text = initialStickerText {
                 if color == text.textColor {
                     if text.showBackgroud {
                         if color.isWhite {
@@ -97,7 +108,7 @@ class EditorStickerTextView: UIView {
                         }else {
                             changeTextColor(color: .white)
                         }
-                        useBgColor = color
+                        textBgColor = color
                     }else {
                         changeTextColor(color: color)
                     }
@@ -204,8 +215,11 @@ class EditorStickerTextView: UIView {
         textView.backgroundColor = .clear
         textView.delegate = self
         textView.layoutManager.delegate = self
+        /*
+            The inset of the text container's layout area within the text view's content area.
+            这个值, 控制着 Text 和 TextView 之间的 margin 值.
+         */
         textView.textContainerInset = UIEdgeInsets(top: 15, left: 15, bottom: 15, right: 15)
-        textView.contentInset = .zero
         textView.becomeFirstResponder()
         textView.addBorderline(inWidth: 1, color: .blue)
         textView.addTip("TextView")
@@ -215,6 +229,11 @@ class EditorStickerTextView: UIView {
 
 extension EditorStickerTextView {
     
+    /*
+        监听 Keyboard 的弹出, 是为了控制 ToolBar 的位置.
+        将所有的布局逻辑, 都放到了一处.
+        UIView.animation 的做法, 也可以保证动画的顺利弹出. 
+     */
     @objc func keyboardWillDismiss(notifi: Notification) {
         guard let info = notifi.userInfo,
               let duration = info[UIResponder.keyboardAnimationDurationUserInfoKey] as? TimeInterval
@@ -240,8 +259,8 @@ extension EditorStickerTextView {
     
     @objc func didTextButtonClick(button: UIButton) {
         button.isSelected = !button.isSelected
-        showBackgroudColor = button.isSelected
-        useBgColor = currentSelectedColor
+        showBgColor = button.isSelected
+        textBgColor = currentSelectedColor
         if button.isSelected {
             if currentSelectedColor.isWhite {
                 changeTextColor(color: .black)

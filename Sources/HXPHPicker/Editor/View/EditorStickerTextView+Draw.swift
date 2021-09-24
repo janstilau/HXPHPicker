@@ -7,13 +7,16 @@
 
 import UIKit
 
+/*
+    这里的整块逻辑, 都是在进行, 背景颜色框的计算工作. 
+ */
 extension EditorStickerTextView {
     
     func createTextBackgroundLayer(path: CGPath) -> EditorStickerTextLayer {
         let textLayer = EditorStickerTextLayer()
         textLayer.path = path
         textLayer.lineWidth = 0
-        let color = showBackgroudColor ? useBgColor.cgColor : UIColor.clear.cgColor
+        let color = showBgColor ? textBgColor.cgColor : UIColor.clear.cgColor
         textLayer.strokeColor = color
         textLayer.fillColor = color
         return textLayer
@@ -278,7 +281,7 @@ extension EditorStickerTextView {
     
     func drawTextBackgroudColor() {
         if textView.text.isEmpty {
-            textLayer?.path = nil
+            textBgLayer?.path = nil
             return
         }
         var rectArray: [CGRect] = []
@@ -326,8 +329,8 @@ extension EditorStickerTextView {
             rectArray.append(usedRect)
         }
         let path = drawBackgroundPath(rects: rectArray)
-        let color = showBackgroudColor ? useBgColor.cgColor : UIColor.clear.cgColor
-        if let textLayer = textLayer {
+        let color = showBgColor ? textBgColor.cgColor : UIColor.clear.cgColor
+        if let textLayer = textBgLayer {
             textLayer.path = path.cgPath
             textLayer.strokeColor = color
             textLayer.fillColor = color
@@ -338,17 +341,17 @@ extension EditorStickerTextView {
         }else {
             for subView in textView.subviews {
                 if let textClass = NSClassFromString("_UITextContainerView"), subView.isKind(of: textClass) {
-                    textLayer = createTextBackgroundLayer(path: path.cgPath)
+                    textBgLayer = createTextBackgroundLayer(path: path.cgPath)
                     CATransaction.begin()
                     CATransaction.setDisableActions(true)
-                    textLayer?.frame = CGRect(
+                    textBgLayer?.frame = CGRect(
                         x: 15,
                         y: 15,
                         width: path.bounds.width,
                         height: textView.contentSize.height
                     )
                     CATransaction.commit()
-                    subView.layer.insertSublayer(textLayer!, at: 0)
+                    subView.layer.insertSublayer(textBgLayer!, at: 0)
                     return
                 }
             }
