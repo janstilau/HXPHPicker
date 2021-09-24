@@ -26,32 +26,32 @@ class GIFImage {
     var frameTotalCount: Int = 0
     /// 兼容之前的 UIImage 使用
     var image: UIImage?
-
+    
     /// 全局配置
     struct GlobalSetting {
         /// 配置预加载帧的数量
         static var prefetchNumber: Int = 10
         static var minFrameDuration: TimeInterval = 0.01
     }
-
+    
     /// 兼容 UIImage data 调用
     convenience init?(data: Data) {
         self.init(data: data, scale: 1.0)
     }
-
+    
     /// 根据二进制数据初始化【核心初始化方法】
     init?(data: Data, scale: CGFloat) {
         guard let cgImageSource = CGImageSourceCreateWithData(data as CFData, nil) else { return }
         self.cgImageSource = cgImageSource
         initGIFSource(cgImageSource: cgImageSource)
     }
-
+    
     /// 获取图片数据源的第 index 帧图片的动画时间
     fileprivate class func getCGImageSourceGifFrameDelay(imageSource: CGImageSource, index: Int) -> TimeInterval {
         var delay = 0.0
         guard let imgProperties: NSDictionary = CGImageSourceCopyPropertiesAtIndex(
-                imageSource,
-                index, nil
+            imageSource,
+            index, nil
         ) else { return delay }
         // 获取该帧图片的属性字典
         if let property = imgProperties[kCGImagePropertyGIFDictionary as String] as? NSDictionary {
@@ -65,7 +65,7 @@ class GIFImage {
         }
         return delay
     }
-
+    
     /// 根据图片数据源初始化，设置动画总时长、总帧数等属性
     fileprivate func initGIFSource(cgImageSource: CGImageSource) {
         let numOfFrames = CGImageSourceGetCount(cgImageSource)
@@ -87,7 +87,7 @@ class GIFImage {
             }
         }
     }
-
+    
     /// 获取某一帧图片
     func getFrame(index: Int) -> UIImage? {
         guard index < frameTotalCount else { return nil }
@@ -127,7 +127,7 @@ class GIFImageView: UIImageView {
     fileprivate var animatedImage: GIFImage?
     /// 定时器
     var displayLink: CADisplayLink?
-
+    
     /// 重载初始化，初始化定时器
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -139,11 +139,11 @@ class GIFImageView: UIImageView {
     override init(frame: CGRect) {
         super.init(frame: frame)
     }
-
+    
     override init(image: UIImage?) {
         super.init(image: image)
     }
-
+    
     /// 设置 GIF 图片
     var gifImage: GIFImage? {
         get {
@@ -168,9 +168,9 @@ class GIFImageView: UIImageView {
             }
             self.layer.setNeedsDisplay()
         }
-
+        
     }
-
+    
     /// 当显示 GIF 时，不处理高亮状态
     override var isHighlighted: Bool {
         get {
@@ -182,7 +182,7 @@ class GIFImageView: UIImageView {
             }
         }
     }
-
+    
     /// 获取是否正在动画
     override var isAnimating: Bool {
         if self.animatedImage != nil && self.displayLink != nil {
@@ -191,7 +191,7 @@ class GIFImageView: UIImageView {
             return super.isAnimating
         }
     }
-
+    
     /// 开启定时器
     override func startAnimating() {
         if self.animatedImage != nil && self.displayLink != nil {
@@ -200,7 +200,7 @@ class GIFImageView: UIImageView {
             super.startAnimating()
         }
     }
-
+    
     /// 暂停定时器
     override func stopAnimating() {
         if self.animatedImage != nil && self.displayLink != nil {
@@ -209,7 +209,7 @@ class GIFImageView: UIImageView {
             super.stopAnimating()
         }
     }
-
+    
     /// 当前显示内容为 GIF 当前帧图片
     override func display(_ layer: CALayer) {
         super.display(layer)
@@ -219,7 +219,7 @@ class GIFImageView: UIImageView {
             }
         }
     }
-
+    
     /// 初始化定时器
     func setupDisplayLink() {
         displayLink?.invalidate()
@@ -227,7 +227,7 @@ class GIFImageView: UIImageView {
         self.displayLink!.add(to: RunLoop.main, forMode: RunLoop.Mode.common)
         self.displayLink!.isPaused = true
     }
-
+    
     /// 动态改变图片动画帧
     @objc fileprivate func changeKeyFrame() {
         if superview == nil {

@@ -24,6 +24,10 @@ public final class SelectBoxView: UIControl {
             }
         }
     }
+    
+    /*
+        当, isSelected 变化的时候, 触发整体的 View 的变化.
+     */
     public override var isSelected: Bool {
         didSet {
             if !isSelected {
@@ -32,15 +36,19 @@ public final class SelectBoxView: UIControl {
             updateLayers()
         }
     }
+    
     var textSize: CGSize = CGSize.zero
+    
     lazy var config: SelectBoxConfiguration = {
         return SelectBoxConfiguration.init()
     }()
+    
     lazy var backgroundLayer: CAShapeLayer = {
         let backgroundLayer = CAShapeLayer.init()
         backgroundLayer.contentsScale = UIScreen.main.scale
         return backgroundLayer
     }()
+    
     lazy var textLayer: CATextLayer = {
         let textLayer = CATextLayer.init()
         textLayer.contentsScale = UIScreen.main.scale
@@ -48,6 +56,7 @@ public final class SelectBoxView: UIControl {
         textLayer.isWrapped = true
         return textLayer
     }()
+    
     lazy var tickLayer: CAShapeLayer = {
         let tickLayer = CAShapeLayer.init()
         tickLayer.lineJoin = .round
@@ -60,11 +69,12 @@ public final class SelectBoxView: UIControl {
         layer.addSublayer(backgroundLayer)
         layer.addSublayer(textLayer)
         layer.addSublayer(tickLayer)
+        self.addBorderLine()
     }
     
+    // 画圆.
     private func backgroundPath() -> CGPath {
-        let strokePath = UIBezierPath(
-            roundedRect: CGRect(
+        let strokePath = UIBezierPath( roundedRect: CGRect(
                 x: 0,
                 y: 0,
                 width: width,
@@ -74,6 +84,7 @@ public final class SelectBoxView: UIControl {
         )
         return strokePath.cgPath
     }
+    
     private func drawBackgroundLayer() {
         backgroundLayer.path = backgroundPath()
         if isSelected {
@@ -91,11 +102,13 @@ public final class SelectBoxView: UIControl {
             config.borderColor.cgColor
         }
     }
+    
     private func drawTextLayer() {
         if config.style != .number {
             textLayer.isHidden = true
             return
         }
+        
         if !isSelected {
             textLayer.string = nil
         }
@@ -110,6 +123,7 @@ public final class SelectBoxView: UIControl {
             textHeight = textSize.height
             textWidth = textSize.width
         }
+        
         textLayer.frame = CGRect(
             x: (width - textWidth) * 0.5,
             y: (height - textHeight) * 0.5,
@@ -121,6 +135,7 @@ public final class SelectBoxView: UIControl {
         textLayer.foregroundColor = PhotoManager.isDark ? config.titleDarkColor.cgColor : config.titleColor.cgColor
     }
     
+    // 画对钩.
     private func tickPath() -> CGPath {
         let tickPath = UIBezierPath.init()
         tickPath.move(to: CGPoint(x: scale(8), y: height * 0.5 + scale(1)))
@@ -128,6 +143,7 @@ public final class SelectBoxView: UIControl {
         tickPath.addLine(to: CGPoint(x: width - scale(7), y: scale(9)))
         return tickPath.cgPath
     }
+    
     private func drawTickLayer() {
         if config.style != .tick {
             tickLayer.isHidden = true
@@ -158,6 +174,7 @@ public final class SelectBoxView: UIControl {
         return numerator / 30 * height
     }
     
+    // 扩大点击区域. 
     public override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
         if isUserInteractionEnabled && CGRect(x: -15, y: -15, width: width + 30, height: height + 30).contains(point) {
             return self

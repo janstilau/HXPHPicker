@@ -51,6 +51,9 @@ final class ProgressHUD: UIView {
     }()
     
     private lazy var indicatorView: UIView = {
+        /*
+            根据 Type 的不同, 创建相应的 View 添加到指示视图里面.
+         */
         if indicatorType == .circle {
             let indicatorView = ProgressIndefiniteView(
                 frame: CGRect(
@@ -83,6 +86,7 @@ final class ProgressHUD: UIView {
     }()
     
     private lazy var imageView: ProgressImageView = {
+        // ProgressImageView 是一个特殊的 View. 里面的显示视图, 都是自己画出来的.
         let imageView = ProgressImageView(
             frame: CGRect(
                 x: 0, y: 0,
@@ -234,6 +238,9 @@ final class ProgressHUD: UIView {
         updateFrame()
     }
     
+    /*
+        具体的 Location 的逻辑, 都集中到这里.
+     */
     private func updateFrame() {
         if text != nil {
             var textWidth = text!.width(ofFont: textLb.font, maxHeight: 15)
@@ -389,6 +396,7 @@ final class ProgressHUD: UIView {
             afterDelay: delayHide
         )
     }
+    
     class func showWarning(
         addedTo view: UIView?,
         text: String?,
@@ -407,6 +415,7 @@ final class ProgressHUD: UIView {
         )
         view.addSubview(progressView)
     }
+    
     class func showSuccess(
         addedTo view: UIView?,
         text: String?,

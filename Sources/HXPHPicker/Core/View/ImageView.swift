@@ -11,46 +11,55 @@ import UIKit
 import Kingfisher
 #endif
 
+/*
+    对于 ImageView 的封装. 主要是条件编译.
+ */
 final class ImageView: UIView {
     lazy var imageView: UIImageView = {
         var imageView: UIImageView
-        #if canImport(Kingfisher)
+#if canImport(Kingfisher)
         imageView = AnimatedImageView.init()
-        #else
+#else
         imageView = GIFImageView.init()
-        #endif
+#endif
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
         return imageView
     }()
+    
     var image: UIImage? {
         didSet {
             setImage(image, animated: false)
         }
     }
     
-    #if canImport(Kingfisher)
+#if canImport(Kingfisher)
     var my: AnimatedImageView {
         imageView as! AnimatedImageView
     }
-    #else
+#else
     var my: GIFImageView {
         imageView as! GIFImageView
     }
-    #endif
+#endif
     
     init() {
         super.init(frame: .zero)
         addSubview(imageView)
     }
+    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
     override func layoutSubviews() {
         super.layoutSubviews()
         imageView.frame = bounds
     }
     
+    /*
+        图片设置的时候, 增加一个渐隐动画.
+     */
     func setImage(_ image: UIImage?, animated: Bool) {
         if let image = image {
             my.image = image
@@ -65,38 +74,38 @@ final class ImageView: UIView {
     }
     
     func setImage(_ img: UIImage) {
-        #if canImport(Kingfisher)
+#if canImport(Kingfisher)
         let image = DefaultImageProcessor.default.process(item: .image(img), options: .init([]))
         my.image = image
-        #else
+#else
         my.image = img
-        #endif
+#endif
     }
     
     func setImageData(_ imageData: Data) {
-        #if canImport(Kingfisher)
+#if canImport(Kingfisher)
         let image = DefaultImageProcessor.default.process(item: .data(imageData), options: .init([]))
         my.image = image
-        #else
+#else
         let image = GIFImage.init(data: imageData)
         my.gifImage = image
-        #endif
+#endif
     }
     
     func startAnimatedImage() {
-        #if canImport(Kingfisher)
+#if canImport(Kingfisher)
         my.startAnimating()
-        #else
+#else
         my.setupDisplayLink()
-        #endif
+#endif
     }
     
     func stopAnimatedImage() {
-        #if canImport(Kingfisher)
+#if canImport(Kingfisher)
         my.stopAnimating()
-        #else
+#else
         my.displayLink?.invalidate()
         my.gifImage = nil
-        #endif
+#endif
     }
 }

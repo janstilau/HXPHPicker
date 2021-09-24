@@ -11,7 +11,7 @@ import AVKit
 
 /*
     这个 View 子类化, 唯一的目的就是, 外界可以直接操作 View 了.
-    而 View 的 Frame 操作, autolayout 操作, 要比 Layer 方便的太多了. 
+    而 View 的 Frame 操作, autolayout 操作, 要比 Layer 方便的太多了.
  */
 class VideoPlayerView: UIView {
     
