@@ -24,7 +24,7 @@ open class PhotoAsset: Equatable {
     /// 媒体子类型
     public var mediaSubType: MediaSubType = .image
     
-    #if HXPICKER_ENABLE_EDITOR
+#if HXPICKER_ENABLE_EDITOR
     /// 图片编辑数据
     public var photoEdit: PhotoEditResult? { didSet { pFileSize = nil } }
     
@@ -33,33 +33,33 @@ open class PhotoAsset: Equatable {
     
     var initialPhotoEdit: PhotoEditResult?
     var initialVideoEdit: VideoEditResult?
-    #endif
+#endif
     
     /// 原图
     /// 如果为网络图片时，获取的是缩略地址的图片，也可能为nil
     /// 如果为网络视频，则为nil
     public var originalImage: UIImage? { getOriginalImage() }
-
+    
     /// 图片/视频文件大小
     public var fileSize: Int { getFileSize() }
     
     /// 视频时长 格式：00:00
     public var videoTime: String? {
-        #if HXPICKER_ENABLE_EDITOR
+#if HXPICKER_ENABLE_EDITOR
         if let videoEdit = videoEdit {
             return videoEdit.videoTime
         }
-        #endif
+#endif
         return pVideoTime
     }
     
     /// 视频时长 秒
     public var videoDuration: TimeInterval {
-        #if HXPICKER_ENABLE_EDITOR
+#if HXPICKER_ENABLE_EDITOR
         if let videoEdit = videoEdit {
             return videoEdit.videoDuration
         }
-        #endif
+#endif
         return pVideoDuration
     }
     
@@ -130,7 +130,7 @@ open class PhotoAsset: Equatable {
     /// 本地/网络Asset的唯一标识符
     public private(set) lazy var localAssetIdentifier: String = UUID().uuidString
     
-    #if canImport(Kingfisher)
+#if canImport(Kingfisher)
     /// 初始化网络图片
     /// - Parameter networkImageAsset: 对应网络图片的 NetworkImageAsset
     public init(networkImageAsset: NetworkImageAsset) {
@@ -142,7 +142,7 @@ open class PhotoAsset: Equatable {
     public var networkImageAsset: NetworkImageAsset?
     
     var localImageType: DonwloadURLType = .thumbnail
-    #endif
+#endif
     
     /// 网络视频
     public var networkVideoAsset: NetworkVideoAsset?
@@ -185,7 +185,7 @@ open class PhotoAsset: Equatable {
 
 // MARK: Self-use
 extension PhotoAsset {
-     
+    
     func copyCamera() -> PhotoAsset {
         var photoAsset: PhotoAsset
         if mediaType == .photo {
@@ -215,11 +215,11 @@ extension PhotoAsset {
         pVideoTime = PhotoTools.transformVideoDurationToString(duration: duration)
     }
     func getOriginalImage() -> UIImage? {
-        #if HXPICKER_ENABLE_EDITOR
+#if HXPICKER_ENABLE_EDITOR
         if photoEdit != nil || videoEdit != nil {
             return getEditedImage()
         }
-        #endif
+#endif
         guard let phAsset = phAsset else {
             if mediaType == .photo {
                 if let image = localImageAsset?.image {
@@ -261,14 +261,14 @@ extension PhotoAsset {
         return originalImage
     }
     func getImageSize() -> CGSize {
-        #if HXPICKER_ENABLE_EDITOR
+#if HXPICKER_ENABLE_EDITOR
         if let photoEdit = photoEdit {
             return photoEdit.editedImage.size
         }
         if let videoEdit = videoEdit {
             return videoEdit.coverImage?.size ?? CGSize(width: 200, height: 200)
         }
-        #endif
+#endif
         let size: CGSize
         if let phAsset = phAsset {
             if phAsset.pixelWidth == 0 || phAsset.pixelHeight == 0 {
@@ -308,15 +308,15 @@ extension PhotoAsset {
                     size = CGSize(width: 200, height: 200)
                 }
             }else {
-                #if canImport(Kingfisher)
+#if canImport(Kingfisher)
                 if let networkImageSize = networkImageAsset?.imageSize, !networkImageSize.equalTo(.zero) {
                     size = networkImageSize
                 } else {
                     size = CGSize(width: 200, height: 200)
                 }
-                #else
+#else
                 size = CGSize(width: 200, height: 200)
-                #endif
+#endif
             }
         }
         return size
@@ -365,7 +365,7 @@ extension PhotoAsset {
         filterEditor: Bool = false,
         resultHandler: @escaping AssetURLCompletion
     ) {
-        #if HXPICKER_ENABLE_EDITOR
+#if HXPICKER_ENABLE_EDITOR
         if (photoEdit != nil || videoEdit != nil) && !filterEditor {
             getEditedImageURL(
                 toFile: fileURL,
@@ -373,7 +373,7 @@ extension PhotoAsset {
             )
             return
         }
-        #endif
+#endif
         guard let phAsset = phAsset else {
             resultHandler(
                 .failure(
@@ -404,7 +404,7 @@ extension PhotoAsset {
         let isGif = phAsset.isImageAnimated
         AssetManager.requestImageURL(
             for: phAsset,
-            toFile: imageFileURL
+               toFile: imageFileURL
         ) { (result) in
             switch result {
             case .success(let imageURL):
@@ -447,7 +447,7 @@ extension PhotoAsset {
         exportSession: ((AVAssetExportSession) -> Void)? = nil,
         resultHandler: @escaping AssetURLCompletion
     ) {
-        #if HXPICKER_ENABLE_EDITOR
+#if HXPICKER_ENABLE_EDITOR
         if let videoEdit = videoEdit {
             if let fileURL = fileURL {
                 if PhotoTools.copyFile(at: videoEdit.editedURL, to: fileURL) {
@@ -460,7 +460,7 @@ extension PhotoAsset {
             resultHandler(.success(.init(url: videoEdit.editedURL, urlType: .local, mediaType: .video)))
             return
         }
-        #endif
+#endif
         guard let phAsset = phAsset else {
             resultHandler(.failure(.invalidPHAsset))
             return

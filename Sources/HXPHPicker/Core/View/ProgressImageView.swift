@@ -7,6 +7,10 @@
 
 import UIKit
 
+/*
+    一个特殊的, 进行不同展示的 View
+    上面的所有的展示, 都是自己画出来的.
+ */
 final class ProgressImageView: UIView {
     
     lazy var circleLayer: CAShapeLayer = {
@@ -41,13 +45,16 @@ final class ProgressImageView: UIView {
         drawCircle()
         drawExclamationPoint()
     }
+    
     init(tickFrame: CGRect) {
         super.init(frame: tickFrame)
         layer.addSublayer(tickLayer)
         drawTickLayer()
     }
+    
     func startAnimation() {
     }
+    
     private func drawCircle() {
         let circlePath = UIBezierPath.init()
         circlePath.addArc(
@@ -64,12 +71,6 @@ final class ProgressImageView: UIView {
         circleLayer.lineWidth = 1.5
         circleLayer.strokeColor = UIColor.white.cgColor
         circleLayer.fillColor = UIColor.clear.cgColor
-        
-//        let circleAimation = CABasicAnimation.init(keyPath: "strokeEnd")
-//        circleAimation.fromValue = 0
-//        circleAimation.toValue = 1
-//        circleAimation.duration = 0.5
-//        circleLayer.add(circleAimation, forKey: "")
     }
     
     private func drawExclamationPoint() {
@@ -80,12 +81,6 @@ final class ProgressImageView: UIView {
         lineLayer.lineWidth = 2
         lineLayer.strokeColor = UIColor.white.cgColor
         lineLayer.fillColor = UIColor.white.cgColor
-        
-//        let lineAimation = CABasicAnimation.init(keyPath: "strokeEnd")
-//        lineAimation.fromValue = 0
-//        lineAimation.toValue = 1
-//        lineAimation.duration = 0.3
-//        lineLayer.add(lineAimation, forKey: "")
         
         let pointPath = UIBezierPath.init()
         pointPath.addArc(
@@ -102,11 +97,6 @@ final class ProgressImageView: UIView {
         pointLayer.lineWidth = 1
         pointLayer.strokeColor = UIColor.white.cgColor
         pointLayer.fillColor = UIColor.white.cgColor
-        
-//        let pointAimation = CAKeyframeAnimation.init(keyPath: "transform.scale")
-//        pointAimation.values = [0, 1.2, 0.8, 1.1, 0.9 , 1]
-//        pointAimation.duration = 0.5
-//        pointLayer.add(pointAimation, forKey: "")
     }
     private func drawTickLayer() {
         let tickPath = UIBezierPath.init()

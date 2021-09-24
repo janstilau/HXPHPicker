@@ -78,17 +78,17 @@ public final class SelectBoxView: UIControl {
         backgroundLayer.path = backgroundPath()
         if isSelected {
             backgroundLayer.fillColor = PhotoManager.isDark ?
-                config.selectedBackgroudDarkColor.cgColor :
-                config.selectedBackgroundColor.cgColor
+            config.selectedBackgroudDarkColor.cgColor :
+            config.selectedBackgroundColor.cgColor
             backgroundLayer.lineWidth = 0
         }else {
             backgroundLayer.lineWidth = config.borderWidth
             backgroundLayer.fillColor = PhotoManager.isDark ?
-                config.darkBackgroundColor.cgColor :
-                config.backgroundColor.cgColor
+            config.darkBackgroundColor.cgColor :
+            config.backgroundColor.cgColor
             backgroundLayer.strokeColor = PhotoManager.isDark ?
-                config.borderDarkColor.cgColor :
-                config.borderColor.cgColor
+            config.borderDarkColor.cgColor :
+            config.borderColor.cgColor
         }
     }
     private func drawTextLayer() {

@@ -71,7 +71,7 @@ public extension PickerResult {
     /// - Parameters:
     ///   - exportPreset: 视频分辨率，默认ratio_640x480
     ///   - videoQuality: 视频质量[0-10]，默认4
-    ///   - exportSession: 导出视频时对应的 AVAssetExportSession   
+    ///   - exportSession: 导出视频时对应的 AVAssetExportSession
     ///   - videoURLHandler: 每一次获取视频地址都会触发
     ///   - completionHandler: 全部获取完成(失败的不会添加)
     func getVideoURL(
@@ -173,12 +173,12 @@ public extension PickerResult {
                     }else if options.contains([.video]) {
                         mediatype = .video
                     }
-                    #if HXPICKER_ENABLE_EDITOR
+#if HXPICKER_ENABLE_EDITOR
                     if photoAsset.mediaSubType == .livePhoto &&
                         photoAsset.photoEdit != nil {
                         mediatype = .photo
                     }
-                    #endif
+#endif
                     let resultHandler: PhotoAsset.AssetURLCompletion = { result in
                         switch result {
                         case .success(let respone):
