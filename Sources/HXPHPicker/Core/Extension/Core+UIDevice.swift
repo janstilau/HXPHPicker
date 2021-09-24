@@ -9,6 +9,11 @@
 import UIKit
 
 extension UIDevice {
+    
+    class var statusBarOrientation: UIInterfaceOrientation {
+        UIApplication.shared.statusBarOrientation
+    }
+    
     class var isPortrait: Bool {
         if isPad {
             return true
@@ -19,9 +24,7 @@ extension UIDevice {
         }
         return true
     }
-    class var statusBarOrientation: UIInterfaceOrientation {
-        UIApplication.shared.statusBarOrientation
-    }
+    
     class var navigationBarHeight: CGFloat {
         if isPad {
             if #available(iOS 12, *) {
@@ -30,9 +33,11 @@ extension UIDevice {
         }
         return statusBarHeight + 44
     }
+    
     class var generalStatusBarHeight: CGFloat {
         isAllIPhoneX ? 44 : 20
     }
+    
     class var statusBarHeight: CGFloat {
         let statusBarHeight: CGFloat
         let window = UIApplication.shared.windows.first
@@ -43,12 +48,20 @@ extension UIDevice {
         }
         return statusBarHeight
     }
+    
+    /*
+        将, 尺寸值的管理, 统一在了一个地方.
+        其实这就是一个全局变量.
+        但是这个全局变量的值, 是不可变的, 是有着明确的含义的. 所以, 这样写是没有问题.
+        全局变量不可变, 是使用全局变量的非常好的一个使用方式.
+     */
     class var topMargin: CGFloat {
         if isAllIPhoneX {
             return statusBarHeight
         }
         return 0
     }
+    
     class var leftMargin: CGFloat {
         if isAllIPhoneX {
             if !isPortrait {
@@ -57,6 +70,7 @@ extension UIDevice {
         }
         return 0
     }
+    
     class var rightMargin: CGFloat {
         if isAllIPhoneX {
             if !isPortrait {
@@ -65,6 +79,7 @@ extension UIDevice {
         }
         return 0
     }
+    
     class var bottomMargin: CGFloat {
         if isAllIPhoneX {
             if isPortrait {
@@ -75,21 +90,25 @@ extension UIDevice {
         }
         return 0
     }
+    
     class var isPad: Bool {
         UI_USER_INTERFACE_IDIOM() == .pad
     }
+    
+    /*
+        该作者, 判断各个机型, 是根据屏幕尺寸相等决断的.
+     */
     class var isAllIPhoneX: Bool {
         (isIPhoneX ||
-            isIPhoneXR ||
-            isIPhoneXsMax ||
-            isIPhoneXsMax ||
-            isIPhoneTwelveMini ||
-            isIPhoneTwelve || isIPhoneTwelveProMax
+         isIPhoneXR ||
+         isIPhoneXsMax ||
+         isIPhoneTwelveMini ||
+         isIPhoneTwelve || isIPhoneTwelveProMax
         )
     }
     class var isIPhoneX: Bool {
         if  UIScreen.instancesRespond(to: Selector(("currentMode"))) == true &&
-            isPad == false {
+                isPad == false {
             if __CGSizeEqualToSize(CGSize(width: 1125, height: 2436), UIScreen.main.currentMode!.size) {
                 return true
             }
@@ -98,7 +117,7 @@ extension UIDevice {
     }
     class var isIPhoneXR: Bool {
         if  UIScreen.instancesRespond(to: Selector(("currentMode"))) == true &&
-            isPad == false {
+                isPad == false {
             if __CGSizeEqualToSize(CGSize(width: 828, height: 1792), UIScreen.main.currentMode!.size) {
                 return true
             }
@@ -107,7 +126,7 @@ extension UIDevice {
     }
     class var isIPhoneXsMax: Bool {
         if  UIScreen.instancesRespond(to: Selector(("currentMode"))) == true &&
-            isPad == false {
+                isPad == false {
             if __CGSizeEqualToSize(CGSize(width: 1242, height: 2688), UIScreen.main.currentMode!.size) {
                 return true
             }
@@ -116,7 +135,7 @@ extension UIDevice {
     }
     class var isIPhoneTwelveMini: Bool {
         if  UIScreen.instancesRespond(to: Selector(("currentMode"))) == true &&
-            isPad == false {
+                isPad == false {
             if __CGSizeEqualToSize(CGSize(width: 1080, height: 2340), UIScreen.main.currentMode!.size) {
                 return true
             }
@@ -125,7 +144,7 @@ extension UIDevice {
     }
     class var isIPhoneTwelve: Bool {
         if  UIScreen.instancesRespond(to: Selector(("currentMode"))) == true &&
-            isPad == false {
+                isPad == false {
             if __CGSizeEqualToSize(CGSize(width: 1170, height: 2532), UIScreen.main.currentMode!.size) {
                 return true
             }
@@ -134,7 +153,7 @@ extension UIDevice {
     }
     class var isIPhoneTwelveProMax: Bool {
         if  UIScreen.instancesRespond(to: Selector(("currentMode"))) == true &&
-            isPad == false {
+                isPad == false {
             if __CGSizeEqualToSize(CGSize(width: 1284, height: 2778), UIScreen.main.currentMode!.size) {
                 return true
             }
@@ -150,8 +169,8 @@ extension UIDevice {
             .children.reduce("") { identifier, element in
                 guard let value = element.value as? Int8,
                       value != 0 else {
-                    return identifier
-                }
+                          return identifier
+                      }
                 return identifier + String(UnicodeScalar(UInt8(value)))
             }
         switch identifier {

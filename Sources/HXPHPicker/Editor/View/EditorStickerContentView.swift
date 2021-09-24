@@ -122,13 +122,13 @@ extension EditorStickerItem: Codable {
         var image = try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(imageData) as! UIImage
         if let data = try container.decodeIfPresent(Data.self, forKey: .imageData) {
             self.imageData = data
-            #if canImport(Kingfisher)
+#if canImport(Kingfisher)
             if data.kf.imageFormat == .GIF {
                 if let gifImage = DefaultImageProcessor.default.process(item: .data(imageData), options: .init([])) {
                     image = gifImage
                 }
             }
-            #endif
+#endif
         }else {
             self.imageData = nil
         }
@@ -149,11 +149,11 @@ extension EditorStickerItem: Codable {
         if let data = imageData {
             try container.encodeIfPresent(data, forKey: .imageData)
         }else {
-            #if canImport(Kingfisher)
+#if canImport(Kingfisher)
             if let data = image.kf.gifRepresentation() {
                 try container.encodeIfPresent(data, forKey: .imageData)
             }
-            #endif
+#endif
         }
         try container.encodeIfPresent(text, forKey: .text)
         try container.encodeIfPresent(music, forKey: .music)
@@ -224,7 +224,7 @@ class EditorStickerContentView: UIView {
                         timer.invalidate()
                         self?.timer = nil
                     }
-            })
+                })
             RunLoop.current.add(timer, forMode: .common)
             self.timer = timer
         }else {

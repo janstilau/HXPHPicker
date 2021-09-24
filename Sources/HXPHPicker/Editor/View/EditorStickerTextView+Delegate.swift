@@ -44,5 +44,4 @@ extension EditorStickerTextView: NSLayoutManagerDelegate {
     }
 }
 
-class EditorStickerTextLayer: CAShapeLayer {
-}
+class EditorStickerTextLayer: CAShapeLayer { }

@@ -15,6 +15,7 @@ extension EditorStickerTextView: UICollectionViewDataSource,
     ) -> Int {
         config.colors.count
     }
+    
     func collectionView(
         _ collectionView: UICollectionView,
         cellForItemAt indexPath: IndexPath
@@ -26,11 +27,16 @@ extension EditorStickerTextView: UICollectionViewDataSource,
         cell.colorHex = config.colors[indexPath.item]
         return cell
     }
+    
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        if currentSelectedIndex == indexPath.item {
-            return
-        }
         collectionView.deselectItem(at: IndexPath(item: currentSelectedIndex, section: 0), animated: true)
+        if currentSelectedIndex == indexPath.item { return }
+        
+        /*
+            如果, 有背景色, 那么这里选择的就是背景色.
+            文字颜色只有黑白两种.
+            如果, 没有背景色, 那么这里选择的就是文字颜色.
+         */
         let color = config.colors[indexPath.item].color
         currentSelectedColor = color
         currentSelectedIndex = indexPath.item
@@ -41,7 +47,7 @@ extension EditorStickerTextView: UICollectionViewDataSource,
             }else {
                 changeTextColor(color: .white)
             }
-        }else {
+        } else {
             changeTextColor(color: color)
         }
     }

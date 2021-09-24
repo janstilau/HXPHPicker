@@ -95,7 +95,7 @@ extension PhotoTools {
     }
     
     public static func defaultColors() -> [String] {
-        ["#ffffff", "#2B2B2B", "#FA5150", "#FEC200", "#07C160", "#10ADFF", "#6467EF"]
+        ["#ffffff", "#2B2B2B", "#FA5150", "#FEC200", "#07C160", "#10ADFF", "#6467EF", "#000000", "#ff0000", "#00ff00", "0000ff"]
     }
     static func defaultMusicInfos() -> [VideoEditorMusicInfo] {
         var infos: [VideoEditorMusicInfo] = []
