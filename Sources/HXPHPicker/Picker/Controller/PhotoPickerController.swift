@@ -107,10 +107,7 @@ open class PhotoPickerController: UINavigationController {
     }
     /// 选择资源初始化
     /// - Parameter config: 相关配置
-    public init(
-        config: PickerConfiguration,
-        delegate: PhotoPickerControllerDelegate? = nil
-    ) {
+    public init( config: PickerConfiguration, delegate: PhotoPickerControllerDelegate? = nil ) {
         PhotoManager.shared.appearanceStyle = config.appearanceStyle
         PhotoManager.shared.createLanguageBundle(languageType: config.languageType)
         self.config = config
@@ -129,6 +126,11 @@ open class PhotoPickerController: UINavigationController {
         }else {
             photoVC = PhotoPickerViewController(config: config.photoList)
         }
+        
+        /*
+            本身, 这是一个 NavigationController.
+            在进入之后, 会根据 config 的不同, 进行 RootVC 的设置.
+         */
         self.viewControllers = [photoVC]
     }
     /// 选择资源初始化

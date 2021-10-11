@@ -11,20 +11,28 @@ import MobileCoreServices
 import AVFoundation
 import Photos
 
+/*
+    这个是照片选择器的 VC.
+ */
 public class PhotoPickerViewController: BaseViewController {
+    
     let config: PhotoListConfiguration
+    
     init(config: PhotoListConfiguration) {
         self.config = config
         super.init(nibName: nil, bundle: nil)
     }
+    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
     var assetCollection: PhotoAssetCollection!
     var assets: [PhotoAsset] = []
     var swipeSelectBeganIndexPath: IndexPath?
     var swipeSelectedIndexArray: [Int]?
     var swipeSelectState: SwipeSelectState?
+    
     lazy var collectionViewLayout: UICollectionViewFlowLayout = {
         let collectionViewLayout = UICollectionViewFlowLayout.init()
         let space = config.spacing
@@ -32,8 +40,10 @@ public class PhotoPickerViewController: BaseViewController {
         collectionViewLayout.minimumInteritemSpacing = space
         return collectionViewLayout
     }()
+    
     public lazy var collectionView: UICollectionView = {
         let collectionView = UICollectionView.init(frame: view.bounds, collectionViewLayout: collectionViewLayout)
+        
         collectionView.dataSource = self
         collectionView.delegate = self
         if let customSingleCellClass = config.cell.customSingleCellClass {
@@ -45,14 +55,15 @@ public class PhotoPickerViewController: BaseViewController {
                     )
             )
         }else {
+            /*
+             classForCoder
+             Overridden by subclasses to substitute a class other than its own during coding.
+             */
             collectionView.register(
-                PhotoPickerViewCell.self,
-                forCellWithReuseIdentifier:
-                    NSStringFromClass(
-                        PhotoPickerViewCell.classForCoder()
-                    )
-            )
+                PhotoPickerViewCell.self, forCellWithReuseIdentifier: NSStringFromClass(
+                    PhotoPickerViewCell.classForCoder()))
         }
+        
         if let customSelectableCellClass = config.cell.customSelectableCellClass {
             collectionView.register(
                 customSelectableCellClass,
@@ -70,22 +81,26 @@ public class PhotoPickerViewController: BaseViewController {
                     )
             )
         }
+        
         if config.allowAddCamera {
-            collectionView.register(
-                PickerCamerViewCell.self,
-                forCellWithReuseIdentifier:
-                    NSStringFromClass(PickerCamerViewCell.classForCoder())
-            )
+            collectionView.register( PickerCamerViewCell.self, forCellWithReuseIdentifier: NSStringFromClass(PickerCamerViewCell.classForCoder()) )
         }
+        
         if #available(iOS 11.0, *) {
             collectionView.contentInsetAdjustmentBehavior = .never
         } else {
             // Fallback on earlier versions
             automaticallyAdjustsScrollViewInsets = false
         }
+        collectionView.backgroundColor = .red
         return collectionView
     }()
     
+    /*
+        这是一个特殊的 Cell, 没有必要复用. 所以, 把他当做是一个特殊的 Cell. 然后, 在需要的地方, 返回这个特殊的 Cell.
+     
+        PickerCamerViewCell 是一个很特殊的 Cell, 里面有着对于 Camera 的相机捕捉.
+     */
     var cameraCell: PickerCamerViewCell {
         var indexPath: IndexPath
         if !pickerController!.config.reverseOrder {
@@ -94,11 +109,7 @@ public class PhotoPickerViewController: BaseViewController {
             indexPath = IndexPath(item: 0, section: 0)
         }
         let cell = collectionView.dequeueReusableCell(
-            withReuseIdentifier: NSStringFromClass(
-                PickerCamerViewCell.classForCoder()
-            ),
-            for: indexPath
-        ) as! PickerCamerViewCell
+            withReuseIdentifier: NSStringFromClass( PickerCamerViewCell.classForCoder() ), for: indexPath) as! PickerCamerViewCell
         cell.config = config.cameraCell
         return cell
     }
@@ -118,9 +129,9 @@ public class PhotoPickerViewController: BaseViewController {
     var videoLoadSingleCell = false
     var needOffset: Bool {
         pickerController != nil &&
-            pickerController!.config.reverseOrder &&
-            config.allowAddCamera &&
-            canAddCamera
+        pickerController!.config.reverseOrder &&
+        config.allowAddCamera &&
+        canAddCamera
     }
     lazy var titleLabel: UILabel = {
         let titleLabel = UILabel.init()
@@ -222,8 +233,8 @@ public class PhotoPickerViewController: BaseViewController {
         }
         if isMultipleSelect {
             let promptHeight: CGFloat = (AssetManager.authorizationStatusIsLimited() &&
-                                            config.bottomView.showPrompt &&
-                                            allowLoadPhotoLibrary) ? 70 : 0
+                                         config.bottomView.showPrompt &&
+                                         allowLoadPhotoLibrary) ? 70 : 0
             let bottomHeight: CGFloat = 50 + UIDevice.bottomMargin + promptHeight
             bottomView.frame = CGRect(x: 0, y: view.height - bottomHeight, width: view.width, height: bottomHeight)
             collectionView.contentInset = UIEdgeInsets(
@@ -338,7 +349,7 @@ extension PhotoPickerViewController {
                 cancelItem = UIBarButtonItem(
                     image: UIImage.image(
                         for: PhotoManager.isDark ?
-                            config.cancelDarkImageName :
+                           config.cancelDarkImageName :
                             config.cancelImageName
                     ),
                     style: .done,
@@ -374,8 +385,8 @@ extension PhotoPickerViewController {
         view.backgroundColor = isDark ? config.backgroundDarkColor : config.backgroundColor
         collectionView.backgroundColor = isDark ? config.backgroundDarkColor : config.backgroundColor
         let titleColor = isDark ?
-            picker.config.navigationTitleDarkColor :
-            picker.config.navigationTitleColor
+        picker.config.navigationTitleDarkColor :
+        picker.config.navigationTitleColor
         if picker.config.albumShowMode == .popup {
             titleView.titleColor = titleColor
         }else {
@@ -566,7 +577,7 @@ extension PhotoPickerViewController {
                     picker.config.maximumSelectedPhotoFileSize == 0 {
                     cell.canSelect = picker.canSelectAsset(
                         for: photoAsset,
-                        showHUD: false
+                           showHUD: false
                     )
                 }
                 cell.updateSelectedState(

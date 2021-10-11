@@ -8,6 +8,10 @@
 import Foundation
 import AVFoundation
 
+/*
+    当, 进入到 CarmerViewController 的时候, 就是使用这里的 Session 了.
+ */
+
 class CameraManager: NSObject {
     let config: CameraConfiguration
     
@@ -616,6 +620,9 @@ extension CameraManager: AVCaptureVideoDataOutputSampleBufferDelegate {
         didOutput sampleBuffer: CMSampleBuffer,
         from connection: AVCaptureConnection
     ) {
+        /*
+            在这里, 将 VideoFrame 不断的进行输入, 然后存储到 cameraPreviewImage 中去. 
+         */
         if let image = PhotoTools.createImage(from: sampleBuffer)?.rotation(to: .right) {
             PhotoManager.shared.cameraPreviewImage = image
         }

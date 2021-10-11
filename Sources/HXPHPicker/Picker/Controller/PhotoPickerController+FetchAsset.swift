@@ -40,7 +40,7 @@ extension PhotoPickerController {
         }
         PhotoManager.shared.fetchCameraAssetCollection(
             for: selectOptions,
-            options: options
+               options: options
         ) { [weak self] (assetCollection) in
             guard let self = self else { return }
             if assetCollection.count == 0 {
@@ -81,11 +81,11 @@ extension PhotoPickerController {
             }
             var firstSetImage = true
             for phAsset in self.selectedAssetArray where
-                phAsset.phAsset == nil {
+            phAsset.phAsset == nil {
                 let inLocal = self.localAssetArray.contains(
                     where: { (localAsset) -> Bool in
-                    return localAsset.isEqual(phAsset)
-                })
+                        return localAsset.isEqual(phAsset)
+                    })
                 let inLocalCamera = self.localCameraAssetArray.contains(
                     where: { (localAsset) -> Bool in
                         return localAsset.isEqual(phAsset)
@@ -110,7 +110,7 @@ extension PhotoPickerController {
             }
             PhotoManager.shared.fetchAssetCollections(
                 for: self.options,
-                showEmptyCollection: false
+                   showEmptyCollection: false
             ) { [weak self] (assetCollection, isCameraRoll) in
                 guard let self = self else { return }
                 if assetCollection != nil {
@@ -180,23 +180,23 @@ extension PhotoPickerController {
                     let inLocal = self
                         .localAssetArray
                         .contains { (localAsset) -> Bool in
-                        if localAsset.isEqual(photoAsset) {
-                            self.localAssetArray[self.localAssetArray.firstIndex(of: localAsset)!] = photoAsset
-                            return true
+                            if localAsset.isEqual(photoAsset) {
+                                self.localAssetArray[self.localAssetArray.firstIndex(of: localAsset)!] = photoAsset
+                                return true
+                            }
+                            return false
                         }
-                        return false
-                    }
                     let inLocalCamera = self
                         .localCameraAssetArray
                         .contains(where: { (localAsset) -> Bool in
-                        if localAsset.isEqual(photoAsset) {
-                            self.localCameraAssetArray[
-                                self.localCameraAssetArray.firstIndex(of: localAsset)!
-                            ] = photoAsset
-                            return true
-                        }
-                        return false
-                    })
+                            if localAsset.isEqual(photoAsset) {
+                                self.localCameraAssetArray[
+                                    self.localCameraAssetArray.firstIndex(of: localAsset)!
+                                ] = photoAsset
+                                return true
+                            }
+                            return false
+                        })
                     if !inLocal && !inLocalCamera {
                         if photoAsset.localIndex > localIndex {
                             localIndex = photoAsset.localIndex
@@ -219,41 +219,41 @@ extension PhotoPickerController {
             var lastAsset: PhotoAsset?
             assetCollection?.enumerateAssets(
                 usingBlock: { [weak self] (photoAsset) in
-                guard let self = self else { return }
-                if self.selectOptions.contains(.gifPhoto) {
-                    if photoAsset.phAsset!.isImageAnimated {
-                        photoAsset.mediaSubType = .imageAnimated
+                    guard let self = self else { return }
+                    if self.selectOptions.contains(.gifPhoto) {
+                        if photoAsset.phAsset!.isImageAnimated {
+                            photoAsset.mediaSubType = .imageAnimated
+                        }
                     }
-                }
-                if self.config.selectOptions.contains(.livePhoto) {
-                    if photoAsset.phAsset!.isLivePhoto {
-                        photoAsset.mediaSubType = .livePhoto
+                    if self.config.selectOptions.contains(.livePhoto) {
+                        if photoAsset.phAsset!.isLivePhoto {
+                            photoAsset.mediaSubType = .livePhoto
+                        }
                     }
-                }
-                
-                switch photoAsset.mediaType {
-                case .photo:
-                    if !self.selectOptions.isPhoto {
-                        return
+                    
+                    switch photoAsset.mediaType {
+                    case .photo:
+                        if !self.selectOptions.isPhoto {
+                            return
+                        }
+                    case .video:
+                        if !self.selectOptions.isVideo {
+                            return
+                        }
                     }
-                case .video:
-                    if !self.selectOptions.isVideo {
-                        return
+                    var asset = photoAsset
+                    if selectedAssets.contains(asset.phAsset!) {
+                        let index = selectedAssets.firstIndex(of: asset.phAsset!)!
+                        let phAsset: PhotoAsset = selectedPhotoAssets[index]
+                        asset = phAsset
+                        lastAsset = phAsset
                     }
-                }
-                var asset = photoAsset
-                if selectedAssets.contains(asset.phAsset!) {
-                    let index = selectedAssets.firstIndex(of: asset.phAsset!)!
-                    let phAsset: PhotoAsset = selectedPhotoAssets[index]
-                    asset = phAsset
-                    lastAsset = phAsset
-                }
-                if self.config.reverseOrder {
-                    photoAssets.insert(asset, at: 0)
-                }else {
-                    photoAssets.append(asset)
-                }
-            })
+                    if self.config.reverseOrder {
+                        photoAssets.insert(asset, at: 0)
+                    }else {
+                        photoAssets.append(asset)
+                    }
+                })
             if self.config.reverseOrder {
                 photoAssets.insert(contentsOf: localAssets, at: 0)
             }else {

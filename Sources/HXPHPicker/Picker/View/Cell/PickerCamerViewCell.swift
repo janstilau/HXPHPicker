@@ -10,6 +10,7 @@ import UIKit
 import AVKit
 
 class PickerCamerViewCell: UICollectionViewCell {
+    
     lazy var captureView: CaptureVideoPreviewView = {
         let view = CaptureVideoPreviewView(isCell: true)
         return view
@@ -35,6 +36,7 @@ class PickerCamerViewCell: UICollectionViewCell {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
     func configProperty() {
         let isCache = PhotoManager.shared.cameraPreviewImage != nil
         if (captureView.previewLayer?.session != nil || isCache) && canPreview() {
@@ -42,7 +44,7 @@ class PickerCamerViewCell: UICollectionViewCell {
         }else {
             imageView.image = UIImage.image(
                 for: PhotoManager.isDark ?
-                    config?.cameraDarkImageName :
+                   config?.cameraDarkImageName :
                     config?.cameraImageName
             )
         }
@@ -52,6 +54,7 @@ class PickerCamerViewCell: UICollectionViewCell {
             requestCameraAccess()
         }
     }
+    
     func canPreview() -> Bool {
         if !UIImagePickerController.isSourceTypeAvailable(.camera) ||
             AssetManager.cameraAuthorizationStatus() == .denied {
@@ -59,6 +62,7 @@ class PickerCamerViewCell: UICollectionViewCell {
         }
         return true
     }
+    
     func requestCameraAccess() {
         if !canPreview() {
             captureView.isHidden = true
@@ -74,6 +78,7 @@ class PickerCamerViewCell: UICollectionViewCell {
             }
         }
     }
+    
     func startSeesion() {
         captureView.startSession { [weak self] isFinished in
             if isFinished {
@@ -83,6 +88,7 @@ class PickerCamerViewCell: UICollectionViewCell {
             }
         }
     }
+    
     override func layoutSubviews() {
         super.layoutSubviews()
         captureView.frame = bounds
@@ -97,6 +103,7 @@ class PickerCamerViewCell: UICollectionViewCell {
             }
         }
     }
+    
     deinit {
         captureView.stopSession()
     }
