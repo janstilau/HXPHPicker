@@ -40,67 +40,67 @@ public extension AssetManager {
         let version = PHVideoRequestOptionsVersion.current
         return requestAVAsset(
             for: asset,
-            version: version,
-            deliveryMode: deliveryMode,
-            isNetworkAccessAllowed: false,
-            progressHandler:
+               version: version,
+               deliveryMode: deliveryMode,
+               isNetworkAccessAllowed: false,
+               progressHandler:
                 progressHandler) { (result) in
-            DispatchQueue.main.async {
-                switch result {
-                case .success(let avResult):
-                    if avResult.avAsset.isPlayable == false {
-                        self.requestAVAsset(
-                            for: asset,
-                            deliveryMode: .highQualityFormat,
-                            iCloudHandler: iCloudHandler,
-                            progressHandler: progressHandler,
-                            resultHandler: resultHandler
-                        )
-                    }else {
-                        resultHandler(.success(avResult))
-                    }
-                case .failure(let error):
-                    switch error.error {
-                    case .needSyncICloud:
-                        let iCloudRequestID = self.requestAVAsset(
-                            for: asset,
-                            version: version,
-                            deliveryMode: deliveryMode,
-                            isNetworkAccessAllowed: true,
-                            progressHandler: progressHandler
-                        ) { (result) in
-                            DispatchQueue.main.async {
-                                switch result {
-                                case .success(let avResult):
-                                    if avResult.avAsset.isPlayable == false {
-                                        self.requestAVAsset(
-                                            for: asset,
-                                            deliveryMode: .highQualityFormat,
-                                            iCloudHandler: iCloudHandler,
-                                            progressHandler: progressHandler,
-                                            resultHandler: resultHandler)
-                                    }else {
-                                        resultHandler(.success(avResult))
-                                    }
-                                case .failure(let error):
-                                    resultHandler(
-                                        .failure(
-                                            .init(
-                                                info: error.info,
-                                                error: .syncICloudFailed(error.info)
+                    DispatchQueue.main.async {
+                        switch result {
+                        case .success(let avResult):
+                            if avResult.avAsset.isPlayable == false {
+                                self.requestAVAsset(
+                                    for: asset,
+                                       deliveryMode: .highQualityFormat,
+                                       iCloudHandler: iCloudHandler,
+                                       progressHandler: progressHandler,
+                                       resultHandler: resultHandler
+                                )
+                            }else {
+                                resultHandler(.success(avResult))
+                            }
+                        case .failure(let error):
+                            switch error.error {
+                            case .needSyncICloud:
+                                let iCloudRequestID = self.requestAVAsset(
+                                    for: asset,
+                                       version: version,
+                                       deliveryMode: deliveryMode,
+                                       isNetworkAccessAllowed: true,
+                                       progressHandler: progressHandler
+                                ) { (result) in
+                                    DispatchQueue.main.async {
+                                        switch result {
+                                        case .success(let avResult):
+                                            if avResult.avAsset.isPlayable == false {
+                                                self.requestAVAsset(
+                                                    for: asset,
+                                                       deliveryMode: .highQualityFormat,
+                                                       iCloudHandler: iCloudHandler,
+                                                       progressHandler: progressHandler,
+                                                       resultHandler: resultHandler)
+                                            }else {
+                                                resultHandler(.success(avResult))
+                                            }
+                                        case .failure(let error):
+                                            resultHandler(
+                                                .failure(
+                                                    .init(
+                                                        info: error.info,
+                                                        error: .syncICloudFailed(error.info)
+                                                    )
+                                                )
                                             )
-                                        )
-                                    )
+                                        }
+                                    }
                                 }
+                                iCloudHandler?(iCloudRequestID)
+                            default:
+                                resultHandler(.failure(error))
                             }
                         }
-                        iCloudHandler?(iCloudRequestID)
-                    default:
-                        resultHandler(.failure(error))
                     }
                 }
-            }
-        }
     }
     
     /// 请求AVAsset，如果资源在iCloud上会自动请求下载iCloud上的资源
@@ -125,8 +125,8 @@ public extension AssetManager {
         options.deliveryMode = deliveryMode
         return requestAVAsset(
             for: asset,
-            options: options,
-            resultHandler: resultHandler
+               options: options,
+               resultHandler: resultHandler
         )
     }
     

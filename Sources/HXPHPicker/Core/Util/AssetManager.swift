@@ -19,6 +19,10 @@ public struct AssetManager {
     ///   - creationDate: 创建时间，默认当前时间
     ///   - location: 位置信息
     ///   - completion: PHAsset为空则保存失败
+    
+    /*
+        拥有默认参数, 以及 para prefix name, 使得在 Swift 里面, 写一个大方法是更加常见的方式.
+     */
     public static func saveSystemAlbum(
         forAsset asset: Any,
         mediaType: PHAssetMediaType,
@@ -27,8 +31,10 @@ public struct AssetManager {
         location: CLLocation? = nil,
         completion: @escaping (PHAsset?) -> Void
     ) {
+        // 通过, PH 类库进行的图片存储, 有着统一的命名.
         var albumName: String?
-        if let customAlbumName = customAlbumName, customAlbumName.count > 0 {
+        if let customAlbumName = customAlbumName,
+            customAlbumName.count > 0 {
             albumName = customAlbumName
         }else {
             if let displayName = Bundle.main.infoDictionary?["CFBundleDisplayName"] as? String {
@@ -37,11 +43,13 @@ public struct AssetManager {
                 albumName = Bundle.main.infoDictionary?[kCFBundleNameKey as String] as? String
             }
         }
+        
         requestAuthorization { (status) in
             if status == .denied || status == .notDetermined || status == .restricted {
                 completion(nil)
                 return
             }
+            
             var placeholder: PHObjectPlaceholder?
             do {
                 try PHPhotoLibrary.shared().performChangesAndWait {
@@ -65,21 +73,17 @@ public struct AssetManager {
                     creationRequest?.location = location
                     placeholder = creationRequest?.placeholderForCreatedAsset
                 }
-            }catch { }
+            } catch { }
+            
             if let placeholder = placeholder,
-               let phAsset = fetchAsset(
-                withLocalIdentifier: placeholder.localIdentifier
-               ) {
+               let phAsset = fetchAsset( withLocalIdentifier: placeholder.localIdentifier ) {
                 completion(phAsset)
-                if let albumName = albumName, let assetCollection = createAssetCollection(for: albumName) {
+                if let albumName = albumName,
+                   let assetCollection = createAssetCollection(for: albumName) {
                     do {
                         try PHPhotoLibrary.shared().performChangesAndWait {
-                            PHAssetCollectionChangeRequest(
-                                for: assetCollection
-                            )?.insertAssets(
-                                [phAsset] as NSFastEnumeration,
-                                at: IndexSet.init(integer: 0)
-                            )
+                            PHAssetCollectionChangeRequest( for: assetCollection )?.insertAssets(
+                                [phAsset] as NSFastEnumeration, at: IndexSet.init(integer: 0) )
                         }
                     }catch {}
                 }
@@ -117,5 +121,8 @@ public struct AssetManager {
         )
     }
     
+    /*
+        所有的, 都是一些静态方法, 所以, AssetManager 里面, 都是一些 Util 的方法封装而已.
+     */
     private init() { }
 }

@@ -25,7 +25,7 @@ public extension AssetManager {
     
     /// 请求imageData，如果资源在iCloud上会自动请求下载iCloud上的资源 注意处理 HEIC格式
     /// - Parameters:
-    ///   - asset: 对应的 PHAsset 数据 
+    ///   - asset: 对应的 PHAsset 数据
     ///   - iCloudHandler: 如果资源在iCloud上，下载之前回先回调出请求ID
     ///   - progressHandler: iCloud下载进度
     ///   - resultHandler: 获取结果
@@ -40,9 +40,9 @@ public extension AssetManager {
     ) -> PHImageRequestID {
         return requestImageData(
             for: asset,
-            version: version,
-            isNetworkAccessAllowed: false,
-            progressHandler: progressHandler
+               version: version,
+               isNetworkAccessAllowed: false,
+               progressHandler: progressHandler
         ) { (result) in
             DispatchQueue.main.async {
                 switch result {
@@ -51,26 +51,26 @@ public extension AssetManager {
                     case .needSyncICloud:
                         let iCloudRequestID = self.requestImageData(
                             for: asset,
-                            version: version,
-                            isNetworkAccessAllowed: true,
-                            progressHandler: progressHandler,
-                            resultHandler: { (result) in
-                            DispatchQueue.main.async {
-                                switch result {
-                                case .success(_):
-                                    resultHandler(result)
-                                case .failure(let error):
-                                    resultHandler(
-                                        .failure(
-                                            .init(
-                                                info: error.info,
-                                                error: .syncICloudFailed(error.info)
+                               version: version,
+                               isNetworkAccessAllowed: true,
+                               progressHandler: progressHandler,
+                               resultHandler: { (result) in
+                                   DispatchQueue.main.async {
+                                       switch result {
+                                       case .success(_):
+                                           resultHandler(result)
+                                       case .failure(let error):
+                                           resultHandler(
+                                            .failure(
+                                                .init(
+                                                    info: error.info,
+                                                    error: .syncICloudFailed(error.info)
+                                                )
                                             )
-                                        )
-                                    )
-                                }
-                            }
-                        })
+                                           )
+                                       }
+                                   }
+                               })
                         iCloudHandler?(iCloudRequestID)
                     default:
                         resultHandler(.failure(error))
@@ -98,8 +98,8 @@ public extension AssetManager {
         options.progressHandler = progressHandler
         return requestImageData(
             for: asset,
-            options: options,
-            resultHandler: resultHandler
+               options: options,
+               resultHandler: resultHandler
         )
     }
     static func transformImageOrientation(
@@ -161,7 +161,7 @@ public extension AssetManager {
         if #available(iOS 13, *) {
             return PHImageManager.default().requestImageDataAndOrientation(
                 for: asset,
-                options: options
+                   options: options
             ) { (imageData, dataUTI, imageOrientation, info) in
                 let sureOrientation = self.transformImageOrientation(
                     orientation: imageOrientation
@@ -188,7 +188,7 @@ public extension AssetManager {
             // Fallback on earlier versions
             return PHImageManager.default().requestImageData(
                 for: asset,
-                options: options
+                   options: options
             ) { (imageData, dataUTI, imageOrientation, info) in
                 if DispatchQueue.isMain {
                     result(

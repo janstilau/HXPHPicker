@@ -8,7 +8,10 @@
 import Foundation
 import Photos
 
-/// 资源类型可选项
+/*
+    OptionSet 一个特殊的类型, 用来表示可以位操作的 Int 值.
+    在 Swift 里面, 枚举和位运算完全的分开了. 
+ */
 public struct PickerAssetOptions: OptionSet {
     /// Photo 静态照片
     public static let photo = PickerAssetOptions(rawValue: 1 << 0)
@@ -22,6 +25,7 @@ public struct PickerAssetOptions: OptionSet {
     public var isPhoto: Bool {
         contains(.photo) || contains(.gifPhoto) || contains(.livePhoto)
     }
+    
     public var isVideo: Bool {
         contains(.video)
     }
@@ -32,6 +36,8 @@ public struct PickerAssetOptions: OptionSet {
         self.rawValue = rawValue
     }
 }
+
+
 
 public enum PickerSelectMode: Int {
     /// 单选模式

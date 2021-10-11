@@ -15,12 +15,11 @@ extension ProgressHUD {
     }
 }
 
-
 /*
-    各种, HUD 基本都是一个思路.
-    自己, BGView 盖住 SuperView.
-    然后按照自己的思路, 构建 ContentView 里面的内容.
-    ContentView 的大小, 是随着里面的内容变化的.
+ 各种, HUD 基本都是一个思路.
+ 自己, BGView 盖住 SuperView.
+ 然后按照自己的思路, 构建 ContentView 里面的内容.
+ ContentView 的大小, 是随着里面的内容变化的.
  */
 
 final class ProgressHUD: UIView {
@@ -52,7 +51,7 @@ final class ProgressHUD: UIView {
     
     private lazy var indicatorView: UIView = {
         /*
-            根据 Type 的不同, 创建相应的 View 添加到指示视图里面.
+         根据 Type 的不同, 创建相应的 View 添加到指示视图里面.
          */
         if indicatorType == .circle {
             let indicatorView = ProgressIndefiniteView(
@@ -132,12 +131,12 @@ final class ProgressHUD: UIView {
     
     private func initView() {
         /*
-            所有的内容, 都添加到了 BackgroundView 上了
+         所有的内容, 都添加到了 BackgroundView 上了
          */
         addSubview(backgroundView)
         contentView.addSubview(textLb)
         /*
-            根据, type 的不同, 添加不同的 View 到 Background 上.
+         根据, type 的不同, 添加不同的 View 到 Background 上.
          */
         if mode == .indicator {
             contentView.addSubview(indicatorView)
@@ -239,7 +238,7 @@ final class ProgressHUD: UIView {
     }
     
     /*
-        具体的 Location 的逻辑, 都集中到这里.
+     具体的 Location 的逻辑, 都集中到这里.
      */
     private func updateFrame() {
         if text != nil {
@@ -281,7 +280,7 @@ final class ProgressHUD: UIView {
         }
         
         /*
-            根据 Content 的位置信息, 来计算 Container 的大小. 
+         根据 Content 的位置信息, 来计算 Container 的大小.
          */
         contentView.height = textLb.frame.maxY
         contentView.width = textMaxWidth
@@ -566,8 +565,8 @@ class ProgressIndefiniteView: UIView {
     }
     
     /*
-        通过 willMove 可以检测到, View 是否添加到 SuperView 上.
-        通过 willMoveToWindow 可以检测到, View 是否可见.
+     通过 willMove 可以检测到, View 是否添加到 SuperView 上.
+     通过 willMoveToWindow 可以检测到, View 是否可见.
      */
     override func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
