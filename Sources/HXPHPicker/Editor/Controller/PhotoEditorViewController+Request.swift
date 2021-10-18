@@ -205,15 +205,15 @@ extension PhotoEditorViewController {
     
     func requestAssetCompletion(image: UIImage) {
         if !imageInitializeCompletion {
-            imageView.setImage(image)
+            photoEditView.setImage(image)
             filterView.image = filterImage
             if let editedData = editResult?.editedData {
-                imageView.setEditedData(editedData: editedData)
-                brushColorView.canUndo = imageView.canUndoDraw
-                mosaicToolView.canUndo = imageView.canUndoMosaic
+                photoEditView.setEditedData(editedData: editedData)
+                brushColorView.canUndo = photoEditView.canUndoDraw
+                mosaicToolView.canUndo = photoEditView.canUndoMosaic
             }
             if state == .cropping {
-                imageView.startCropping(true)
+                photoEditView.startCropping(true)
                 croppingAction()
             }
             imageInitializeCompletion = true
@@ -300,9 +300,9 @@ extension PhotoEditorViewController {
     }
     func setFilterImage() {
         if let image = filterHDImage {
-            imageView.updateImage(image)
+            photoEditView.updateImage(image)
         }
-        imageView.setMosaicOriginalImage(mosaicImage)
+        photoEditView.setMosaicOriginalImage(mosaicImage)
         filterView.image = filterImage
     }
     func localImageHandler() {

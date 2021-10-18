@@ -85,9 +85,9 @@ extension PhotoEditorViewController {
         }else {
             if let option = currentToolOption {
                 if option.type == .graffiti {
-                    imageView.drawEnabled = true
+                    photoEditView.drawEnabled = true
                 }else if option.type == .mosaic {
-                    imageView.mosaicEnabled = true
+                    photoEditView.mosaicEnabled = true
                 }
             }
             showTopView()
@@ -114,7 +114,7 @@ extension PhotoEditorViewController {
                 mosaicToolView.isHidden = false
             }
         }else {
-            imageView.stickerEnabled = true
+            photoEditView.stickerEnabled = true
         }
         UIView.animate(withDuration: 0.25) {
             self.toolView.alpha = 1

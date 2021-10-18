@@ -10,6 +10,7 @@ import UIKit
 import Kingfisher
 #endif
 
+// 将, 单个表情被点击之后, 通过代理的方式, 回传到上一层.
 protocol EditorChartletViewListCellDelegate: AnyObject {
     func listCell(_ cell: EditorChartletViewListCell, didSelectImage image: UIImage, imageData: Data?)
 }
@@ -83,11 +84,10 @@ class EditorChartletViewListCell: UICollectionViewCell,
         return CGSize(width: itemWidth, height: itemWidth)
     }
     
-    func collectionView(
-        _ collectionView: UICollectionView,
-        didSelectItemAt indexPath: IndexPath
-    ) {
+    func collectionView(_ collectionView: UICollectionView,
+                        didSelectItemAt indexPath: IndexPath ) {
         collectionView.deselectItem(at: indexPath, animated: false)
+        
         let cell = collectionView.cellForItem(at: indexPath) as! EditorChartletViewCell
         if var image = cell.chartlet.image {
             let imageData: Data?
@@ -101,13 +101,15 @@ class EditorChartletViewListCell: UICollectionViewCell,
             }else {
                 imageData = cell.chartlet.imageData
             }
+            
             delegate?.listCell(
                 self,
                 didSelectImage: image,
                 imageData: imageData
             )
-        }else {
+        } else {
 #if canImport(Kingfisher)
+            // 只要, 在图片已经下载完成的情况下, 点击之后才应该触发回调操作.
             if let url = cell.chartlet.url, cell.downloadCompletion {
                 let options: KingfisherOptionsInfo = []
                 PhotoTools.downloadNetworkImage(
@@ -124,9 +126,11 @@ class EditorChartletViewListCell: UICollectionViewCell,
                                     return
                                 }
                                 self.delegate?.listCell(self, didSelectImage: image, imageData: nil)
-                                return
+                            } else {
+                                self.delegate?.listCell(self,
+                                                        didSelectImage: image,
+                                                        imageData: image.kf.gifRepresentation())
                             }
-                            self.delegate?.listCell(self, didSelectImage: image, imageData: image.kf.gifRepresentation())
                         }
                     })
             }

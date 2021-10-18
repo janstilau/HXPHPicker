@@ -9,15 +9,15 @@ import UIKit
 
 extension PhotoEditorViewController {
     func exportResources() {
-        if imageView.canReset() ||
-            imageView.imageResizerView.hasCropping ||
-            imageView.canUndoDraw ||
-            imageView.canUndoMosaic ||
-            imageView.hasFilter ||
-            imageView.hasSticker {
-            imageView.deselectedSticker()
+        if photoEditView.canReset() ||
+            photoEditView.imageResizerView.hasCropping ||
+            photoEditView.canUndoDraw ||
+            photoEditView.canUndoMosaic ||
+            photoEditView.hasFilter ||
+            photoEditView.hasSticker {
+            photoEditView.deselectedSticker()
             ProgressHUD.showLoading(addedTo: view, animated: true)
-            imageView.cropping { [weak self] (result) in
+            photoEditView.cropping { [weak self] (result) in
                 guard let self = self else { return }
                 if let result = result {
                     self.delegate?.photoEditorViewController(self, didFinish: result)

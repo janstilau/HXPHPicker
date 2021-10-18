@@ -22,16 +22,6 @@ protocol PhotoEditorViewDelegate: AnyObject {
 
 class PhotoEditorView: UIScrollView, UIGestureRecognizerDelegate {
     weak var editorDelegate: PhotoEditorViewDelegate?
-    lazy var imageResizerView: EditorImageResizerView = {
-        let imageResizerView = EditorImageResizerView.init(cropConfig: config.cropping,
-                                                           mosaicConfig: config.mosaic)
-        imageResizerView.exportScale = config.scale
-        imageResizerView.imageView.drawView.lineColor = config.brushColors[config.defaultBrushColorIndex].color
-        imageResizerView.imageView.drawView.lineWidth = config.brushLineWidth
-        imageResizerView.delegate = self
-        imageResizerView.imageView.delegate = self
-        return imageResizerView
-    }()
     
     override var zoomScale: CGFloat {
         didSet { imageResizerView.zoomScale = zoomScale }
@@ -92,6 +82,39 @@ class PhotoEditorView: UIScrollView, UIGestureRecognizerDelegate {
         addSubview(imageResizerView)
     }
     
+    override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+        let view = super.hitTest(point, with: event)
+        if state != .cropping && imageResizerView == view {
+            if imageResizerView.drawEnabled {
+                return imageResizerView.imageView.drawView
+            }
+            if imageResizerView.mosaicEnabled {
+                return imageResizerView.imageView.mosaicView
+            }
+            return self
+        }else if state == .cropping && self == view {
+            return imageResizerView
+        }
+        return view
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    lazy var imageResizerView: EditorImageResizerView = {
+        let imageResizerView = EditorImageResizerView.init(cropConfig: config.cropping,
+                                                           mosaicConfig: config.mosaic)
+        imageResizerView.exportScale = config.scale
+        imageResizerView.imageView.drawView.lineColor = config.brushColors[config.defaultBrushColorIndex].color
+        imageResizerView.imageView.drawView.lineWidth = config.brushLineWidth
+        imageResizerView.delegate = self
+        imageResizerView.imageView.delegate = self
+        return imageResizerView
+    }()
+}
+
+extension PhotoEditorView {
     func updateImageViewFrame() {
         let imageWidth = width
         var imageHeight: CGFloat
@@ -218,7 +241,7 @@ class PhotoEditorView: UIScrollView, UIGestureRecognizerDelegate {
         }
         cropSize = imageResizerView.cropSize
         updateImageViewFrame()
-    } 
+    }
     func cropping(completion: @escaping (PhotoEditResult?) -> Void) {
         let toRect = imageResizerView.getCroppingRect()
         let inputImage = imageResizerView.imageView.image
@@ -305,21 +328,6 @@ class PhotoEditorView: UIScrollView, UIGestureRecognizerDelegate {
         imageResizerView.imageView.stickerView.removeAllSticker()
     }
     
-    override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
-        let view = super.hitTest(point, with: event)
-        if state != .cropping && imageResizerView == view {
-            if imageResizerView.drawEnabled {
-                return imageResizerView.imageView.drawView
-            }
-            if imageResizerView.mosaicEnabled {
-                return imageResizerView.imageView.mosaicView
-            }
-            return self
-        }else if state == .cropping && self == view {
-            return imageResizerView
-        }
-        return view
-    }
     func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
         if state == .cropping {
             return false
@@ -329,11 +337,8 @@ class PhotoEditorView: UIScrollView, UIGestureRecognizerDelegate {
         }
         return true
     }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
 }
+
 extension PhotoEditorView: UIScrollViewDelegate {
     
     func viewForZooming(in scrollView: UIScrollView) -> UIView? {
@@ -347,9 +352,9 @@ extension PhotoEditorView: UIScrollViewDelegate {
             return
         }
         let offsetX = (scrollView.width > scrollView.contentSize.width) ?
-            (scrollView.width - scrollView.contentSize.width) * 0.5 : 0
+        (scrollView.width - scrollView.contentSize.width) * 0.5 : 0
         let offsetY = (scrollView.height > scrollView.contentSize.height) ?
-            (scrollView.height - scrollView.contentSize.height) * 0.5 : 0
+        (scrollView.height - scrollView.contentSize.height) * 0.5 : 0
         let centerX = scrollView.contentSize.width * 0.5 + offsetX
         let centerY = scrollView.contentSize.height * 0.5 + offsetY
         imageResizerView.center = CGPoint(x: centerX, y: centerY)
@@ -359,6 +364,7 @@ extension PhotoEditorView: UIScrollViewDelegate {
     }
 }
 extension PhotoEditorView: PhotoEditorContentViewDelegate {
+    
     func contentView(_ contentView: PhotoEditorContentView, updateStickerText item: EditorStickerItem) {
         editorDelegate?.editorView(self, updateStickerText: item)
     }
