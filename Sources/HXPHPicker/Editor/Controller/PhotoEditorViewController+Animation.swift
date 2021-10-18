@@ -8,11 +8,13 @@
 import UIKit
 
 extension PhotoEditorViewController {
+    
     func showChartletView() {
         UIView.animate(withDuration: 0.25) {
             self.setChartletViewFrame()
         }
     }
+    
     func hiddenChartletView() {
         UIView.animate(withDuration: 0.25) {
             self.setChartletViewFrame()
@@ -24,6 +26,7 @@ extension PhotoEditorViewController {
             self.setFilterViewFrame()
         }
     }
+    
     func hiddenFilterView() {
         UIView.animate(withDuration: 0.25) {
             self.setFilterViewFrame()
@@ -58,6 +61,7 @@ extension PhotoEditorViewController {
             self.mosaicToolView.alpha = 1
         }
     }
+    
     func hiddenMosaicToolView() {
         if mosaicToolView.isHidden {
             return
@@ -72,6 +76,7 @@ extension PhotoEditorViewController {
             self.mosaicToolView.isHidden = true
         }
     }
+    
     func croppingAction() {
         if state == .cropping {
             cropConfirmView.isHidden = false
@@ -96,8 +101,8 @@ extension PhotoEditorViewController {
                 self.cropToolView.isHidden = true
             }
         }
-
     }
+    
     func showTopView() {
         topViewIsHidden = false
         toolView.isHidden = false
@@ -124,6 +129,7 @@ extension PhotoEditorViewController {
             }
         }
     }
+    
     func hidenTopView() {
         topViewIsHidden = true
         UIView.animate(withDuration: 0.25) {

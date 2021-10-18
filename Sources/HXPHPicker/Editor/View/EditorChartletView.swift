@@ -12,17 +12,71 @@ import Kingfisher
 
 protocol EditorChartletViewDelegate: AnyObject {
     func chartletView(backClick chartletView: EditorChartletView)
+    
     func chartletView(_ chartletView: EditorChartletView,
                       loadTitleChartlet response: @escaping EditorTitleChartletResponse)
+    
     func chartletView(_ chartletView: EditorChartletView,
                       titleChartlet: EditorChartlet,
                       titleIndex: Int,
                       loadChartletList response: @escaping EditorChartletListResponse)
-    func chartletView(_ chartletView: EditorChartletView, didSelectImage image: UIImage, imageData: Data?)
+    
+    func chartletView(_ chartletView: EditorChartletView,
+                      didSelectImage image: UIImage,
+                      imageData: Data?)
 }
 
 class EditorChartletView: UIView {
     weak var delegate: EditorChartletViewDelegate?
+    
+    let editorType: EditorController.EditorType
+    var previewView: EditorChartletPreviewView?
+    var previewIndex: Int = -1
+    let config: EditorChartletConfig
+    var titles: [EditorChartletTitle] = []
+    var selectedTitleIndex: Int = 0
+    var configTitles: [EditorChartlet] = []
+    
+    init (config: EditorChartletConfig, editorType: EditorController.EditorType ) {
+        self.config = config
+        self.editorType = editorType
+        super.init(frame: .zero)
+        setupTitles(config.titles)
+        setupViews()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    /*
+     使用了, 最最原始的方式, 进行布局, 而不是 autolayout.
+     */
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        
+        bgView.frame = CGRect(x: 0, y: titleBgView.frame.maxY, width: width, height: height - titleBgView.height)
+        titleBgView.frame = CGRect(x: 0, y: 0, width: width, height: 50)
+        backButton.frame = CGRect(x: width - 50 - UIDevice.rightMargin, y: 0, width: 50, height: 50)
+        
+        titleView.frame = CGRect(x: 0, y: 0, width: width, height: 50)
+        titleView.contentInset = UIEdgeInsets(
+            top: 5,
+            left: 15 + UIDevice.leftMargin,
+            bottom: 5,
+            right: backButton.width + UIDevice.rightMargin
+        )
+        
+        listView.frame = bounds
+        loadingView.center = CGPoint(x: width * 0.5, y: height * 0.5)
+        
+        self.subviews.forEach { aSubView in
+            if aSubView == titleBgView { return }
+            if aSubView == bgView { return }
+            aSubView.addBorderLine()
+        }
+    }
+    
     lazy var loadingView: UIActivityIndicatorView = {
         let view = UIActivityIndicatorView(style: .white)
         view.hidesWhenStopped = true
@@ -45,9 +99,9 @@ class EditorChartletView: UIView {
         button.addTarget(self, action: #selector(didBackButtonClick), for: .touchUpInside)
         return button
     }()
-    @objc func didBackButtonClick() {
-        delegate?.chartletView(backClick: self)
-    }
+    /*
+     title 指的是上方的 Tab 部分.
+     */
     lazy var titleFlowLayout: UICollectionViewFlowLayout = {
         let flowLayout = UICollectionViewFlowLayout()
         flowLayout.scrollDirection = .horizontal
@@ -55,6 +109,7 @@ class EditorChartletView: UIView {
         flowLayout.minimumInteritemSpacing = 0
         return flowLayout
     }()
+    
     lazy var titleView: UICollectionView = {
         let view = UICollectionView(frame: .zero, collectionViewLayout: titleFlowLayout)
         view.backgroundColor = .clear
@@ -68,6 +123,7 @@ class EditorChartletView: UIView {
         view.register(EditorChartletViewCell.self, forCellWithReuseIdentifier: "EditorChartletViewCellTitleID")
         return view
     }()
+    
     lazy var listFlowLayout: UICollectionViewFlowLayout = {
         let flowLayout = UICollectionViewFlowLayout()
         flowLayout.scrollDirection = .horizontal
@@ -93,28 +149,9 @@ class EditorChartletView: UIView {
         view.addGestureRecognizer(longPress)
         return view
     }()
-    let editorType: EditorController.EditorType
-    var previewView: EditorChartletPreviewView?
-    var previewIndex: Int = -1
-    let config: EditorChartletConfig
-    var titles: [EditorChartletTitle] = []
-    var selectedTitleIndex: Int = 0
-    var configTitles: [EditorChartlet] = []
-    init(
-        config: EditorChartletConfig,
-        editorType: EditorController.EditorType
-    ) {
-        self.config = config
-        self.editorType = editorType
-        super.init(frame: .zero)
-        setupTitles(config.titles)
-        addSubview(bgView)
-        addSubview(listView)
-        addSubview(titleBgView)
-        addSubview(titleView)
-        addSubview(backButton)
-        addSubview(loadingView)
-    }
+}
+
+extension EditorChartletView {
     
     func setupTitles(_ titleChartlets: [EditorChartlet]) {
         configTitles = titleChartlets
@@ -123,15 +160,15 @@ class EditorChartletView: UIView {
             if let image = title.image {
                 titleChartlet = EditorChartletTitle(image: image)
             }else {
-                #if canImport(Kingfisher)
+#if canImport(Kingfisher)
                 if let url = title.url {
                     titleChartlet = EditorChartletTitle(url: url)
                 }else {
                     titleChartlet = .init(image: "hx_picker_album_empty".image)
                 }
-                #else
+#else
                 titleChartlet = .init(image: "hx_picker_album_empty".image)
-                #endif
+#endif
             }
             if index == 0 {
                 titleChartlet.isSelected = true
@@ -140,12 +177,28 @@ class EditorChartletView: UIView {
         }
     }
     
+    func setupViews() {
+        addSubview(bgView)
+        addSubview(listView)
+        addSubview(titleBgView)
+        addSubview(titleView)
+        addSubview(backButton)
+        addSubview(loadingView)
+        
+        self.addBorderline(inWidth: 2, color: UIColor.purple)
+        self.addTip("Chartlet")
+    }
+    
+    @objc func didBackButtonClick() {
+        delegate?.chartletView(backClick: self)
+    }
+    
     @objc func longPressClick(longPress: UILongPressGestureRecognizer) {
         guard let listCell = listView.cellForItem(
-                at: IndexPath(
-                    item: selectedTitleIndex,
-                    section: 0
-                )
+            at: IndexPath(
+                item: selectedTitleIndex,
+                section: 0
+            )
         ) as? EditorChartletViewListCell else {
             return
         }
@@ -171,7 +224,7 @@ class EditorChartletView: UIView {
                 let keyWindow = UIApplication.shared.keyWindow
                 let rect = cell.convert(cell.bounds, to: keyWindow)
                 let touchCenter = CGPoint(x: rect.midX, y: rect.midY)
-                #if canImport(Kingfisher)
+#if canImport(Kingfisher)
                 if let image = cell.chartlet.image {
                     previewView = EditorChartletPreviewView(
                         image: image,
@@ -188,7 +241,7 @@ class EditorChartletView: UIView {
                     )
                     keyWindow?.addSubview(previewView!)
                 }
-                #else
+#else
                 if let image = cell.chartlet.image {
                     previewView = EditorChartletPreviewView(
                         image: image,
@@ -197,7 +250,7 @@ class EditorChartletView: UIView {
                     )
                     keyWindow?.addSubview(previewView!)
                 }
-                #endif
+#endif
                 cell.showSelectedBgView = true
             }
         case .cancelled, .ended, .failed:
@@ -219,26 +272,6 @@ class EditorChartletView: UIView {
         default:
             break
         }
-    }
-    
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        titleBgView.frame = CGRect(x: 0, y: 0, width: width, height: 50)
-        backButton.frame = CGRect(x: width - 50 - UIDevice.rightMargin, y: 0, width: 50, height: 50)
-        bgView.frame = CGRect(x: 0, y: titleBgView.frame.maxY, width: width, height: height - titleBgView.height)
-        titleView.frame = CGRect(x: 0, y: 0, width: width, height: 50)
-        titleView.contentInset = UIEdgeInsets(
-            top: 5,
-            left: 15 + UIDevice.leftMargin,
-            bottom: 5,
-            right: backButton.width + UIDevice.rightMargin
-        )
-        listView.frame = bounds
-        loadingView.center = CGPoint(x: width * 0.5, y: height * 0.5)
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
     }
 }
 
@@ -286,72 +319,68 @@ extension EditorChartletView: UICollectionViewDataSource,
             return listView.size
         }
     }
-    func collectionView(
-        _ collectionView: UICollectionView,
-        willDisplay cell: UICollectionViewCell,
-        forItemAt indexPath: IndexPath
-    ) {
+    /*
+     Tells the delegate that the specified cell is about to be displayed in the collection view.
+    */
+    func collectionView(_ collectionView: UICollectionView,
+                        willDisplay cell: UICollectionViewCell,
+                        forItemAt indexPath: IndexPath) {
         if collectionView != listView {
             return
         }
         if config.loadScene == .cellDisplay {
             requestData(index: indexPath.item)
         }
+        // 如果, 已经加载完了, 就直接使用数据, 否则, 显示 Loading 页面.
         let titleChartlet = titles[indexPath.item]
         if !titleChartlet.chartletList.isEmpty || !titleChartlet.isLoading {
             let listCell = cell as! EditorChartletViewListCell
             listCell.chartletList = titleChartlet.chartletList
-            return
+        } else {
+            let listCell = cell as! EditorChartletViewListCell
+            listCell.startLoading()
         }
-        let listCell = cell as! EditorChartletViewListCell
-        listCell.startLoading()
     }
-    func collectionView(
-        _ collectionView: UICollectionView,
-        didEndDisplaying cell: UICollectionViewCell,
-        forItemAt indexPath: IndexPath
-    ) {
+    func collectionView( _ collectionView: UICollectionView,
+                         didEndDisplaying cell: UICollectionViewCell,
+                         forItemAt indexPath: IndexPath) {
         if collectionView != listView {
             return
         }
         let listCell = cell as! EditorChartletViewListCell
         listCell.stopLoad()
     }
-    func collectionView(
-        _ collectionView: UICollectionView,
-        didSelectItemAt indexPath: IndexPath
-    ) {
+    
+    func collectionView( _ collectionView: UICollectionView,
+                         didSelectItemAt indexPath: IndexPath) {
         collectionView.deselectItem(at: indexPath, animated: false)
         if collectionView == titleView {
             listView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: false)
             requestData(index: indexPath.item)
         }
     }
+    
+    /*
+        有关, TitleView 的修改, 是在 ListView 的 scrollViewDidScroll 中触发的, 感觉不是一个很好的设计.
+     */
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        if scrollView != listView {
-            return
-        }
+        if scrollView != listView { return }
+        
         let currentIndex = currentIndex()
-        if currentIndex == selectedTitleIndex {
-            return
-        }
+        if currentIndex == selectedTitleIndex { return }
+        
         let indexPath = IndexPath(item: currentIndex, section: 0)
         titleView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: true)
         let titleCell = titleView.cellForItem(at: indexPath) as? EditorChartletViewCell
         titleCell?.isSelectedTitle = true
         titles[currentIndex].isSelected = true
         
-        let selectedCell = titleView.cellForItem(
-            at: IndexPath(
-                item: selectedTitleIndex,
-                section: 0
-            )
-        ) as? EditorChartletViewCell
+        let selectedCell = titleView.cellForItem(at: IndexPath(item: selectedTitleIndex, section: 0)) as? EditorChartletViewCell
         selectedCell?.isSelectedTitle = false
         titles[selectedTitleIndex].isSelected = false
-        
         selectedTitleIndex = currentIndex
     }
+    
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
         if scrollView != listView {
             return
@@ -361,6 +390,10 @@ extension EditorChartletView: UICollectionViewDataSource,
         }
     }
     
+    /*
+        根据, ListView 的 Offset, 来判断当前的 Index 的值.
+        然后在 ScroolViewDidScroll 中, 更新相关的状态值.
+     */
     func currentIndex() -> Int {
         let offsetX = listView.contentOffset.x  + (listView.width) * 0.5
         var currentIndex = Int(offsetX / listView.width)
@@ -372,7 +405,10 @@ extension EditorChartletView: UICollectionViewDataSource,
         }
         return currentIndex
     }
-    
+
+    // 加载, 某个表情组的数据.
+    // 如果已经加载过了, 那么会在 Guard 逻辑中提前退出. 所以, 不会重复进行加载.
+    // 如果正在进行加载, 也会提前退出. 所以, 不会重复进行加载.
     func requestData(index: Int) {
         let titleChartle = titles[index]
         if !titleChartle.chartletList.isEmpty || titleChartle.isLoading || configTitles.isEmpty {
@@ -384,6 +420,7 @@ extension EditorChartletView: UICollectionViewDataSource,
                                titleIndex: index,
                                loadChartletList: { [weak self] item, chartletList in
             guard let self = self else { return }
+            
             titleChartle.isLoading = false
             self.titles[item].chartletList = chartletList
             let cell = self.listView.cellForItem(at: IndexPath(item: index, section: 0)) as? EditorChartletViewListCell
@@ -394,8 +431,10 @@ extension EditorChartletView: UICollectionViewDataSource,
     func firstRequest() {
         if titles.isEmpty {
             loadingView.startAnimating()
-            delegate?.chartletView(self, loadTitleChartlet: { [weak self] titleChartlets in
+            delegate?.chartletView(self,
+                                   loadTitleChartlet: { [weak self] titleChartlets in
                 guard let self = self else { return }
+                
                 self.loadingView.stopAnimating()
                 self.setupTitles(titleChartlets)
                 if self.config.loadScene == .scrollStop {

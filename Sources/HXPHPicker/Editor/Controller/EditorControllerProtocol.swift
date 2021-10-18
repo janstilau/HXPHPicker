@@ -11,32 +11,36 @@ import Photos
 import Kingfisher
 #endif
 
+/*
+ 
+ */
+
 public protocol PhotoEditorViewControllerDelegate: AnyObject {
     
     /// 编辑完成
     /// - Parameters:
     ///   - photoEditorViewController: 对应的 PhotoEditorViewController
     ///   - result: 编辑后的数据
-    func photoEditorViewController(
-        _ photoEditorViewController: PhotoEditorViewController,
-        didFinish result: PhotoEditResult
-    )
+    func photoEditorViewController(_ photoEditorViewController: PhotoEditorViewController,
+                                   didFinish result: PhotoEditResult)
     
     /// 点击完成按钮，但是照片未编辑
     /// - Parameters:
     ///   - photoEditorViewController: 对应的 PhotoEditorViewController
-    func photoEditorViewController(
-        didFinishWithUnedited photoEditorViewController: PhotoEditorViewController
-    )
+    func photoEditorViewController(didFinishWithUnedited photoEditorViewController: PhotoEditorViewController )
     
+    
+    /*
+        在定义接口的时候, 同步函数, 还是最为好理解的设计.
+        但是, 如果确实需要异步操作了, 那么传递一个 block, 作为异步操作的回调, 是一个常见的设计.
+        在苹果的原生 Api 里面, 也越来越多这种设计的方式了.
+     */
     /// 加载贴图标题资源
     /// - Parameters:
     ///   - photoEditorViewController: 对应的 PhotoEditorViewController
     ///   - loadTitleChartlet: 传入标题数组
-    func photoEditorViewController(
-        _ photoEditorViewController: PhotoEditorViewController,
-        loadTitleChartlet response: @escaping EditorTitleChartletResponse
-    )
+    func photoEditorViewController( _ photoEditorViewController: PhotoEditorViewController,
+                                    loadTitleChartlet response: @escaping EditorTitleChartletResponse)
     /// 加载贴图资源
     /// - Parameters:
     ///   - photoEditorViewController: 对应的 PhotoEditorViewController
@@ -52,10 +56,9 @@ public protocol PhotoEditorViewControllerDelegate: AnyObject {
     
     /// 取消编辑
     /// - Parameter photoEditorViewController: 对应的 PhotoEditorViewController
-    func photoEditorViewController(
-        didCancel photoEditorViewController: PhotoEditorViewController
-    )
+    func photoEditorViewController(didCancel photoEditorViewController: PhotoEditorViewController)
 }
+
 public extension PhotoEditorViewControllerDelegate {
     func photoEditorViewController(
         _ photoEditorViewController: PhotoEditorViewController,
@@ -63,45 +66,51 @@ public extension PhotoEditorViewControllerDelegate {
     ) {
         back(photoEditorViewController)
     }
+    
     func photoEditorViewController(
         didFinishWithUnedited photoEditorViewController: PhotoEditorViewController
     ) {
         back(photoEditorViewController)
     }
+    
     func photoEditorViewController(
         didCancel photoEditorViewController: PhotoEditorViewController
     ) {
         back(photoEditorViewController)
     }
-    func photoEditorViewController(
-        _ photoEditorViewController: PhotoEditorViewController,
-        loadTitleChartlet response: @escaping EditorTitleChartletResponse
-    ) {
-        #if canImport(Kingfisher)
+    
+    /*
+        EditView, 将 加载 Titles 的逻辑, 代理给了外界.
+        EditorVC, 可以自己去加载相关的工作, 也可以直接使用其他类提供的逻辑.
+        例如, 有一个 CharletManager 会承担所有的表情相关的逻辑.
+     */
+    func photoEditorViewController( _ photoEditorViewController: PhotoEditorViewController,
+                                    loadTitleChartlet response: @escaping EditorTitleChartletResponse) {
+#if canImport(Kingfisher)
         let titles = PhotoTools.defaultTitleChartlet()
         response(titles)
-        #else
+#else
         response([])
-        #endif
+#endif
+        
     }
-    func photoEditorViewController(
-        _ photoEditorViewController: PhotoEditorViewController,
-        titleChartlet: EditorChartlet,
-        titleIndex: Int,
-        loadChartletList response: @escaping EditorChartletListResponse
-    ) {
+    func photoEditorViewController(_ photoEditorViewController: PhotoEditorViewController,
+                                   titleChartlet: EditorChartlet,
+                                   titleIndex: Int,
+                                   loadChartletList response: @escaping EditorChartletListResponse) {
         /// 默认加载这些贴图
-        #if canImport(Kingfisher)
+#if canImport(Kingfisher)
         let chartletList = PhotoTools.defaultNetworkChartlet()
         response(titleIndex, chartletList)
-        #else
+#else
         response(titleIndex, [])
-        #endif
+#endif
     }
     
-    private func back(
-        _ photoEditorViewController: PhotoEditorViewController
-    ) {
+    /*
+     在, Protocol 的 Extension 里面, 定义了一个方法, 供其他的方法使用.
+     */
+    private func back(_ photoEditorViewController: PhotoEditorViewController) {
         if !photoEditorViewController.autoBack {
             if let navigationController = photoEditorViewController.navigationController,
                navigationController.viewControllers.count > 1 {
@@ -214,12 +223,12 @@ public extension VideoEditorViewControllerDelegate {
         _ videoEditorViewController: VideoEditorViewController,
         loadTitleChartlet response: @escaping EditorTitleChartletResponse
     ) {
-        #if canImport(Kingfisher)
+#if canImport(Kingfisher)
         let titles = PhotoTools.defaultTitleChartlet()
         response(titles)
-        #else
+#else
         response([])
-        #endif
+#endif
     }
     func videoEditorViewController(
         _ videoEditorViewController: VideoEditorViewController,
@@ -228,12 +237,12 @@ public extension VideoEditorViewControllerDelegate {
         loadChartletList response: @escaping EditorChartletListResponse
     ) {
         /// 默认加载这些贴图
-        #if canImport(Kingfisher)
+#if canImport(Kingfisher)
         let chartletList = PhotoTools.defaultNetworkChartlet()
         response(titleIndex, chartletList)
-        #else
+#else
         response(titleIndex, [])
-        #endif
+#endif
     }
     
     func videoEditorViewController(
@@ -268,13 +277,13 @@ public extension VideoEditorViewControllerDelegate {
     
     private func back(
         _ videoEditorViewController: VideoEditorViewController) {
-        if !videoEditorViewController.autoBack {
-            if let navigationController = videoEditorViewController.navigationController,
-               navigationController.viewControllers.count > 1 {
-                navigationController.popViewController(animated: true)
-            }else {
-                videoEditorViewController.dismiss(animated: true)
+            if !videoEditorViewController.autoBack {
+                if let navigationController = videoEditorViewController.navigationController,
+                   navigationController.viewControllers.count > 1 {
+                    navigationController.popViewController(animated: true)
+                }else {
+                    videoEditorViewController.dismiss(animated: true)
+                }
             }
         }
-    }
 }

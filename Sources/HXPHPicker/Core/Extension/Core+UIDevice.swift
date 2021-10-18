@@ -8,6 +8,9 @@
 
 import UIKit
 
+// 将, 所有的, 关于设备的信息, 记录在一个地方.
+// 外界使用的时候, 直接根据这些值, 进行布局操作. 
+
 extension UIDevice {
     
     class var statusBarOrientation: UIInterfaceOrientation {
@@ -18,8 +21,7 @@ extension UIDevice {
         if isPad {
             return true
         }
-        if  statusBarOrientation == .landscapeLeft ||
-                statusBarOrientation == .landscapeRight {
+        if  statusBarOrientation == .landscapeLeft || statusBarOrientation == .landscapeRight {
             return false
         }
         return true
@@ -50,10 +52,10 @@ extension UIDevice {
     }
     
     /*
-        将, 尺寸值的管理, 统一在了一个地方.
-        其实这就是一个全局变量.
-        但是这个全局变量的值, 是不可变的, 是有着明确的含义的. 所以, 这样写是没有问题.
-        全局变量不可变, 是使用全局变量的非常好的一个使用方式.
+     将, 尺寸值的管理, 统一在了一个地方.
+     其实这就是一个全局变量.
+     但是这个全局变量的值, 是不可变的, 是有着明确的含义的. 所以, 这样写是没有问题.
+     全局变量不可变, 是使用全局变量的非常好的一个使用方式.
      */
     class var topMargin: CGFloat {
         if isAllIPhoneX {
@@ -96,7 +98,7 @@ extension UIDevice {
     }
     
     /*
-        该作者, 判断各个机型, 是根据屏幕尺寸相等决断的.
+     该作者, 判断各个机型, 是根据屏幕尺寸相等决断的.
      */
     class var isAllIPhoneX: Bool {
         (isIPhoneX ||

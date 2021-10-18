@@ -18,7 +18,7 @@ open class PhotoEditorViewController: BaseViewController {
     
     /// 配置
     /*
-        这种必传项, 应该在 init 方法内, 进行赋值.
+     这种必传项, 应该在 init 方法内, 进行赋值.
      */
     public let config: PhotoEditorConfiguration
     
@@ -192,10 +192,7 @@ open class PhotoEditorViewController: BaseViewController {
         return view
     }()
     lazy var chartletView: EditorChartletView = {
-        let view = EditorChartletView(
-            config: config.chartlet,
-            editorType: .photo
-        )
+        let view = EditorChartletView(config: config.chartlet, editorType: .photo)
         view.delegate = self
         return view
     }()
@@ -446,19 +443,15 @@ open class PhotoEditorViewController: BaseViewController {
             viewHeight = view.height * 0.6
         }
         if showChartlet {
-            chartletView.frame = CGRect(
-                x: 0,
-                y: view.height - viewHeight - UIDevice.bottomMargin,
-                width: view.width,
-                height: viewHeight + UIDevice.bottomMargin
-            )
-        }else {
-            chartletView.frame = CGRect(
-                x: 0,
-                y: view.height,
-                width: view.width,
-                height: viewHeight + UIDevice.bottomMargin
-            )
+            chartletView.frame = CGRect(x: 0,
+                                        y: view.height - viewHeight - UIDevice.bottomMargin,
+                                        width: view.width,
+                                        height: viewHeight + UIDevice.bottomMargin)
+        } else {
+            chartletView.frame = CGRect(x: 0,
+                                        y: view.height,
+                                        width: view.width,
+                                        height: viewHeight + UIDevice.bottomMargin)
         }
     }
     func setFilterViewFrame() {
@@ -509,7 +502,7 @@ open class PhotoEditorViewController: BaseViewController {
 }
 
 /*
-    ToolView 的回调方法.
+ ToolView 的回调方法.
  */
 extension PhotoEditorViewController: EditorToolViewDelegate {
     
@@ -785,7 +778,7 @@ extension PhotoEditorViewController: UIGestureRecognizerDelegate {
 }
 
 /*
-    增加完 Text 的回调.
+ 增加完 Text 的回调.
  */
 extension PhotoEditorViewController: EditorStickerTextViewControllerDelegate {
     func stickerTextViewController(
@@ -830,19 +823,18 @@ extension PhotoEditorViewController: EditorChartletViewDelegate {
     func chartletView(backClick chartletView: EditorChartletView) {
         singleTap()
     }
-    func chartletView(
-        _ chartletView: EditorChartletView,
-        titleChartlet: EditorChartlet,
-        titleIndex: Int,
-        loadChartletList response: @escaping (Int, [EditorChartlet]) -> Void
-    ) {
+    
+    // 在 PhotoEditVC 里面, 也会将这些, 代理给外界. 或者, 使用默认的一些数据.
+    // 这些都是取值的过程, 可以在开始的版本, 写简单一些, 直接使用单例从 ChartletManager 中取值就得了.
+    func chartletView(_ chartletView: EditorChartletView,
+                      titleChartlet: EditorChartlet,
+                      titleIndex: Int,
+                      loadChartletList response: @escaping (Int, [EditorChartlet]) -> Void) {
         if let editorDelegate = delegate {
-            editorDelegate.photoEditorViewController(
-                self,
-                titleChartlet: titleChartlet,
-                titleIndex: titleIndex,
-                loadChartletList: response
-            )
+            editorDelegate.photoEditorViewController(self,
+                                                     titleChartlet: titleChartlet,
+                                                     titleIndex: titleIndex,
+                                                     loadChartletList: response)
         }else {
             /// 默认加载这些贴图
 #if canImport(Kingfisher)

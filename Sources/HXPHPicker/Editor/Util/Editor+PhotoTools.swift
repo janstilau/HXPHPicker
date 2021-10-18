@@ -22,9 +22,9 @@ extension PhotoTools {
         let frameCount = images.count
         let imageURL = getImageTmpURL(.gif)
         guard let destination = CGImageDestinationCreateWithURL(
-                imageURL as CFURL,
-                kUTTypeGIF as CFString,
-                frameCount, nil
+            imageURL as CFURL,
+            kUTTypeGIF as CFString,
+            frameCount, nil
         ) else {
             return nil
         }
@@ -82,14 +82,14 @@ extension PhotoTools {
         guard let frameDuration = duration else { return defaultFrameDuration }
         return frameDuration.doubleValue > 0.011 ? frameDuration.doubleValue : defaultFrameDuration
     }
-
+    
     static func getFrameDuration(
         from imageSource: CGImageSource,
         at index: Int
     ) -> TimeInterval {
         guard let properties = CGImageSourceCopyPropertiesAtIndex(imageSource, index, nil)
-            as? [String: Any] else { return 0.0 }
-
+                as? [String: Any] else { return 0.0 }
+        
         let gifInfo = properties[kCGImagePropertyGIFDictionary as String] as? [String: Any]
         return getFrameDuration(from: gifInfo)
     }
@@ -110,14 +110,19 @@ extension PhotoTools {
         }
         return infos
     }
-    #if canImport(Kingfisher)
+#if canImport(Kingfisher)
     public static func defaultTitleChartlet() -> [EditorChartlet] {
         let title = EditorChartlet(
             url: URL(string: "http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/chartle/xxy_s_highlighted.png")
         )
-        return [title]
+        //        return [title]
+        return [title, title]
     }
     
+    /*
+        提供默认配置, 是一个非常非常常见的事情.
+        不能强制要求, 使用者在使用的时候, 配置每一项数据. 这样, 必然不好使用.
+     */
     public static func defaultNetworkChartlet() -> [EditorChartlet] {
         var chartletList: [EditorChartlet] = []
         for index in 1...40 {
@@ -129,7 +134,7 @@ extension PhotoTools {
         }
         return chartletList
     }
-    #endif
+#endif
     
     /// 默认滤镜
     public static func defaultFilters() -> [PhotoEditorFilterInfo] {
@@ -316,7 +321,7 @@ extension PhotoTools {
                 let videoURL = outputURL ?? PhotoTools.getVideoTmpURL()
                 let mixComposition = try mixComposition(
                     for: avAsset,
-                    videoTrack: videoTrack
+                       videoTrack: videoTrack
                 )
                 var addVideoComposition = false
                 let animationBeginTime: CFTimeInterval
@@ -324,28 +329,28 @@ extension PhotoTools {
                     animationBeginTime = AVCoreAnimationBeginTimeAtZero
                 }else {
                     animationBeginTime = timeRang.start.seconds == 0 ?
-                        AVCoreAnimationBeginTimeAtZero :
-                        timeRang.start.seconds
+                    AVCoreAnimationBeginTimeAtZero :
+                    timeRang.start.seconds
                 }
                 let videoComposition = try videoComposition(
                     for: avAsset,
-                    videoTrack: videoTrack,
-                    mixComposition: mixComposition,
-                    stickerInfos: stickerInfos,
-                    animationBeginTime: animationBeginTime,
-                    videoDuration: timeRang == .zero ? videoTrack.timeRange.duration.seconds : timeRang.duration.seconds
+                       videoTrack: videoTrack,
+                       mixComposition: mixComposition,
+                       stickerInfos: stickerInfos,
+                       animationBeginTime: animationBeginTime,
+                       videoDuration: timeRang == .zero ? videoTrack.timeRange.duration.seconds : timeRang.duration.seconds
                 )
                 if videoComposition.renderSize.width > 0 {
                     addVideoComposition = true
                 }
                 let audioMix = try audioMix(
                     for: avAsset,
-                    videoTrack: videoTrack,
-                    mixComposition: mixComposition,
-                    timeRang: timeRang,
-                    audioURL: audioURL,
-                    audioVolume: audioVolume,
-                    originalAudioVolume: originalAudioVolume
+                       videoTrack: videoTrack,
+                       mixComposition: mixComposition,
+                       timeRang: timeRang,
+                       audioURL: audioURL,
+                       audioVolume: audioVolume,
+                       originalAudioVolume: originalAudioVolume
                 )
                 if let exportSession = AVAssetExportSession(
                     asset: mixComposition,
@@ -635,21 +640,21 @@ extension PhotoTools {
             
             /// 这种方式模拟器会崩溃
             /// https://developer.apple.com/forums/thread/133681
-//            let videolayer = CALayer()
-//            videolayer.frame = bounds
-//
-//            let parentLayer = CALayer()
-//            parentLayer.frame = bounds
-//            parentLayer.isGeometryFlipped = true
-//            parentLayer.addSublayer(videolayer)
-//            parentLayer.addSublayer(overlaylayer)
-//
-//            let animationTool = AVVideoCompositionCoreAnimationTool(
-//                postProcessingAsVideoLayer: videolayer,
-//                in: parentLayer
-//            )
-//            videoComposition.animationTool = animationTool
-
+            //            let videolayer = CALayer()
+            //            videolayer.frame = bounds
+            //
+            //            let parentLayer = CALayer()
+            //            parentLayer.frame = bounds
+            //            parentLayer.isGeometryFlipped = true
+            //            parentLayer.addSublayer(videolayer)
+            //            parentLayer.addSublayer(overlaylayer)
+            //
+            //            let animationTool = AVVideoCompositionCoreAnimationTool(
+            //                postProcessingAsVideoLayer: videolayer,
+            //                in: parentLayer
+            //            )
+            //            videoComposition.animationTool = animationTool
+            
             let watermarkLayerTrackID = videoAsset.unusedTrackID()
             videoComposition.animationTool = AVVideoCompositionCoreAnimationTool(
                 additionalLayer: overlaylayer,
@@ -855,7 +860,7 @@ extension PhotoTools {
             return animationLayer
         }
         let delayTimes = gifResult.1
-         
+        
         var currentTime: Double = 0
         var animations = [CAAnimation]()
         for (index, frame) in frames.enumerated() {
@@ -883,5 +888,5 @@ extension PhotoTools {
         animationLayer.add(group, forKey: nil)
         return animationLayer
     }
-
+    
 }

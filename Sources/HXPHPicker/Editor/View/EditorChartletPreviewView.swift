@@ -44,7 +44,7 @@ class EditorChartletPreviewView: UIView {
         imageView.image = image
         addSubview(imageView)
     }
-    #if canImport(Kingfisher)
+#if canImport(Kingfisher)
     init(
         imageURL: URL,
         editorType: EditorController.EditorType,
@@ -90,7 +90,7 @@ class EditorChartletPreviewView: UIView {
             }
         }
     }
-    #endif
+#endif
     func setupFrame(imageSize: CGSize) {
         let viewSize = touchViewSize
         let center = touchCenter
@@ -98,8 +98,8 @@ class EditorChartletPreviewView: UIView {
         let screenWidth = UIScreen.main.bounds.width
         let screenHeight = UIScreen.main.bounds.height
         let maxWidth = (!UIDevice.isPad && UIDevice.isPortrait) ?
-            screenWidth * 0.5 :
-            screenWidth * 0.25
+        screenWidth * 0.5 :
+        screenWidth * 0.25
         let maxHeight = screenHeight * 0.5
         var width = imageSize.width
         var height = imageSize.height

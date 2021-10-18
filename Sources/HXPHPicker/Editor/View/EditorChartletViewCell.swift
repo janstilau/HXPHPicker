@@ -11,6 +11,7 @@ import Kingfisher
 #endif
 
 class EditorChartletViewCell: UICollectionViewCell {
+    
     lazy var selectedBgView: UIVisualEffectView = {
         let effect = UIBlurEffect(style: .dark)
         let view = UIVisualEffectView(effect: effect)
@@ -25,6 +26,7 @@ class EditorChartletViewCell: UICollectionViewCell {
         view.imageView.contentMode = .scaleAspectFit
         return view
     }()
+    
     var editorType: EditorController.EditorType = .photo
     var downloadCompletion = false
     

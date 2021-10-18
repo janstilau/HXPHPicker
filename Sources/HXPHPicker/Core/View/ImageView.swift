@@ -12,7 +12,7 @@ import Kingfisher
 #endif
 
 /*
-    对于 ImageView 的封装. 主要是条件编译.
+ 对于 ImageView 的封装. 主要是条件编译.
  */
 final class ImageView: UIView {
     lazy var imageView: UIImageView = {
@@ -58,7 +58,7 @@ final class ImageView: UIView {
     }
     
     /*
-        图片设置的时候, 增加一个渐隐动画.
+     图片设置的时候, 增加一个渐隐动画.
      */
     func setImage(_ image: UIImage?, animated: Bool) {
         if let image = image {

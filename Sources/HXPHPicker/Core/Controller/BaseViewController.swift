@@ -27,6 +27,9 @@ open class BaseViewController: UIViewController {
             name: UIApplication.willChangeStatusBarOrientationNotification,
             object: nil
         )
+        
+        let clazzName = NSStringFromClass(type(of: self))
+        debugPrint("\(clazzName) viewDidLoad")
     }
     
     @objc open func deviceOrientationDidChanged(notify: Notification) {
@@ -39,5 +42,7 @@ open class BaseViewController: UIViewController {
     
     deinit {
         NotificationCenter.default.removeObserver(self)
+        let clazzName = NSStringFromClass(type(of: self))
+        debugPrint("\(clazzName) dealloc")
     }
 }

@@ -14,36 +14,16 @@ protocol EditorChartletViewListCellDelegate: AnyObject {
     func listCell(_ cell: EditorChartletViewListCell, didSelectImage image: UIImage, imageData: Data?)
 }
 
+/*
+    一个 EditorChartletViewListCell, 代表的是一组表情包.
+    里面有一个 CollectionView, 来展示, 所有的表情.
+ */
 class EditorChartletViewListCell: UICollectionViewCell,
                                   UICollectionViewDataSource,
                                   UICollectionViewDelegate,
                                   UICollectionViewDelegateFlowLayout {
     weak var delegate: EditorChartletViewListCellDelegate?
-    lazy var loadingView: UIActivityIndicatorView = {
-        let view = UIActivityIndicatorView(style: .white)
-        view.hidesWhenStopped = true
-        return view
-    }()
     
-    lazy var flowLayout: UICollectionViewFlowLayout = {
-        let flowLayout = UICollectionViewFlowLayout()
-        flowLayout.scrollDirection = .vertical
-        flowLayout.minimumLineSpacing = 5
-        flowLayout.minimumInteritemSpacing = 5
-        return flowLayout
-    }()
-    lazy var collectionView: UICollectionView = {
-        let view = UICollectionView.init(frame: .zero, collectionViewLayout: flowLayout)
-        view.backgroundColor = .clear
-        view.dataSource = self
-        view.delegate = self
-        view.showsHorizontalScrollIndicator = false
-        if #available(iOS 11.0, *) {
-            view.contentInsetAdjustmentBehavior = .never
-        }
-        view.register(EditorChartletViewCell.self, forCellWithReuseIdentifier: "EditorChartletViewListCellID")
-        return view
-    }()
     var rowCount: Int = 4
     var chartletList: [EditorChartlet] = [] {
         didSet {
@@ -63,6 +43,7 @@ class EditorChartletViewListCell: UICollectionViewCell,
     func startLoading() {
         loadingView.startAnimating()
     }
+    
     func stopLoad() {
         loadingView.stopAnimating()
     }
@@ -126,7 +107,7 @@ class EditorChartletViewListCell: UICollectionViewCell,
                 imageData: imageData
             )
         }else {
-            #if canImport(Kingfisher)
+#if canImport(Kingfisher)
             if let url = cell.chartlet.url, cell.downloadCompletion {
                 let options: KingfisherOptionsInfo = []
                 PhotoTools.downloadNetworkImage(
@@ -134,22 +115,22 @@ class EditorChartletViewListCell: UICollectionViewCell,
                     cancelOrigianl: false,
                     options: options,
                     completionHandler: { [weak self] (image) in
-                    guard let self = self else { return }
-                    if let image = image {
-                        if self.editorType == .photo {
-                            if let data = image.kf.gifRepresentation(),
-                               let img = UIImage(data: data) {
-                                self.delegate?.listCell(self, didSelectImage: img, imageData: nil)
+                        guard let self = self else { return }
+                        if let image = image {
+                            if self.editorType == .photo {
+                                if let data = image.kf.gifRepresentation(),
+                                   let img = UIImage(data: data) {
+                                    self.delegate?.listCell(self, didSelectImage: img, imageData: nil)
+                                    return
+                                }
+                                self.delegate?.listCell(self, didSelectImage: image, imageData: nil)
                                 return
                             }
-                            self.delegate?.listCell(self, didSelectImage: image, imageData: nil)
-                            return
+                            self.delegate?.listCell(self, didSelectImage: image, imageData: image.kf.gifRepresentation())
                         }
-                        self.delegate?.listCell(self, didSelectImage: image, imageData: image.kf.gifRepresentation())
-                    }
-                })
+                    })
             }
-            #endif
+#endif
         }
     }
     
@@ -174,4 +155,31 @@ class EditorChartletViewListCell: UICollectionViewCell,
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
+    lazy var loadingView: UIActivityIndicatorView = {
+        let view = UIActivityIndicatorView(style: .white)
+        view.hidesWhenStopped = true
+        return view
+    }()
+    
+    lazy var flowLayout: UICollectionViewFlowLayout = {
+        let flowLayout = UICollectionViewFlowLayout()
+        flowLayout.scrollDirection = .vertical
+        flowLayout.minimumLineSpacing = 5
+        flowLayout.minimumInteritemSpacing = 5
+        return flowLayout
+    }()
+    
+    lazy var collectionView: UICollectionView = {
+        let view = UICollectionView.init(frame: .zero, collectionViewLayout: flowLayout)
+        view.backgroundColor = .clear
+        view.dataSource = self
+        view.delegate = self
+        view.showsHorizontalScrollIndicator = false
+        if #available(iOS 11.0, *) {
+            view.contentInsetAdjustmentBehavior = .never
+        }
+        view.register(EditorChartletViewCell.self, forCellWithReuseIdentifier: "EditorChartletViewListCellID")
+        return view
+    }()
 }
