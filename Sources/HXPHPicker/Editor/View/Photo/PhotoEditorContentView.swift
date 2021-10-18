@@ -41,6 +41,7 @@ class PhotoEditorContentView: UIView {
     }()
     var image: UIImage? { imageView.image }
     
+    // 当, ZoomScale 发生变化之后, 进行了同步处理.
     var zoomScale: CGFloat = 1 {
         didSet {
             drawView.scale = zoomScale
@@ -48,7 +49,6 @@ class PhotoEditorContentView: UIView {
             stickerView.scale = zoomScale
         }
     }
-    
     
     // 涂抹面板
     lazy var drawView: PhotoEditorDrawView = {
@@ -69,7 +69,7 @@ class PhotoEditorContentView: UIView {
         let view = EditorStickerView(frame: .zero)
         view.delegate = self
         view.addBorderline(inWidth: 2, color: .green)
-        view.addTip("StickerView")
+        view.addTip("StickerContainer")
         return view
     }()
     
@@ -83,6 +83,7 @@ class PhotoEditorContentView: UIView {
         addSubview(drawView)
         addSubview(stickerView)
     }
+    
     func setMosaicOriginalImage(_ image: UIImage?) {
         mosaicView.originalImage = image
     }

@@ -124,10 +124,10 @@ open class PhotoEditorViewController: BaseViewController {
     lazy var photoEditView: PhotoEditorView = {
         let imageView = PhotoEditorView.init(config: config)
         imageView.editorDelegate = self
-        imageView.addBorderline(inWidth: 2, color: UIColor.red)
-        imageView.addTip("EditorViewInVc")
+        imageView.addBorderline(inWidth: 4, color: UIColor.red)
         return imageView
     }()
+    
     /// 裁剪确认视图
     public lazy var cropConfirmView: EditorCropConfirmView = {
         let cropConfirmView = EditorCropConfirmView.init(config: config.cropConfimView, showReset: true)
@@ -138,6 +138,7 @@ open class PhotoEditorViewController: BaseViewController {
         cropConfirmView.addTip("CropConfirmView")
         return cropConfirmView
     }()
+    
     public lazy var toolView: EditorToolView = {
         let toolView = EditorToolView.init(config: config.toolView)
         toolView.delegate = self
@@ -811,7 +812,8 @@ extension PhotoEditorViewController: EditorStickerTextViewControllerDelegate {
     
     // 在这里, 完成了 Text 和 Sticker 的统一处理.
     // Text 变为了图片, 就是一个 Sticker
-    func stickerTextViewController( _ controller: EditorStickerTextViewController, didFinish stickerText: EditorStickerText ) {
+    func stickerTextViewController( _ controller: EditorStickerTextViewController,
+                                    didFinish stickerText: EditorStickerText ) {
         let item = EditorStickerItem(image: stickerText.image, imageData: nil, text: stickerText)
         photoEditView.addSticker(item: item, isSelected: false)
     }

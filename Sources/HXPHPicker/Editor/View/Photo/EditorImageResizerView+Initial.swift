@@ -256,8 +256,10 @@ extension EditorImageResizerView {
         controlView.maxImageresizerFrame = maxControlRect
     }
     
+    // 狗贼, 在这里才进行了 Frame 的确认.
     func setViewFrame(_ frame: CGRect) {
         containerView.frame = frame
+        
         maskBgView.frame = containerView.bounds
         maskLinesView.frame = containerView.bounds
         scrollView.frame = containerView.bounds

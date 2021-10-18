@@ -24,6 +24,7 @@ extension EditorStickerViewDelegate {
     func stickerView(didRemoveAudio stickerView: EditorStickerView) {}
 }
 
+// 所有的, StickerItem 的 Contianer.
 class EditorStickerView: UIView {
     weak var delegate: EditorStickerViewDelegate?
     var scale: CGFloat = 1 {
@@ -77,11 +78,12 @@ class EditorStickerView: UIView {
         clipsToBounds = true
         isUserInteractionEnabled = true
     }
+    
+    // 在, StickerView 的 HitTest 中, 进行 selectedVew 的更新操作.
     override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
         let view = super.hitTest(point, with: event)
-        if touching {
-            return view
-        }
+        if touching { return view }
+        
         if let view = view, view is EditorStickerContentView {
             if let selectView = selectView {
                 var rect = selectView.frame
@@ -100,7 +102,7 @@ class EditorStickerView: UIView {
                 itemView.resetRotaion()
                 selectView = itemView
             }
-        }else {
+        } else {
             if let selectView = selectView {
                 var rect = selectView.frame
                 rect = CGRect(x: rect.minX - 35, y: rect.minY - 35, width: rect.width + 70, height: rect.height + 70)
@@ -152,10 +154,13 @@ class EditorStickerView: UIView {
     }
     
     @discardableResult
-    func add(sticker item: EditorStickerItem, isSelected: Bool) -> EditorStickerItemView {
+    func add(sticker item: EditorStickerItem,
+             isSelected: Bool) -> EditorStickerItemView {
         selectView?.isSelected = false
+        
         let itemView = EditorStickerItemView.init(item: item, scale: scale)
         itemView.delegate = self
+        
         var pScale: CGFloat
         if item.text == nil && item.music == nil {
             let ratio: CGFloat = 0.5
@@ -168,7 +173,7 @@ class EditorStickerView: UIView {
                 height = UIScreen.main.bounds.height
             }
             pScale = min(ratio * width / itemView.width, ratio * height / itemView.height)
-        }else if item.text != nil {
+        } else if item.text != nil {
             pScale = min(
                 min(
                     self.width * self.scale - 40,
@@ -179,9 +184,10 @@ class EditorStickerView: UIView {
                     itemView.height
                 ) / itemView.height
             )
-        }else {
+        } else {
             pScale = 1
         }
+        
         itemView.superAngle = angle
         itemView.superMirrorType = mirrorType
         var radians = angleRadians()
@@ -197,9 +203,14 @@ class EditorStickerView: UIView {
             itemView.center = convert(keyWindow.center, from: keyWindow)
         }
         itemView.firstTouch = isSelected
+        
         itemView.addBorderLine()
         addSubview(itemView)
+        
+        // 如果, 不根据 scale, 进行缩放, 那么 ItemView 会和在没有缩放的时候, 一样大.
+        // 也就是说, 在放大的情况下, 在屏幕上, 会非常大.
         itemView.update(pinchScale: pScale / self.scale, rotation: radians, isMirror: true)
+        
         if isSelected {
             selectView = itemView
         }
@@ -208,10 +219,12 @@ class EditorStickerView: UIView {
         }
         return itemView
     }
+    
     func deselectedSticker() {
         selectView?.isSelected = false
         selectView = nil
     }
+    
     func removeAudioView() {
         audioView?.invalidateTimer()
         audioView?.removeFromSuperview()

@@ -9,6 +9,7 @@ import UIKit
 
 // MARK: UIScrollViewDelegate
 extension EditorImageResizerView: UIScrollViewDelegate {
+    
     func didScrollAction() {
         if state != .cropping || controlView.panning {
             return
@@ -18,6 +19,7 @@ extension EditorImageResizerView: UIScrollViewDelegate {
             hideMaskBgView()
         }
     }
+    
     func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
         didScrollAction()
         delegate?.imageResizerView(willBeginDragging: self)
@@ -50,13 +52,15 @@ extension EditorImageResizerView: UIScrollViewDelegate {
         }
         delegate?.imageResizerView(didEndDecelerating: self)
     }
+    
     func viewForZooming(in scrollView: UIScrollView) -> UIView? {
         return imageView
     }
+    
     func scrollViewDidZoom(_ scrollView: UIScrollView) {
         updateScrollViewContentInset(controlView.frame)
-        
     }
+    
     func scrollViewWillBeginZooming(_ scrollView: UIScrollView, with view: UIView?) {
         if state != .cropping {
             return

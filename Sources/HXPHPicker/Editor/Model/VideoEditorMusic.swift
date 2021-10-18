@@ -38,7 +38,7 @@ public struct VideoEditorMusicInfo {
 }
 
 /*
- lrc 里面, 本身就带有时间信息的. 所以, 可以直接使用里面的内容, 做视频播放的同步数据.
+    lrc 里面, 本身就带有时间信息的. 所以, 可以直接使用里面的内容, 做视频播放的同步数据.
  */
 class VideoEditorMusic: Equatable, Codable {
     let audioURL: URL
@@ -176,18 +176,16 @@ class VideoEditorMusic: Equatable, Codable {
         }
     }
      
-    func lyric(
-        atTime time: TimeInterval
-    ) -> VideoEditorLyric? {
+    func lyric( atTime time: TimeInterval ) -> VideoEditorLyric? {
         if lyricIsEmpty {
             return .init(lyric: "此歌曲暂无歌词，请您欣赏".localized)
         }
+        // 从这里看, 就是线性的寻找, 在这个时间段的歌词.
         for lyric in lyrics {
             if lyric.second.isEmpty || lyric.second == "60000:50:00" {
                 continue
             }
-            if time >= lyric.startTime
-                && time <= lyric.endTime {
+            if time >= lyric.startTime && time <= lyric.endTime {
                 return lyric
             }
         }

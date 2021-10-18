@@ -42,6 +42,7 @@ extension EditorStickerView: EditorStickerItemViewDelegate {
     
     func stickerItemView(touchEnded itemView: EditorStickerItemView) {
         delegate?.stickerView(touchEnded: self)
+        
         if let selectView = selectView, selectView != itemView {
             selectView.isSelected = false
             self.selectView = itemView
@@ -101,6 +102,7 @@ extension EditorStickerView: EditorStickerItemViewDelegate {
             trashView.inArea = false
         }
     }
+    
     func stickerItemView(_ itemView: EditorStickerItemView, moveToCenter rect: CGRect) -> Bool {
         if let moveToCenter = delegate?.stickerView(self, moveToCenter: rect) {
             return moveToCenter

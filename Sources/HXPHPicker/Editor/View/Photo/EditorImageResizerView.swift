@@ -76,6 +76,7 @@ class EditorImageResizerView: UIView {
     
     let mosaicConfig: PhotoEditorConfiguration.MosaicConfig
     
+    // imageView 是真正的内容视图. 里面包括, 原始 Img, drawView, StickView,
     lazy var imageView: PhotoEditorContentView = {
         let imageView = PhotoEditorContentView.init(mosaicConfig: mosaicConfig)
         imageView.itemViewMoveToCenter = { [weak self] rect -> Bool in
@@ -130,6 +131,7 @@ class EditorImageResizerView: UIView {
         return maskBgView
     }()
     
+    // 背后的黑色视图.
     lazy var maskLinesView: EditorImageResizerMaskView = {
         let maskLinesView = EditorImageResizerMaskView.init(isMask: false)
         maskLinesView.isRoundCrop = cropConfig.isRoundCrop
@@ -139,6 +141,7 @@ class EditorImageResizerView: UIView {
         return maskLinesView
     }()
     
+    // 切割视图.
     lazy var controlView: EditorImageResizerControlView = {
         let controlView = EditorImageResizerControlView.init()
         controlView.isUserInteractionEnabled = false

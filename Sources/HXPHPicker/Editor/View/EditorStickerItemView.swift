@@ -21,17 +21,21 @@ protocol EditorStickerItemViewDelegate: AnyObject {
 }
 
 class EditorStickerItemView: UIView {
-    weak var delegate: EditorStickerItemViewDelegate?
     
+    // contentView 提供, 最最原始的 StickView 的显示. 不包括 Scale, Retote 的信息.
     lazy var contentView: EditorStickerContentView = {
         let view = EditorStickerContentView(item: item)
         view.center = center
         return view
     }()
+    
+    // externalBorder 表示, 被选中的状态.
     lazy var externalBorder: CALayer = {
         let externalBorder = CALayer()
         return externalBorder
     }()
+    
+    weak var delegate: EditorStickerItemViewDelegate?
     
     var item: EditorStickerItem
     var isEnabled: Bool = true {
@@ -67,28 +71,38 @@ class EditorStickerItemView: UIView {
     var initialPoint: CGPoint = .zero
     var initialRadian: CGFloat = 0
     
+    // 在 StickerView 中, add(sticker item: EditorStickerItem) 会被调用
     init(item: EditorStickerItem, scale: CGFloat) {
         self.item = item
         self.scale = scale
-        let rect = CGRect(x: 0, y: 0, width: item.frame.width, height: item.frame.height)
+        
+        // 在, 最开始的时候, 是根据 Item 的 Frame 的值, 来计算的高度.
+        let rect = CGRect(x: 0,
+                          y: 0,
+                          width: item.frame.width,
+                          height: item.frame.height)
         super.init(frame: rect)
+        
         let margin = itemMargin / scale
-        externalBorder.frame = CGRect(
-            x: -margin * 0.5,
-            y: -margin * 0.5,
-            width: width + margin,
-            height: height + margin
-        )
+        externalBorder.frame = CGRect(x: -margin * 0.5,
+                                      y: -margin * 0.5,
+                                      width: width + margin,
+                                      height: height + margin)
+        
         layer.addSublayer(externalBorder)
         addSubview(contentView)
+        
         if item.music == nil {
-            externalBorder.borderColor = UIColor.white.cgColor
+            externalBorder.borderColor = UIColor.purple.cgColor
         }
         layer.shadowOpacity = 0.3
         layer.shadowOffset = CGSize(width: 0, height: 0)
         layer.shadowRadius = 1
-        initGestures()
+        setupGestures()
+        
+        self.backgroundColor = UIColor.lightGray
     }
+    
     override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
         let view = super.hitTest(point, with: event)
         if bounds.contains(point) {
@@ -96,19 +110,43 @@ class EditorStickerItemView: UIView {
         }
         return view
     }
+    
     func invalidateTimer() {
         self.contentView.invalidateTimer()
     }
-    func initGestures() {
+    
+    var firstTouch: Bool = false
+    var radian: CGFloat = 0
+    var pinchScale: CGFloat = 1
+    var mirrorType: EditorImageResizerView.MirrorType = .none
+    var superMirrorType: EditorImageResizerView.MirrorType = .none
+    var superAngle: CGFloat = 0
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+}
+
+extension EditorStickerItemView {
+    
+    func setupGestures() {
         contentView.isUserInteractionEnabled = true
+        
         let tapGR = UITapGestureRecognizer(target: self, action: #selector(contentViewTapClick(tapGR:)))
         contentView.addGestureRecognizer(tapGR)
+        
         let panGR = UIPanGestureRecognizer(target: self, action: #selector(contentViewPanClick(panGR:)))
         contentView.addGestureRecognizer(panGR)
+        
         if item.music == nil {
             let pinchGR = UIPinchGestureRecognizer(target: self, action: #selector(contentViewPinchClick(pinchGR:)))
             contentView.addGestureRecognizer(pinchGR)
         }
+        
         let rotationGR = UIRotationGestureRecognizer(
             target: self,
             action: #selector(contentViewRotationClick(rotationGR:))
@@ -134,6 +172,7 @@ class EditorStickerItemView: UIView {
         }
         firstTouch = true
     }
+    
     @objc func contentViewPanClick(panGR: UIPanGestureRecognizer) {
         if isDelete {
             return
@@ -143,8 +182,8 @@ class EditorStickerItemView: UIView {
         }
         switch panGR.state {
         case .began:
-            touching = true
             firstTouch = true
+            touching = true
             delegate?.stickerItemView(didTouchBegan: self)
             isSelected = true
             initialPoint = self.center
@@ -156,9 +195,12 @@ class EditorStickerItemView: UIView {
             touching = false
             var isDelete = false
             if let panIsDelete = delegate?.stickerItemView(panGestureRecognizerEnded: self) {
+                // isDelegte, 只会在手指放开的时候, 才会触发.
                 isDelete = panIsDelete
             }
             self.delegate?.stickerItemView(touchEnded: self)
+            
+            // 如果, 超过了 SuperImageView 的范围, 会自动移动到中心位置.
             let rect = convert(contentView.frame, to: superview?.viewController()?.view)
             if let moveToCenter = delegate?.stickerItemView(self, moveToCenter: rect), !isDelete {
                 let keyWindow = UIApplication.shared.keyWindow
@@ -185,8 +227,8 @@ class EditorStickerItemView: UIView {
         }
         switch pinchGR.state {
         case .began:
-            touching = true
             firstTouch = true
+            touching = true
             delegate?.stickerItemView(didTouchBegan: self)
             isSelected = true
             initialScale = pinchScale
@@ -203,6 +245,7 @@ class EditorStickerItemView: UIView {
             pinchGR.scale = 1
         }
     }
+    
     @objc func contentViewRotationClick(rotationGR: UIRotationGestureRecognizer) {
         if isDelete {
             return
@@ -257,17 +300,16 @@ class EditorStickerItemView: UIView {
             break
         }
     }
-    var firstTouch: Bool = false
-    var radian: CGFloat = 0
-    var pinchScale: CGFloat = 1
-    var mirrorType: EditorImageResizerView.MirrorType = .none
-    var superMirrorType: EditorImageResizerView.MirrorType = .none
-    var superAngle: CGFloat = 0
+}
+
+extension EditorStickerItemView {
+    
     func update(pinchScale: CGFloat,
                 rotation: CGFloat = CGFloat(MAXFLOAT),
                 isInitialize: Bool = false,
                 isPinch: Bool = false,
                 isMirror: Bool = false) {
+        
         if rotation != CGFloat(MAXFLOAT) {
             radian = rotation
         }
@@ -312,17 +354,20 @@ class EditorStickerItemView: UIView {
         }
         transform = .identity
         var margin = itemMargin / scale
+        
         if touching {
             margin *= scale
             contentView.transform = .init(scaleX: self.pinchScale * scale, y: self.pinchScale * scale)
         }else {
             contentView.transform = .init(scaleX: self.pinchScale, y: self.pinchScale)
         }
+        
         var rect = frame
         rect.origin.x += (rect.width - contentView.width) / 2
         rect.origin.y += (rect.height - contentView.height) / 2
         rect.size.width = contentView.width
         rect.size.height = contentView.height
+        // 在这里, 会进行 Frame 的设置.
         frame = rect
         CATransaction.begin()
         CATransaction.setDisableActions(true)
@@ -406,12 +451,5 @@ class EditorStickerItemView: UIView {
     }
     func resetRotaion() {
         update(pinchScale: pinchScale, rotation: radian, isMirror: true)
-    }
-    override func layoutSubviews() {
-        super.layoutSubviews()
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
     }
 }

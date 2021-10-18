@@ -202,6 +202,7 @@ extension PhotoEditorView {
         setContentOffset(CGPoint(x: -contentInset.left, y: -contentInset.top), animated: false)
     }
     
+    // 裁剪这件事, 会让外界的 ScrollView, 停止操作. 
     func startCropping(_ animated: Bool) {
         editorDelegate?.editorView(willAppearCrop: self)
         state = .cropping
