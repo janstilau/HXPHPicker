@@ -8,6 +8,7 @@
 import UIKit
 
 class EditorStickerTrashView: UIView {
+    
     lazy var bgView: UIVisualEffectView = {
         let effect = UIBlurEffect(style: .dark)
         let view = UIVisualEffectView(effect: effect)

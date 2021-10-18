@@ -7,23 +7,19 @@
 
 import UIKit
 
+// 将 EditorStickerTextView 的具体实现, 按照功能模块, 使用 extension 进行分层
+
 extension EditorStickerTextView: UICollectionViewDataSource,
                                  UICollectionViewDelegate {
-    func collectionView(
-        _ collectionView: UICollectionView,
-        numberOfItemsInSection section: Int
-    ) -> Int {
+    func collectionView( _ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         config.colors.count
     }
     
-    func collectionView(
-        _ collectionView: UICollectionView,
-        cellForItemAt indexPath: IndexPath
-    ) -> UICollectionViewCell {
+    func collectionView(_ collectionView: UICollectionView,
+                        cellForItemAt indexPath: IndexPath ) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(
             withReuseIdentifier: "EditorStickerTextViewCellID",
-            for: indexPath
-        ) as! PhotoEditorBrushColorViewCell
+            for: indexPath ) as! PhotoEditorBrushColorViewCell
         cell.colorHex = config.colors[indexPath.item]
         return cell
     }
@@ -32,11 +28,6 @@ extension EditorStickerTextView: UICollectionViewDataSource,
         collectionView.deselectItem(at: IndexPath(item: currentSelectedIndex, section: 0), animated: true)
         if currentSelectedIndex == indexPath.item { return }
         
-        /*
-            如果, 有背景色, 那么这里选择的就是背景色.
-            文字颜色只有黑白两种.
-            如果, 没有背景色, 那么这里选择的就是文字颜色.
-         */
         let color = config.colors[indexPath.item].color
         currentSelectedColor = color
         currentSelectedIndex = indexPath.item

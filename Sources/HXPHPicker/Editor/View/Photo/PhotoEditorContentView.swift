@@ -26,6 +26,8 @@ class PhotoEditorContentView: UIView {
     
     var stickerMaxScale: ((CGSize) -> CGFloat)?
     
+    // 底图面板.
+    // 可以看到, 编辑的图片, 是和这几个 View 在一起显示的.
     lazy var imageView: UIImageView = {
         var imageView: UIImageView
         #if canImport(Kingfisher)
@@ -38,6 +40,7 @@ class PhotoEditorContentView: UIView {
         return imageView
     }()
     var image: UIImage? { imageView.image }
+    
     var zoomScale: CGFloat = 1 {
         didSet {
             drawView.scale = zoomScale
@@ -45,16 +48,23 @@ class PhotoEditorContentView: UIView {
             stickerView.scale = zoomScale
         }
     }
+    
+    
+    // 涂抹面板
     lazy var drawView: PhotoEditorDrawView = {
         let drawView = PhotoEditorDrawView.init(frame: .zero)
         drawView.delegate = self
         return drawView
     }()
+    
+    // 马赛克面板
     lazy var mosaicView: PhotoEditorMosaicView = {
         let view = PhotoEditorMosaicView(mosaicConfig: mosaicConfig)
         view.delegate = self
         return view
     }()
+    
+    // 贴图面板
     lazy var stickerView: EditorStickerView = {
         let view = EditorStickerView(frame: .zero)
         view.delegate = self
@@ -85,6 +95,7 @@ class PhotoEditorContentView: UIView {
         #endif
     }
     
+    // 所有的子 View, 都是同样的尺寸, 这样, 外界在进行放大缩小的时候, 能够统一进行处理.
     override func layoutSubviews() {
         super.layoutSubviews()
         imageView.frame = bounds
@@ -92,6 +103,7 @@ class PhotoEditorContentView: UIView {
         mosaicView.frame = bounds
         stickerView.frame = bounds
     }
+    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }

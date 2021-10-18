@@ -72,6 +72,7 @@ public extension EditorToolOptions {
 extension EditorToolView {
     
     struct Options: OptionSet {
+        
         static let graffiti = Options(rawValue: 1 << 0)
         static let chartlet = Options(rawValue: 1 << 1)
         static let text = Options(rawValue: 1 << 2)
@@ -79,6 +80,7 @@ extension EditorToolView {
         static let filter = Options(rawValue: 1 << 4)
         static let music = Options(rawValue: 1 << 5)
         static let cropping = Options(rawValue: 1 << 6)
+        
         let rawValue: Int
         
         var isSticker: Bool {
@@ -87,6 +89,7 @@ extension EditorToolView {
             }
             return false
         }
+        
         init(rawValue: Int) {
             self.rawValue = rawValue
         }

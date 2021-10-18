@@ -18,7 +18,7 @@ open class PhotoEditorViewController: BaseViewController {
     
     /// 配置
     /*
-     这种必传项, 应该在 init 方法内, 进行赋值.
+        这种必传项, 应该在 init 方法内, 进行赋值.
      */
     public let config: PhotoEditorConfiguration
     
@@ -124,8 +124,8 @@ open class PhotoEditorViewController: BaseViewController {
     lazy var photoEditView: PhotoEditorView = {
         let imageView = PhotoEditorView.init(config: config)
         imageView.editorDelegate = self
-        imageView.addBorderline(inWidth: 2, color: UIColor.yellow)
-        imageView.addTip("EditorView")
+        imageView.addBorderline(inWidth: 2, color: UIColor.red)
+        imageView.addTip("EditorViewInVc")
         return imageView
     }()
     /// 裁剪确认视图
@@ -134,13 +134,13 @@ open class PhotoEditorViewController: BaseViewController {
         cropConfirmView.alpha = 0
         cropConfirmView.isHidden = true
         cropConfirmView.delegate = self
+        cropConfirmView.addBorderline(inWidth: 2, color: UIColor.random())
+        cropConfirmView.addTip("CropConfirmView")
         return cropConfirmView
     }()
     public lazy var toolView: EditorToolView = {
         let toolView = EditorToolView.init(config: config.toolView)
         toolView.delegate = self
-        toolView.addBorderline(inWidth: 2, color: .red)
-        toolView.addTip("工具栏")
         return toolView
     }()
     public lazy var topView: UIView = {
@@ -163,6 +163,8 @@ open class PhotoEditorViewController: BaseViewController {
         view.currentColorIndex = config.defaultBrushColorIndex
         view.alpha = 0
         view.isHidden = true
+        view.addBorderLine()
+        view.addTip("BrushColorVIEW")
         return view
     }()
     public lazy var cropToolView: PhotoEditorCropToolView = {
@@ -175,6 +177,8 @@ open class PhotoEditorViewController: BaseViewController {
         view.themeColor = config.cropping.aspectRatioSelectedColor
         view.alpha = 0
         view.isHidden = true
+        view.addBorderLine()
+        view.addTip("CropToolView")
         return view
     }()
     lazy var mosaicToolView: PhotoEditorMosaicToolView = {
@@ -182,6 +186,8 @@ open class PhotoEditorViewController: BaseViewController {
         view.delegate = self
         view.alpha = 0
         view.isHidden = true
+        view.addBorderLine()
+        view.addTip("MosaicToolView")
         return view
     }()
     lazy var filterView: PhotoEditorFilterView = {
@@ -191,11 +197,15 @@ open class PhotoEditorViewController: BaseViewController {
                                               sourceIndex: filter?.sourceIndex ?? -1,
                                               value: value ?? 0)
         view.delegate = self
+        view.addBorderLine()
+        view.addTip("FilterView")
         return view
     }()
     lazy var chartletView: EditorChartletView = {
         let view = EditorChartletView(config: config.chartlet, editorType: .photo)
         view.delegate = self
+        view.addBorderLine()
+        view.addTip("ChartletView")
         return view
     }()
     
@@ -286,41 +296,8 @@ open class PhotoEditorViewController: BaseViewController {
             }
         }
         
-        let singleTap = UITapGestureRecognizer.init(target: self, action: #selector(singleTap))
-        singleTap.delegate = self
-        view.addGestureRecognizer(singleTap)
-        view.isExclusiveTouch = true
-        view.backgroundColor = .black
-        view.clipsToBounds = true
-        view.addSubview(photoEditView)
-        view.addSubview(toolView)
-        if toolOptions.contains(.cropping) {
-            view.addSubview(cropConfirmView)
-            view.addSubview(cropToolView)
-        }
-        if config.fixedCropState {
-            state = .cropping
-            toolView.alpha = 0
-            toolView.isHidden = true
-            topView.alpha = 0
-            topView.isHidden = true
-        }else {
-            state = config.state
-            if toolOptions.contains(.graffiti) {
-                view.addSubview(brushColorView)
-            }
-            if toolOptions.contains(.chartlet) {
-                view.addSubview(chartletView)
-            }
-            if toolOptions.contains(.mosaic) {
-                view.addSubview(mosaicToolView)
-            }
-            if toolOptions.contains(.filter) {
-                view.addSubview(filterView)
-            }
-        }
-        view.layer.addSublayer(topMaskLayer)
-        view.addSubview(topView)
+        setupViews()
+        
         if needRequest {
             if requestType == 1 {
 #if HXPICKER_ENABLE_PICKER
@@ -362,6 +339,50 @@ open class PhotoEditorViewController: BaseViewController {
         orientationDidChange = true
         imageViewDidChange = false
     }
+    
+    func setupViews() {
+        let singleTap = UITapGestureRecognizer.init(target: self, action: #selector(singleTap))
+        singleTap.delegate = self
+        view.addGestureRecognizer(singleTap)
+        
+        /*
+         A Boolean value that indicates whether the receiver handles touch events exclusively.
+         */
+        view.isExclusiveTouch = true
+        view.backgroundColor = .black
+        view.clipsToBounds = true
+        
+        view.addSubview(photoEditView)
+        view.addSubview(toolView)
+        if toolOptions.contains(.cropping) {
+            view.addSubview(cropConfirmView)
+            view.addSubview(cropToolView)
+        }
+        if config.fixedCropState {
+            state = .cropping
+            toolView.alpha = 0
+            toolView.isHidden = true
+            topView.alpha = 0
+            topView.isHidden = true
+        }else {
+            state = config.state
+            if toolOptions.contains(.graffiti) {
+                view.addSubview(brushColorView)
+            }
+            if toolOptions.contains(.chartlet) {
+                view.addSubview(chartletView)
+            }
+            if toolOptions.contains(.mosaic) {
+                view.addSubview(mosaicToolView)
+            }
+            if toolOptions.contains(.filter) {
+                view.addSubview(filterView)
+            }
+        }
+        view.layer.addSublayer(topMaskLayer)
+        view.addSubview(topView)
+    }
+    
     open override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         toolView.frame = CGRect(
@@ -407,7 +428,7 @@ open class PhotoEditorViewController: BaseViewController {
             photoEditView.reset(false)
             photoEditView.finishCropping(false)
             orientationDidChange = true
-        }else {
+        } else {
             photoEditView.frame = view.bounds
         }
         if !imageInitializeCompletion {
@@ -780,25 +801,18 @@ extension PhotoEditorViewController: UIGestureRecognizerDelegate {
 }
 
 /*
- 增加完 Text 的回调.
+    增加完 Text 的回调.
  */
 extension PhotoEditorViewController: EditorStickerTextViewControllerDelegate {
-    func stickerTextViewController(
-        _ controller: EditorStickerTextViewController,
-        didFinish stickerItem: EditorStickerItem
-    ) {
+    func stickerTextViewController( _ controller: EditorStickerTextViewController,
+                                    didFinish stickerItem: EditorStickerItem ) {
         photoEditView.updateSticker(item: stickerItem)
     }
     
-    func stickerTextViewController(
-        _ controller: EditorStickerTextViewController,
-        didFinish stickerText: EditorStickerText
-    ) {
-        let item = EditorStickerItem(
-            image: stickerText.image,
-            imageData: nil,
-            text: stickerText
-        )
+    // 在这里, 完成了 Text 和 Sticker 的统一处理.
+    // Text 变为了图片, 就是一个 Sticker
+    func stickerTextViewController( _ controller: EditorStickerTextViewController, didFinish stickerText: EditorStickerText ) {
+        let item = EditorStickerItem(image: stickerText.image, imageData: nil, text: stickerText)
         photoEditView.addSticker(item: item, isSelected: false)
     }
 }

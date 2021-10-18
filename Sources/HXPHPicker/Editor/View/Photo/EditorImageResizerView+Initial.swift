@@ -9,6 +9,7 @@ import UIKit
 import AVFoundation
 
 extension EditorImageResizerView {
+    
     func setCropData(cropData: PhotoEditCropData) {
         hasCropping = true
         // 记录当前数据

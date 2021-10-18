@@ -184,9 +184,6 @@ extension EditorChartletView {
         addSubview(titleView)
         addSubview(backButton)
         addSubview(loadingView)
-        
-        self.addBorderline(inWidth: 2, color: UIColor.purple)
-        self.addTip("Chartlet")
     }
     
     @objc func didBackButtonClick() {

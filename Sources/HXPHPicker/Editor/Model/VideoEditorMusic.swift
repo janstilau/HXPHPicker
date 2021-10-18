@@ -37,11 +37,13 @@ public struct VideoEditorMusicInfo {
     }
 }
 
+/*
+ lrc 里面, 本身就带有时间信息的. 所以, 可以直接使用里面的内容, 做视频播放的同步数据.
+ */
 class VideoEditorMusic: Equatable, Codable {
     let audioURL: URL
     let lrc: String
-    init(audioURL: URL,
-         lrc: String) {
+    init(audioURL: URL, lrc: String) {
         self.audioURL = audioURL
         self.lrc = lrc
     }

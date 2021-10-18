@@ -60,6 +60,7 @@ class EditorStickerView: UIView {
             }
         }
     }
+    
     weak var audioView: EditorStickerItemView?
     lazy var trashView: EditorStickerTrashView = {
         let view = EditorStickerTrashView(frame: CGRect(x: 0, y: 0, width: 180, height: 80))

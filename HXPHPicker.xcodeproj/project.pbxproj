@@ -616,6 +616,7 @@
 		7BFD79FD25AC8AF700694499 /* RELEASE_NOTE.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = RELEASE_NOTE.md; sourceTree = "<group>"; };
 		98BBBE43DD88BF719F1FA7D1 /* Pods_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		9954A16ACB03271F6C07C4AC /* Pods-Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Example.debug.xcconfig"; path = "Target Support Files/Pods-Example/Pods-Example.debug.xcconfig"; sourceTree = "<group>"; };
+		AA170D1B271D86D3009A4486 /* LRC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LRC.h; sourceTree = "<group>"; };
 		D3A1B88CE8E4B4FE1AA36BCC /* Pods_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		E88BDC49481CACD737FE86CF /* Pods-Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Example.release.xcconfig"; path = "Target Support Files/Pods-Example/Pods-Example.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -1291,6 +1292,7 @@
 				7BDAE9BB26803AB000DF0362 /* VideoEditorMusic.swift */,
 				7B6DE5382683317E00EE1B1D /* PhotoEditorFilter.swift */,
 				7BB6CB3E26AE4E7C006CBB74 /* EditorChartlet.swift */,
+				AA170D1B271D86D3009A4486 /* LRC.h */,
 			);
 			path = Model;
 			sourceTree = "<group>";

@@ -79,6 +79,7 @@ class PhotoEditorView: UIScrollView, UIGestureRecognizerDelegate {
         if #available(iOS 11.0, *) {
             contentInsetAdjustmentBehavior = .never
         }
+        // PhotoEditorView 里面, 仅仅增加了一个 SubView
         addSubview(imageResizerView)
     }
     
@@ -110,11 +111,15 @@ class PhotoEditorView: UIScrollView, UIGestureRecognizerDelegate {
         imageResizerView.imageView.drawView.lineWidth = config.brushLineWidth
         imageResizerView.delegate = self
         imageResizerView.imageView.delegate = self
+        
+        imageResizerView.addBorderline(inWidth: 2, color: UIColor.blue)
+        imageResizerView.addTip("ResizeView")
         return imageResizerView
     }()
 }
 
 extension PhotoEditorView {
+    
     func updateImageViewFrame() {
         let imageWidth = width
         var imageHeight: CGFloat
@@ -132,7 +137,10 @@ extension PhotoEditorView {
             imageResizerView.setViewFrame(bounds)
         }
         contentSize = CGSize(width: imageWidth, height: imageHeight)
-        imageResizerView.frame = CGRect(x: imageX, y: imageY, width: imageWidth, height: imageHeight)
+        imageResizerView.frame = CGRect(x: imageX,
+                                        y: imageY,
+                                        width: imageWidth,
+                                        height: imageHeight)
     }
     
     func setImage(_ image: UIImage) {
@@ -347,6 +355,7 @@ extension PhotoEditorView: UIScrollViewDelegate {
         }
         return imageResizerView
     }
+    
     func scrollViewDidZoom(_ scrollView: UIScrollView) {
         if !canZoom {
             return
@@ -359,6 +368,7 @@ extension PhotoEditorView: UIScrollViewDelegate {
         let centerY = scrollView.contentSize.height * 0.5 + offsetY
         imageResizerView.center = CGPoint(x: centerX, y: centerY)
     }
+    
     func scrollViewDidEndZooming(_ scrollView: UIScrollView, with view: UIView?, atScale scale: CGFloat) {
         imageResizerView.zoomScale = scale
     }

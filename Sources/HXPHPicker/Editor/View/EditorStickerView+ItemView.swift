@@ -72,7 +72,8 @@ extension EditorStickerView: EditorStickerItemViewDelegate {
         }
     }
     
-    func stickerItemView(_ itemView: EditorStickerItemView, panGestureRecognizerChanged panGR: UIPanGestureRecognizer) {
+    func stickerItemView(_ itemView: EditorStickerItemView,
+                         panGestureRecognizerChanged panGR: UIPanGestureRecognizer) {
         let point = panGR.location(in: UIApplication.shared.keyWindow)
         if trashView.frame.contains(point) && !trashViewDidRemove {
             trashView.inArea = true

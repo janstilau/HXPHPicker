@@ -13,7 +13,7 @@ extension CALayer {
         let toSize: CGSize
         if size.equalTo(.zero) {
             toSize = frame.size
-        }else {
+        } else {
             toSize = size
         }
         UIGraphicsBeginImageContextWithOptions(toSize, false, scale)

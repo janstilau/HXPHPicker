@@ -8,7 +8,7 @@
 import UIKit
 
 /*
-    这里的整块逻辑, 都是在进行, 背景颜色框的计算工作. 
+    这里的整块逻辑, 都是在进行, 背景颜色框的计算工作.
  */
 extension EditorStickerTextView {
     
@@ -279,18 +279,30 @@ extension EditorStickerTextView {
         return path
     }
     
+    /*
+        绘制, 背景图的过程.
+     */
     func drawTextBackgroudColor() {
         if textView.text.isEmpty {
             textBgLayer?.path = nil
             return
         }
+        
         var rectArray: [CGRect] = []
         let layoutManager = textView.layoutManager
         let numberOfGlyphs = layoutManager.numberOfGlyphs
         var currentGlyph = 0
+        
+        // 在这个循环里面, 收集每一行的 Rect 信息.
         while currentGlyph < numberOfGlyphs {
             var glyphRange = NSRange()
             var usedRect = layoutManager.lineFragmentUsedRect(forGlyphAt: currentGlyph, effectiveRange: &glyphRange)
+            /*
+                从结果上看, 是每一行, 一个 Range. 和 Emoji 表情, 没有太大的关系.
+             */
+            let nsText = textView.text as NSString
+            print("Text: \(nsText.substring(with: glyphRange))  Range: \(glyphRange)")
+            
             currentGlyph = NSMaxRange(glyphRange)
             var nextIsEmpty = true
             var lastLineIsEmpty = false
@@ -311,6 +323,7 @@ extension EditorStickerTextView {
                     lastLineIsEmpty = true
                 }
             }
+            
             if !nextIsEmpty || lastLineIsEmpty {
                 usedRect = CGRect(
                     x: usedRect.minX - 6,
@@ -328,7 +341,11 @@ extension EditorStickerTextView {
             }
             rectArray.append(usedRect)
         }
+        
+        
+        
         let path = drawBackgroundPath(rects: rectArray)
+        
         let color = showBgColor ? textBgColor.cgColor : UIColor.clear.cgColor
         if let textLayer = textBgLayer {
             textLayer.path = path.cgPath
@@ -338,7 +355,7 @@ extension EditorStickerTextView {
             CATransaction.setDisableActions(true)
             textLayer.frame = CGRect(x: 15, y: 15, width: path.bounds.width, height: textView.contentSize.height)
             CATransaction.commit()
-        }else {
+        } else {
             for subView in textView.subviews {
                 if let textClass = NSClassFromString("_UITextContainerView"), subView.isKind(of: textClass) {
                     textBgLayer = createTextBackgroundLayer(path: path.cgPath)
@@ -363,10 +380,14 @@ extension EditorStickerTextView {
         return newSize.width
     }
     
+    /*
+        从当前的 TextView 中, 取出图来, 进行绘制.
+     */
     func textImage() -> UIImage? {
         textView.tintColor = .clear
         for subView in textView.subviews {
-            if let textClass = NSClassFromString("_UITextContainerView"), subView.isKind(of: textClass) {
+            if let textClass = NSClassFromString("_UITextContainerView"),
+               subView.isKind(of: textClass) {
                 let size = CGSize(width: textMaximumWidth(view: subView), height: subView.height)
                 let image = subView.layer.convertedToImage(size: size)
                 subView.layer.contents = nil

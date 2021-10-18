@@ -24,8 +24,7 @@ public class EditorTextConfig {
     /// 文本视图推出样式
     public lazy var modalPresentationStyle: UIModalPresentationStyle = {
         if #available(iOS 13.0, *) {
-//            return .automatic
-            return .fullScreen
+            return .automatic
         } else {
             return .fullScreen
         }

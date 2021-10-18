@@ -12,21 +12,22 @@ protocol PhotoEditorBrushColorViewDelegate: AnyObject {
     func brushColorView(didUndoButton colorView: PhotoEditorBrushColorView)
 }
 
+/*
+    PhotoEditorBrushColorView 是当涂抹按钮点击之后的 ToolView.
+ */
 public class PhotoEditorBrushColorView: UIView {
     weak var delegate: PhotoEditorBrushColorViewDelegate?
+    
     var brushColors: [String] = []
+    
     var currentColorIndex: Int = 0 {
         didSet {
-            collectionView.selectItem(
-                at: IndexPath(
-                    item: currentColorIndex,
-                    section: 0
-                ),
-                animated: true,
-                scrollPosition: .centeredHorizontally
-            )
+            collectionView.selectItem( at: IndexPath( item: currentColorIndex, section: 0 ),
+                                       animated: true,
+                                       scrollPosition: .centeredHorizontally)
         }
     }
+    
     lazy var flowLayout: UICollectionViewFlowLayout = {
         let flowLayout = UICollectionViewFlowLayout.init()
         flowLayout.scrollDirection = .horizontal
@@ -85,12 +86,10 @@ public class PhotoEditorBrushColorView: UIView {
         super.layoutSubviews()
         
         collectionView.frame = bounds
-        flowLayout.sectionInset = UIEdgeInsets(
-            top: 0,
-            left: 12 + UIDevice.leftMargin,
-            bottom: 0,
-            right: height + UIDevice.rightMargin
-        )
+        flowLayout.sectionInset = UIEdgeInsets( top: 0,
+                                                left: 12 + UIDevice.leftMargin,
+                                                bottom: 0,
+                                                right: height + UIDevice.rightMargin)
         undoButton.frame = CGRect(x: width - UIDevice.rightMargin - height, y: 0, width: height, height: height)
     }
 }
@@ -99,10 +98,8 @@ extension PhotoEditorBrushColorView: UICollectionViewDataSource, UICollectionVie
     public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         brushColors.count
     }
-    public func collectionView(
-        _ collectionView: UICollectionView,
-        cellForItemAt indexPath: IndexPath
-    ) -> UICollectionViewCell {
+    
+    public func collectionView( _ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath ) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(
             withReuseIdentifier: "PhotoEditorBrushColorViewCellID",
             for: indexPath
@@ -110,23 +107,15 @@ extension PhotoEditorBrushColorView: UICollectionViewDataSource, UICollectionVie
         cell.colorHex = brushColors[indexPath.item]
         return cell
     }
-    public func collectionView(
-        _ collectionView: UICollectionView,
-        didSelectItemAt indexPath: IndexPath
-    ) {
-        collectionView.scrollToItem(
-            at: indexPath,
-            at: .centeredHorizontally,
-            animated: true
-        )
-        delegate?.brushColorView(
-            self,
-            changedColor: brushColors[indexPath.item]
-        )
+    
+    public func collectionView( _ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath ) {
+        collectionView.scrollToItem( at: indexPath, at: .centeredHorizontally, animated: true)
+        delegate?.brushColorView( self, changedColor: brushColors[indexPath.item])
     }
 }
 
 class PhotoEditorBrushColorViewCell: UICollectionViewCell {
+    
     lazy var colorBgView: UIView = {
         let view = UIView.init()
         view.size = CGSize(width: 22, height: 22)

@@ -41,14 +41,12 @@ class EditorImageResizerView: UIView {
         case down
     }
     
-    deinit {
-//        print("deinit", self)
-    }
     var exportScale: CGFloat = UIScreen.main.scale
     var animationDuration: TimeInterval = 0.25
     /// 裁剪配置
     var cropConfig: PhotoCroppingConfiguration
     weak var delegate: EditorImageResizerViewDelegate?
+    
     lazy var containerView: PhotoEditorContainerView = {
         let containerView = PhotoEditorContainerView.init()
         containerView.addSubview(scrollView)
@@ -56,6 +54,7 @@ class EditorImageResizerView: UIView {
         containerView.addSubview(maskBgView)
         containerView.addSubview(maskLinesView)
         containerView.addSubview(controlView)
+        
         return containerView
     }()
     
@@ -139,6 +138,7 @@ class EditorImageResizerView: UIView {
         maskLinesView.isHidden = true
         return maskLinesView
     }()
+    
     lazy var controlView: EditorImageResizerControlView = {
         let controlView = EditorImageResizerControlView.init()
         controlView.isUserInteractionEnabled = false
@@ -223,14 +223,17 @@ class EditorImageResizerView: UIView {
         self.cropConfig = cropConfig
         self.mosaicConfig = mosaicConfig
         super.init(frame: .zero)
+        // EditorImageResizerView 只有这样一个 SubView. 然后其他的内容, 是在 containerView 之上.
         addSubview(containerView)
     }
+    
     override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
         if state == .cropping {
             return true
         }
         return super.point(inside: point, with: event)
     }
+    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -265,6 +268,7 @@ class EditorImageResizerView: UIView {
             return .up
         }
     }
+    
     func getCroppingRect() -> CGRect {
         var rect = maskBgView.convert(controlView.frame, to: imageView)
         rect = CGRect(

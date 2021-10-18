@@ -78,20 +78,24 @@ extension UIImage {
         UIGraphicsEndImageContext()
         return image
     }
+    
     func scaleImage(toScale: CGFloat) -> UIImage? {
         if toScale == 1 {
             return self
         }
-        UIGraphicsBeginImageContextWithOptions(
-            CGSize(width: width * toScale, height: height * toScale),
-            false,
-            self.scale
-        )
+        // 开启一张画布, 用 scale 和自己的 size, 设置画布的长度.
+        // 然后将自己画到这个画布上.
+        // 具体, 像素点如何计算中间值, 交给 draw 函数.
+        UIGraphicsBeginImageContextWithOptions(CGSize(width: width * toScale,
+                                                      height: height * toScale),
+                                               false,
+                                               self.scale)
         self.draw(in: CGRect(x: 0, y: 0, width: width * toScale, height: height * toScale))
         let image = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
         return image
     }
+    
     class func image(for color: UIColor?, havingSize: CGSize, radius: CGFloat = 0) -> UIImage? {
         if let color = color {
             let rect: CGRect
@@ -106,7 +110,6 @@ extension UIImage {
             let path = UIBezierPath(roundedRect: rect, cornerRadius: radius).cgPath
             context?.addPath(path)
             context?.fillPath()
-        
             let image = UIGraphicsGetImageFromCurrentImageContext()
             UIGraphicsEndImageContext()
             return image
