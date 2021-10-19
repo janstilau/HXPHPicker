@@ -530,6 +530,7 @@ open class PhotoEditorViewController: BaseViewController {
  */
 extension PhotoEditorViewController: EditorToolViewDelegate {
     
+    // 完成按钮点击之后, 会触发到该方法.
     func toolView(didFinishButtonClick toolView: EditorToolView) {
         exportResources()
     }

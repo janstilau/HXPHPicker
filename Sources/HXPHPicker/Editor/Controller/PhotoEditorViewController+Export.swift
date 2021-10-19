@@ -15,6 +15,7 @@ extension PhotoEditorViewController {
             photoEditView.canUndoMosaic ||
             photoEditView.hasFilter ||
             photoEditView.hasSticker {
+            
             photoEditView.deselectedSticker()
             ProgressHUD.showLoading(addedTo: view, animated: true)
             photoEditView.cropping { [weak self] (result) in

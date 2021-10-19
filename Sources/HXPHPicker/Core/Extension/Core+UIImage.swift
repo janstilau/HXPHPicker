@@ -325,6 +325,8 @@ extension UIImage {
         return mergeImage
     }
     
+    // 图片数组的 Merge 操作, 就是, 把这几个图片, 都画到同一块画布上.
+    // 然后, 从这个画布上, 获取到一张最终的图.
     class func merge(images: [UIImage], scale: CGFloat = UIScreen.main.scale) -> UIImage? {
         if images.isEmpty {
             return nil
@@ -340,6 +342,7 @@ extension UIImage {
         UIGraphicsEndImageContext()
         return mergeImage
     }
+    
     class func gradualShadowImage(_ havingSize: CGSize) -> UIImage? {
         let layer = PhotoTools.getGradientShadowLayer(true)
         layer.frame = CGRect(origin: .zero, size: havingSize)

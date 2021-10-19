@@ -257,33 +257,42 @@ extension PhotoEditorView {
         cropSize = imageResizerView.cropSize
         updateImageViewFrame()
     }
+    
+    // 真正的, 将几张图片合成的逻辑, 在这里.
     func cropping(completion: @escaping (PhotoEditResult?) -> Void) {
+        
         let toRect = imageResizerView.getCroppingRect()
         let inputImage = imageResizerView.imageView.image
+        // 390, 2541
+        // ImageView 的 Frame 是保持不变的.
+        // imageResizerView 的 Frame, 经过了 ScrollView 的放大缩小, 有了明显的变化
         let viewWidth = imageResizerView.imageView.width
         let viewHeight = imageResizerView.imageView.height
+        
         var drawLayer: CALayer?
         if imageResizerView.imageView.drawView.count > 0 {
             drawLayer = imageResizerView.imageView.drawView.layer
         }
+        
         var stickerLayer: CALayer?
         if imageResizerView.imageView.stickerView.count > 0 {
             stickerLayer = imageResizerView.imageView.stickerView.layer
         }
+        
         var mosaicLayer: CALayer?
         if imageResizerView.imageView.mosaicView.count > 0 {
             mosaicLayer = imageResizerView.imageView.mosaicView.layer
         }
+        
         DispatchQueue.global().async {
-            let imageOptions = self.imageResizerView.cropping(
-                inputImage,
-                toRect: toRect,
-                mosaicLayer: mosaicLayer,
-                drawLayer: drawLayer,
-                stickerLayer: stickerLayer,
-                viewWidth: viewWidth,
-                viewHeight: viewHeight
-            )
+            // 真正的, 绘制操作, 还是在 self.imageResizerView.cropping 的内部
+            let imageOptions = self.imageResizerView.cropping(inputImage,
+                                                            toRect: toRect,
+                                                            mosaicLayer: mosaicLayer,
+                                                            drawLayer: drawLayer,
+                                                            stickerLayer: stickerLayer,
+                                                            viewWidth: viewWidth,
+                                                            viewHeight: viewHeight)
             if let imageOptions = imageOptions {
                 DispatchQueue.main.async {
                     let editResult = PhotoEditResult(

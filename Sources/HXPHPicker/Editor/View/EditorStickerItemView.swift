@@ -47,6 +47,7 @@ class EditorStickerItemView: UIView {
     var isDelete: Bool = false
     var scale: CGFloat
     var touching: Bool = false
+    // 当, 取消选择了之后, 会更改自己的 border 显示.
     var isSelected: Bool = false {
         willSet {
             if isSelected == newValue {
@@ -89,6 +90,9 @@ class EditorStickerItemView: UIView {
                                       width: width + margin,
                                       height: height + margin)
         
+        /*
+            StcikerItemView 里面, 仅仅提供了两个子视图.
+         */
         layer.addSublayer(externalBorder)
         addSubview(contentView)
         
@@ -103,6 +107,7 @@ class EditorStickerItemView: UIView {
         self.backgroundColor = UIColor.lightGray
     }
     
+    // 覆盖, 所有的 ContentView 的子 View 的触摸行为
     override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
         let view = super.hitTest(point, with: event)
         if bounds.contains(point) {
@@ -121,10 +126,6 @@ class EditorStickerItemView: UIView {
     var mirrorType: EditorImageResizerView.MirrorType = .none
     var superMirrorType: EditorImageResizerView.MirrorType = .none
     var superAngle: CGFloat = 0
-    
-    override func layoutSubviews() {
-        super.layoutSubviews()
-    }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -189,6 +190,9 @@ extension EditorStickerItemView {
             initialPoint = self.center
         case .changed:
             let point = panGR.translation(in: superview)
+            // 在 pan 中, 进行了相关的中心点的改变.
+            // 如果, 把这行注释了, 那么 StickerView 也就不会进行移动了
+            // 这里, 没有改变 ContentView 的位置, 而是直接的改变的自己的位置.
             center = CGPoint(x: initialPoint.x + point.x, y: initialPoint.y + point.y)
             delegate?.stickerItemView(self, panGestureRecognizerChanged: panGR)
         case .ended, .cancelled, .failed:
@@ -218,7 +222,12 @@ extension EditorStickerItemView {
             break
         }
     }
+    
     @objc func contentViewPinchClick(pinchGR: UIPinchGestureRecognizer) {
+        /*
+            对于 pinch 来说, scale 是一个连续的值.
+            zoomOut, 这个值就会不断的表大.
+         */
         if isDelete {
             return
         }
@@ -304,6 +313,7 @@ extension EditorStickerItemView {
 
 extension EditorStickerItemView {
     
+    // 这个函数, 之所以这么复杂, 是因为在 Pinch Gesture 里面, 也用到了这个函数
     func update(pinchScale: CGFloat,
                 rotation: CGFloat = CGFloat(MAXFLOAT),
                 isInitialize: Bool = false,
@@ -321,6 +331,7 @@ extension EditorStickerItemView {
         if let max = delegate?.stickerItemView(self, maxScale: item.frame.size) {
             maxScale = max / scale
         }
+        
         if isInitialize {
             self.pinchScale = pinchScale
         }else {
@@ -362,6 +373,8 @@ extension EditorStickerItemView {
             contentView.transform = .init(scaleX: self.pinchScale, y: self.pinchScale)
         }
         
+        // 因为, 改变的其实是 ContentView. 所以, 在每次 ContentView 改变之后, 其实要改变自己的 位置, 然后将 ContentView 放到中心点来.
+        // 以下的两个方法, 都是做的这件事情. 
         var rect = frame
         rect.origin.x += (rect.width - contentView.width) / 2
         rect.origin.y += (rect.height - contentView.height) / 2

@@ -162,9 +162,11 @@ class EditorStickerView: UIView {
         
         var pScale: CGFloat
         if item.text == nil && item.music == nil {
+            // 表情贴图的时候, 会走到这里.
             let ratio: CGFloat = 0.5
             var width = self.width * self.scale
             var height = self.height * self.scale
+            // 算出了, Scale 之后的, Editor 的宽高.
             if width > UIScreen.main.bounds.width {
                 width = UIScreen.main.bounds.width
             }
@@ -174,7 +176,6 @@ class EditorStickerView: UIView {
             pScale = min(ratio * width / itemView.width, ratio * height / itemView.height)
         } else if item.text != nil {
             pScale = min(
-                print(self.width)
                 min(self.width * self.scale - 40, itemView.width) / itemView.width,
                 min(self.height * self.scale - 40, itemView.height) / itemView.height
             )
@@ -205,6 +206,7 @@ class EditorStickerView: UIView {
         
         // 如果, 不根据 scale, 进行缩放, 那么 ItemView 会和在没有缩放的时候, 一样大.
         // 也就是说, 在放大的情况下, 在屏幕上, 会非常大.
+        // 这里不太明白, pScale / self.scale 之间的区别. 
         itemView.update(pinchScale: pScale / self.scale, rotation: radians, isMirror: true)
         
         if isSelected {
