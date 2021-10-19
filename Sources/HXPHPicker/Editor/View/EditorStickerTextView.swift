@@ -37,11 +37,11 @@ class EditorStickerTextView: UIView {
     var showBgColor: Bool = false
     var textBgColor: UIColor = .clear
     var textIsDelete: Bool = false
-    var textBgLayer: EditorStickerTextLayer?
-    var rectArray: [CGRect] = []
+    var textBgLayer: EditorStickerTextLayer? // 背景图层
+    var rectArray: [CGRect] = [] // 背景图层的范围.
     var blankWidth: CGFloat = 22
     var layerRadius: CGFloat = 8
-    var keyboardFrame: CGRect = .zero
+    var keyboardFrame: CGRect = .zero // 主要是为了弹起 OptionView
     var maxIndex: Int = 0
     
     init(config: EditorTextConfig, stickerText: EditorStickerText?) {
@@ -158,7 +158,7 @@ class EditorStickerTextView: UIView {
     }
     
     /*
-        没有使用 autolayout, 而是在 LayoutSubViews 里面, 使用的 frame 做的绝对布局
+     没有使用 autolayout, 而是在 LayoutSubViews 里面, 使用的 frame 做的绝对布局
      */
     override func layoutSubviews() {
         super.layoutSubviews()
@@ -168,7 +168,7 @@ class EditorStickerTextView: UIView {
         // 根据了键盘高度, 来定位了 TextBtn 和 Collection 的位置.
         // 这块逻辑, 应该移交到外界, 因为这样就固定了这个 View 必须底部贴边了.
         let toolBarTop = height -
-        (keyboardFrame.equalTo(.zero) ? UIDevice.bottomMargin + 50 : 50 + keyboardFrame.height)
+            (keyboardFrame.equalTo(.zero) ? UIDevice.bottomMargin + 50 : 50 + keyboardFrame.height)
         
         textButton.frame = CGRect( x: UIDevice.leftMargin, y: toolBarTop, width: 50, height: 50)
         collectionView.frame = CGRect(

@@ -442,6 +442,7 @@ extension EditorStickerItemView {
         contentView.update(item: item)
         update(size: item.frame.size, isMirror: true)
     }
+    
     func update(size: CGSize, isMirror: Bool = false) {
         let center = self.center
         var frame = frame

@@ -38,8 +38,8 @@ extension EditorStickerText: Codable {
     }
     
     /*
-        从这里可以看出, 其实 Codeable 和 NSCoding 系统不是冲突的.
-        NSCoding 系统, 生成的 Data 是可以应用到 Codable 系统里面的.
+     从这里可以看出, 其实 Codeable 和 NSCoding 系统不是冲突的.
+     NSCoding 系统, 生成的 Data 是可以应用到 Codable 系统里面的.
      */
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
@@ -135,13 +135,13 @@ extension EditorStickerItem: Codable {
         var image = try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(imageData) as! UIImage
         if let data = try container.decodeIfPresent(Data.self, forKey: .imageData) {
             self.imageData = data
-#if canImport(Kingfisher)
+            #if canImport(Kingfisher)
             if data.kf.imageFormat == .GIF {
                 if let gifImage = DefaultImageProcessor.default.process(item: .data(imageData), options: .init([])) {
                     image = gifImage
                 }
             }
-#endif
+            #endif
         }else {
             self.imageData = nil
         }
@@ -163,11 +163,11 @@ extension EditorStickerItem: Codable {
         if let data = imageData {
             try container.encodeIfPresent(data, forKey: .imageData)
         }else {
-#if canImport(Kingfisher)
+            #if canImport(Kingfisher)
             if let data = image.kf.gifRepresentation() {
                 try container.encodeIfPresent(data, forKey: .imageData)
             }
-#endif
+            #endif
         }
         try container.encodeIfPresent(text, forKey: .text)
         try container.encodeIfPresent(music, forKey: .music)
@@ -202,24 +202,24 @@ class EditorStickerContentView: UIView {
             updateText()
             
             /*
-                如果, 是一个 Music, 那么就在这里, 增加一个定时器, 然后在定时器的回调里面, 根据当前的时间, 获取应该播放的歌词, 更新显示.
+             如果, 是一个 Music, 那么就在这里, 增加一个定时器, 然后在定时器的回调里面, 根据当前的时间, 获取应该播放的歌词, 更新显示.
              */
             let timer = Timer.scheduledTimer(withTimeInterval: 0.5,
                                              repeats: true,
                                              block: { [weak self] timer in
-                    // 这里, 使用了一个比较简单的做法, 直接使用了全局变量来获取当前正在播放的音频.
-                    if let player = PhotoManager.shared.audioPlayer {
-                        CATransaction.begin()
-                        CATransaction.setDisableActions(true)
-                        let lyric = self?.item.music?.lyric(atTime: player.currentTime)
-                        self?.textLayer.string = lyric?.lyric
-                        self?.updateText()
-                        CATransaction.commit()
-                    }else {
-                        timer.invalidate()
-                        self?.timer = nil
-                    }
-                })
+                                                // 这里, 使用了一个比较简单的做法, 直接使用了全局变量来获取当前正在播放的音频.
+                                                if let player = PhotoManager.shared.audioPlayer {
+                                                    CATransaction.begin()
+                                                    CATransaction.setDisableActions(true)
+                                                    let lyric = self?.item.music?.lyric(atTime: player.currentTime)
+                                                    self?.textLayer.string = lyric?.lyric
+                                                    self?.updateText()
+                                                    CATransaction.commit()
+                                                }else {
+                                                    timer.invalidate()
+                                                    self?.timer = nil
+                                                }
+                                             })
             RunLoop.current.add(timer, forMode: .common)
             self.timer = timer
         } else {
@@ -243,7 +243,7 @@ class EditorStickerContentView: UIView {
         imageView.image = item.image
     }
     
-    func updateText() {
+    private func updateText() {
         if var height = (textLayer.string as? String)?.height(ofFont: textLayer.font as! UIFont, maxWidth: width) {
             height = min(100, height)
             textLayer.frame = CGRect(origin: .zero, size: CGSize(width: width, height: height))
@@ -264,19 +264,20 @@ class EditorStickerContentView: UIView {
             imageView.frame = bounds
         }
     }
+    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
     // 如果, 是 Music 类型, 就显示这个播放效果 View.
-    lazy var animationView: VideoEditorMusicAnimationView = {
+    private lazy var animationView: VideoEditorMusicAnimationView = {
         let view = VideoEditorMusicAnimationView(hexColor: "#ffffff")
         view.startAnimation()
         return view
     }()
     
     // 如果, 是 Music 类型, 就显示这个歌词 View.
-    lazy var textLayer: CATextLayer = {
+    private lazy var textLayer: CATextLayer = {
         let textLayer = CATextLayer()
         let fontSize: CGFloat = 25
         let font = UIFont.boldSystemFont(ofSize: fontSize)
@@ -291,7 +292,7 @@ class EditorStickerContentView: UIView {
     }()
     
     // 如果, 是贴图, 那么就使用 imageView 来显示相应的内容.
-    lazy var imageView: ImageView = {
+    private lazy var imageView: ImageView = {
         let view = ImageView()
         if let imageData = item.imageData {
             view.setImageData(imageData)
@@ -304,19 +305,30 @@ class EditorStickerContentView: UIView {
 
 extension EditorStickerContentView: UIGestureRecognizerDelegate {
     
+    /*
+     gestureRecognizer 会是 ContentView 上添加的
+     Pinch, Pan, Tap, Rotate.
+     */
     func gestureRecognizer( _ gestureRecognizer: UIGestureRecognizer,
                             shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer ) -> Bool {
         if otherGestureRecognizer.delegate is PhotoEditorViewController ||
             otherGestureRecognizer.delegate is VideoEditorViewController {
+            // 这个没有触发过.
             return false
         }
         
+        // 没太明白, 这里的处理逻辑
         if otherGestureRecognizer is UITapGestureRecognizer ||
             gestureRecognizer is UITapGestureRecognizer {
             return true
         }
         
-        if let view = gestureRecognizer.view, view == self,
+        /*
+         如果, 手势的 View 都是当前的 ContentView, 那么可以同时进行触发.
+         比如, 可以同时进行 Pinch 和 Pan.
+         */
+        if let view = gestureRecognizer.view,
+           view == self,
            let otherView = otherGestureRecognizer.view,
            otherView == self {
             return true
