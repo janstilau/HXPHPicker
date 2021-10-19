@@ -104,8 +104,8 @@ class PhotoEditorView: UIScrollView, UIGestureRecognizerDelegate {
     }
     
     /*
-        PhotoEditorView 里面, 仅仅有这样一个 SubView. 然后所有的内容, 都在这个 View 上.
-        这样, 放大缩小的时候, 所有的内容, 能够一起变化. 大大减少了逻辑的复杂度.
+     PhotoEditorView 里面, 仅仅有这样一个 SubView. 然后所有的内容, 都在这个 View 上.
+     这样, 放大缩小的时候, 所有的内容, 能够一起变化. 大大减少了逻辑的复杂度.
      */
     lazy var imageResizerView: EditorImageResizerView = {
         let imageResizerView = EditorImageResizerView.init(cropConfig: config.cropping,
@@ -287,12 +287,12 @@ extension PhotoEditorView {
         DispatchQueue.global().async {
             // 真正的, 绘制操作, 还是在 self.imageResizerView.cropping 的内部
             let imageOptions = self.imageResizerView.cropping(inputImage,
-                                                            toRect: toRect,
-                                                            mosaicLayer: mosaicLayer,
-                                                            drawLayer: drawLayer,
-                                                            stickerLayer: stickerLayer,
-                                                            viewWidth: viewWidth,
-                                                            viewHeight: viewHeight)
+                                                              toRect: toRect,
+                                                              mosaicLayer: mosaicLayer,
+                                                              drawLayer: drawLayer,
+                                                              stickerLayer: stickerLayer,
+                                                              viewWidth: viewWidth,
+                                                              viewHeight: viewHeight)
             if let imageOptions = imageOptions {
                 DispatchQueue.main.async {
                     let editResult = PhotoEditResult(
@@ -377,9 +377,9 @@ extension PhotoEditorView: UIScrollViewDelegate {
             return
         }
         let offsetX = (scrollView.width > scrollView.contentSize.width) ?
-        (scrollView.width - scrollView.contentSize.width) * 0.5 : 0
+            (scrollView.width - scrollView.contentSize.width) * 0.5 : 0
         let offsetY = (scrollView.height > scrollView.contentSize.height) ?
-        (scrollView.height - scrollView.contentSize.height) * 0.5 : 0
+            (scrollView.height - scrollView.contentSize.height) * 0.5 : 0
         let centerX = scrollView.contentSize.width * 0.5 + offsetX
         let centerY = scrollView.contentSize.height * 0.5 + offsetY
         imageResizerView.center = CGPoint(x: centerX, y: centerY)
@@ -403,6 +403,7 @@ extension PhotoEditorView: PhotoEditorContentViewDelegate {
 }
 
 extension PhotoEditorView: EditorImageResizerViewDelegate {
+    
     func imageResizerView(willChangedMaskRect imageResizerView: EditorImageResizerView) {
         editorDelegate?.editorView(willBeginEditing: self)
     }
