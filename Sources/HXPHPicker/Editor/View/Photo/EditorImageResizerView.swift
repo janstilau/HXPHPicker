@@ -55,6 +55,9 @@ class EditorImageResizerView: UIView {
         containerView.addSubview(maskLinesView)
         containerView.addSubview(controlView)
         
+        containerView.addBorderLine(inWidth: 1)
+        containerView.addTip("ContainerViewInResizer")
+        
         return containerView
     }()
     
@@ -71,6 +74,8 @@ class EditorImageResizerView: UIView {
             scrollView.contentInsetAdjustmentBehavior = .never
         }
         scrollView.addSubview(imageView)
+        scrollView.addBorderline(inWidth: 1, color: UIColor.magenta)
+        scrollView.addTip("TipViewInResizer")
         return scrollView
     }()
     
@@ -119,6 +124,10 @@ class EditorImageResizerView: UIView {
             let maxScale = min(itemSize.width, itemSize.height)
             return max((newRect.width + 35) / maxScale, (newRect.height + 35) / maxScale)
         }
+        
+        imageView.addBorderline(inWidth: 1, color: UIColor.random())
+        imageView.addTip("ContentViewInResizer")
+        
         return imageView
     }()
     
@@ -128,6 +137,8 @@ class EditorImageResizerView: UIView {
         maskBgView.alpha = 0
         maskBgView.isHidden = true
         maskBgView.isUserInteractionEnabled = false
+        maskLinesView.addBorderline(inWidth: 1, color: UIColor.random())
+        maskLinesView.addTip("MaskBgInResizer")
         return maskBgView
     }()
     
@@ -138,6 +149,8 @@ class EditorImageResizerView: UIView {
         maskLinesView.isUserInteractionEnabled = false
         maskLinesView.alpha = 0
         maskLinesView.isHidden = true
+        maskLinesView.addBorderline(inWidth: 1, color: UIColor.orange)
+        maskLinesView.addTip("MaskLineInResizer")
         return maskLinesView
     }()
     
@@ -146,6 +159,8 @@ class EditorImageResizerView: UIView {
         let controlView = EditorImageResizerControlView.init()
         controlView.isUserInteractionEnabled = false
         controlView.delegate = self
+        controlView.addBorderline(inWidth: 1, color: UIColor.white)
+        controlView.addTip("ControlViewInResizer")
         return controlView
     }()
     /// 当前状态

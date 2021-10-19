@@ -31,7 +31,7 @@ class PhotoEditorView: UIScrollView, UIGestureRecognizerDelegate {
     
     var state: State = .normal
     var imageScale: CGFloat = 1
-    var canZoom = true
+    private var canZoom = true
     var cropSize: CGSize = .zero
     
     var image: UIImage? { imageResizerView.imageView.image }
@@ -93,7 +93,7 @@ class PhotoEditorView: UIScrollView, UIGestureRecognizerDelegate {
                 return imageResizerView.imageView.mosaicView
             }
             return self
-        }else if state == .cropping && self == view {
+        } else if state == .cropping && self == view {
             return imageResizerView
         }
         return view
@@ -103,17 +103,23 @@ class PhotoEditorView: UIScrollView, UIGestureRecognizerDelegate {
         fatalError("init(coder:) has not been implemented")
     }
     
+    /*
+        PhotoEditorView 里面, 仅仅有这样一个 SubView. 然后所有的内容, 都在这个 View 上.
+        这样, 放大缩小的时候, 所有的内容, 能够一起变化. 大大减少了逻辑的复杂度.
+     */
     lazy var imageResizerView: EditorImageResizerView = {
         let imageResizerView = EditorImageResizerView.init(cropConfig: config.cropping,
                                                            mosaicConfig: config.mosaic)
+        
         imageResizerView.exportScale = config.scale
         imageResizerView.imageView.drawView.lineColor = config.brushColors[config.defaultBrushColorIndex].color
         imageResizerView.imageView.drawView.lineWidth = config.brushLineWidth
         imageResizerView.delegate = self
         imageResizerView.imageView.delegate = self
         
-        imageResizerView.addBorderline(inWidth: 2, color: UIColor.blue)
+        imageResizerView.addBorderline(inWidth: 2, color: UIColor.purple)
         imageResizerView.addTip("ResizeView")
+        
         return imageResizerView
     }()
 }
@@ -202,7 +208,7 @@ extension PhotoEditorView {
         setContentOffset(CGPoint(x: -contentInset.left, y: -contentInset.top), animated: false)
     }
     
-    // 裁剪这件事, 会让外界的 ScrollView, 停止操作. 
+    // 裁剪这件事, 会让外界的 ScrollView, 停止操作.
     func startCropping(_ animated: Bool) {
         editorDelegate?.editorView(willAppearCrop: self)
         state = .cropping
@@ -386,6 +392,7 @@ extension PhotoEditorView: PhotoEditorContentViewDelegate {
         editorDelegate?.editorView(drawViewEndDraw: self)
     }
 }
+
 extension PhotoEditorView: EditorImageResizerViewDelegate {
     func imageResizerView(willChangedMaskRect imageResizerView: EditorImageResizerView) {
         editorDelegate?.editorView(willBeginEditing: self)

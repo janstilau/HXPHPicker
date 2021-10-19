@@ -17,47 +17,54 @@ class EditorImageResizerControlView: UIView {
     weak var delegate: EditorImageResizerControlViewDelegate?
     
     lazy var topControl: UIView = {
-        let view = UIView.init()
+        let view = UIView()
         let pan = UIPanGestureRecognizer.init(target: self, action: #selector(panGestureRecognizerHandler(pan:)))
         view.addGestureRecognizer(pan)
         return view
     }()
+    
     lazy var bottomControl: UIView = {
         let view = UIView.init()
         let pan = UIPanGestureRecognizer.init(target: self, action: #selector(panGestureRecognizerHandler(pan:)))
         view.addGestureRecognizer(pan)
         return view
     }()
+    
     lazy var leftControl: UIView = {
         let view = UIView.init()
         let pan = UIPanGestureRecognizer.init(target: self, action: #selector(panGestureRecognizerHandler(pan:)))
         view.addGestureRecognizer(pan)
         return view
     }()
+    
     lazy var rightControl: UIView = {
         let view = UIView.init()
         let pan = UIPanGestureRecognizer.init(target: self, action: #selector(panGestureRecognizerHandler(pan:)))
         view.addGestureRecognizer(pan)
         return view
     }()
+    
     lazy var leftTopControl: UIView = {
         let view = UIView.init()
         let pan = UIPanGestureRecognizer.init(target: self, action: #selector(panGestureRecognizerHandler(pan:)))
         view.addGestureRecognizer(pan)
         return view
     }()
+    
     lazy var rightTopControl: UIView = {
         let view = UIView.init()
         let pan = UIPanGestureRecognizer.init(target: self, action: #selector(panGestureRecognizerHandler(pan:)))
         view.addGestureRecognizer(pan)
         return view
     }()
+    
     lazy var rightBottomControl: UIView = {
         let view = UIView.init()
         let pan = UIPanGestureRecognizer.init(target: self, action: #selector(panGestureRecognizerHandler(pan:)))
         view.addGestureRecognizer(pan)
         return view
     }()
+    
     lazy var leftBottomControl: UIView = {
         let view = UIView.init()
         let pan = UIPanGestureRecognizer.init(target: self, action: #selector(panGestureRecognizerHandler(pan:)))
@@ -91,6 +98,10 @@ class EditorImageResizerControlView: UIView {
         controls.append(leftBottomControl.gestureRecognizers!.first!)
         controls.append(rightTopControl.gestureRecognizers!.first!)
         controls.append(rightBottomControl.gestureRecognizers!.first!)
+        
+        self.subviews.forEach { aView in
+            aView.backgroundColor = .random()
+        }
     }
     
     func changeControl(enabled: Bool, index: Int) {

@@ -154,8 +154,7 @@ class EditorStickerView: UIView {
     }
     
     @discardableResult
-    func add(sticker item: EditorStickerItem,
-             isSelected: Bool) -> EditorStickerItemView {
+    func add(sticker item: EditorStickerItem, isSelected: Bool) -> EditorStickerItemView {
         selectView?.isSelected = false
         
         let itemView = EditorStickerItemView.init(item: item, scale: scale)
@@ -175,14 +174,9 @@ class EditorStickerView: UIView {
             pScale = min(ratio * width / itemView.width, ratio * height / itemView.height)
         } else if item.text != nil {
             pScale = min(
-                min(
-                    self.width * self.scale - 40,
-                    itemView.width
-                ) / itemView.width,
-                min(
-                    self.height * self.scale - 40,
-                    itemView.height
-                ) / itemView.height
+                print(self.width)
+                min(self.width * self.scale - 40, itemView.width) / itemView.width,
+                min(self.height * self.scale - 40, itemView.height) / itemView.height
             )
         } else {
             pScale = 1
@@ -199,12 +193,14 @@ class EditorStickerView: UIView {
             }
         }
         itemView.isSelected = isSelected
+        // 在这里, 确保了刚刚创建的视图, 会添加到图片的正中间的位置.
         if let keyWindow = UIApplication.shared.keyWindow {
             itemView.center = convert(keyWindow.center, from: keyWindow)
         }
         itemView.firstTouch = isSelected
         
         itemView.addBorderLine()
+        itemView.addTip("StickerView")
         addSubview(itemView)
         
         // 如果, 不根据 scale, 进行缩放, 那么 ItemView 会和在没有缩放的时候, 一样大.

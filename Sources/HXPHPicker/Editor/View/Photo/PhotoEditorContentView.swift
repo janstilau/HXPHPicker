@@ -30,11 +30,11 @@ class PhotoEditorContentView: UIView {
     // 可以看到, 编辑的图片, 是和这几个 View 在一起显示的.
     lazy var imageView: UIImageView = {
         var imageView: UIImageView
-        #if canImport(Kingfisher)
+#if canImport(Kingfisher)
         imageView = AnimatedImageView.init()
-        #else
+#else
         imageView = UIImageView.init()
-        #endif
+#endif
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
         return imageView
@@ -75,30 +75,31 @@ class PhotoEditorContentView: UIView {
     
     let mosaicConfig: PhotoEditorConfiguration.MosaicConfig
     
+    // 从这里看, 这个 View 就是一个盒子.
     init(mosaicConfig: PhotoEditorConfiguration.MosaicConfig) {
         self.mosaicConfig = mosaicConfig
         super.init(frame: .zero)
-        addSubview(imageView)
-        addSubview(mosaicView)
-        addSubview(drawView)
-        addSubview(stickerView)
+        addSubview(imageView) // 最底层的显示
+        addSubview(mosaicView) // 马赛克视图
+        addSubview(drawView) // 涂抹视图
+        addSubview(stickerView) // 贴图视图.
     }
     
     func setMosaicOriginalImage(_ image: UIImage?) {
         mosaicView.originalImage = image
     }
     func setImage(_ image: UIImage) {
-        #if canImport(Kingfisher)
+#if canImport(Kingfisher)
         let view = imageView as! AnimatedImageView
         view.image = image
-        #else
+#else
         imageView.image = image
-        #endif
+#endif
     }
     
-    // 所有的子 View, 都是同样的尺寸, 这样, 外界在进行放大缩小的时候, 能够统一进行处理.
     override func layoutSubviews() {
         super.layoutSubviews()
+        // 所有的视图, 都紧紧地贴合到自己的父视图.
         imageView.frame = bounds
         drawView.frame = bounds
         mosaicView.frame = bounds
@@ -118,7 +119,9 @@ extension PhotoEditorContentView: PhotoEditorDrawViewDelegate {
         delegate?.contentView(drawViewEndDraw: self)
     }
 }
+
 extension PhotoEditorContentView: EditorStickerViewDelegate {
+    
     func stickerView(_ stickerView: EditorStickerView, updateStickerText item: EditorStickerItem) {
         delegate?.contentView(self, updateStickerText: item)
     }
@@ -150,6 +153,7 @@ extension PhotoEditorContentView: EditorStickerViewDelegate {
         return 5
     }
 }
+
 extension PhotoEditorContentView: PhotoEditorMosaicViewDelegate {
     func mosaicView(_ mosaicView: PhotoEditorMosaicView, splashColor atPoint: CGPoint) -> UIColor? {
         imageView.color(for: atPoint)
