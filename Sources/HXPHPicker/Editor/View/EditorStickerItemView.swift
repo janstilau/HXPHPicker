@@ -191,7 +191,7 @@ extension EditorStickerItemView {
         case .changed:
             let point = panGR.translation(in: superview)
             // 在 pan 中, 进行了相关的中心点的改变.
-            // 如果, 把这行注释了, 那么 StickerView 也就不会进行移动了
+            // 如果, 把这行注释了, 那么 StickerItemView 也就不会进行移动了
             // 这里, 没有改变 ContentView 的位置, 而是直接的改变的自己的位置.
             center = CGPoint(x: initialPoint.x + point.x, y: initialPoint.y + point.y)
             delegate?.stickerItemView(self, panGestureRecognizerChanged: panGR)

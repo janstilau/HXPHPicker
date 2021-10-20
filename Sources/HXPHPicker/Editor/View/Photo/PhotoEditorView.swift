@@ -20,6 +20,7 @@ protocol PhotoEditorViewDelegate: AnyObject {
     func editorView(_ editorView: PhotoEditorView, updateStickerText item: EditorStickerItem)
 }
 
+// 没太明白, 直接继承 ScrollView 的意义. 
 class PhotoEditorView: UIScrollView, UIGestureRecognizerDelegate {
     weak var editorDelegate: PhotoEditorViewDelegate?
     
