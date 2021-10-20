@@ -8,6 +8,8 @@
 import UIKit
 
 extension PhotoEditorViewController {
+    
+    // 真正的合成图的操作, 在这里.
     func exportResources() {
         if photoEditView.canReset() ||
             photoEditView.imageResizerView.hasCropping ||

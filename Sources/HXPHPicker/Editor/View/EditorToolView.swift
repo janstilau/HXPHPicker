@@ -67,9 +67,11 @@ public class EditorToolView: UIView {
         finishButton.addTarget(self, action: #selector(didFinishButtonClick(button:)), for: .touchUpInside)
         return finishButton
     }()
+    
     @objc func didFinishButtonClick(button: UIButton) {
         delegate?.toolView(didFinishButtonClick: self)
     }
+    
     var stretchMask: Bool = false
     var currentSelectedIndexPath: IndexPath?
     var musicCellShowBox: Bool = false

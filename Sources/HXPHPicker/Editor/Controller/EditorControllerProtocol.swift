@@ -11,10 +11,6 @@ import Photos
 import Kingfisher
 #endif
 
-/*
- 
- */
-
 public protocol PhotoEditorViewControllerDelegate: AnyObject {
     
     /// 编辑完成

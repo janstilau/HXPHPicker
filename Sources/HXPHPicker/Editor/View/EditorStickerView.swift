@@ -406,6 +406,7 @@ class EditorStickerView: UIView {
         )
         return stickerData
     }
+    
     func setStickerData(stickerData: EditorStickerData, viewSize: CGSize) {
         mirrorType = stickerData.mirrorType
         angle = stickerData.angel
@@ -426,6 +427,7 @@ class EditorStickerView: UIView {
             )
         }
     }
+    
     func getStickerInfo() -> [EditorStickerInfo] {
         var infos: [EditorStickerInfo] = []
         for subView in subviews {

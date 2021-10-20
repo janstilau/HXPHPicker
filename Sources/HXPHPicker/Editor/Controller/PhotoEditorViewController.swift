@@ -526,11 +526,11 @@ open class PhotoEditorViewController: BaseViewController {
 }
 
 /*
- ToolView 的回调方法.
+    ToolView 的回调方法.
  */
 extension PhotoEditorViewController: EditorToolViewDelegate {
     
-    // 完成按钮点击之后, 会触发到该方法.
+    // 完成按钮的回调
     func toolView(didFinishButtonClick toolView: EditorToolView) {
         exportResources()
     }
