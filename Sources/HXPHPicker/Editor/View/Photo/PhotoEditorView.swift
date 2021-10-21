@@ -127,6 +127,7 @@ class PhotoEditorView: UIScrollView, UIGestureRecognizerDelegate {
 
 extension PhotoEditorView {
     
+    // 确定, 最初的 ImageView 的位置. 
     func updateImageViewFrame() {
         let imageWidth = width
         var imageHeight: CGFloat
@@ -140,7 +141,7 @@ extension PhotoEditorView {
         if imageHeight < height {
             imageY = (height - imageHeight) * 0.5
             imageResizerView.setViewFrame(CGRect(x: 0, y: -imageY, width: width, height: height))
-        }else {
+        } else {  
             imageResizerView.setViewFrame(bounds)
         }
         contentSize = CGSize(width: imageWidth, height: imageHeight)
@@ -155,6 +156,7 @@ extension PhotoEditorView {
         updateImageViewFrame()
         imageResizerView.setImage(image)
     }
+    
     func updateImage(_ image: UIImage) {
         imageResizerView.updateImage(image)
     }
@@ -378,9 +380,9 @@ extension PhotoEditorView: UIScrollViewDelegate {
             return
         }
         let offsetX = (scrollView.width > scrollView.contentSize.width) ?
-            (scrollView.width - scrollView.contentSize.width) * 0.5 : 0
+        (scrollView.width - scrollView.contentSize.width) * 0.5 : 0
         let offsetY = (scrollView.height > scrollView.contentSize.height) ?
-            (scrollView.height - scrollView.contentSize.height) * 0.5 : 0
+        (scrollView.height - scrollView.contentSize.height) * 0.5 : 0
         let centerX = scrollView.contentSize.width * 0.5 + offsetX
         let centerY = scrollView.contentSize.height * 0.5 + offsetY
         imageResizerView.center = CGPoint(x: centerX, y: centerY)

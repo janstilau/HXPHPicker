@@ -144,6 +144,7 @@ open class PhotoEditorViewController: BaseViewController {
         toolView.delegate = self
         return toolView
     }()
+    
     public lazy var topView: UIView = {
         let view = UIView.init(frame: CGRect(x: 0, y: 0, width: 0, height: 44))
         let cancelBtn = UIButton.init(frame: CGRect(x: 0, y: 0, width: 57, height: 44))
@@ -152,6 +153,7 @@ open class PhotoEditorViewController: BaseViewController {
         view.addSubview(cancelBtn)
         return view
     }()
+    
     public lazy var topMaskLayer: CAGradientLayer = {
         let layer = PhotoTools.getGradientShadowLayer(true)
         return layer
@@ -168,6 +170,7 @@ open class PhotoEditorViewController: BaseViewController {
         view.addTip("BrushColorVIEW")
         return view
     }()
+    
     public lazy var cropToolView: PhotoEditorCropToolView = {
         var showRatios = true
         if config.cropping.fixedRatio || config.cropping.isRoundCrop {
@@ -182,6 +185,7 @@ open class PhotoEditorViewController: BaseViewController {
         view.addTip("CropToolView")
         return view
     }()
+    
     lazy var mosaicToolView: PhotoEditorMosaicToolView = {
         let view = PhotoEditorMosaicToolView(selectedColor: config.toolView.toolSelectedColor)
         view.delegate = self
@@ -191,6 +195,7 @@ open class PhotoEditorViewController: BaseViewController {
         view.addTip("MosaicToolView")
         return view
     }()
+    
     lazy var filterView: PhotoEditorFilterView = {
         let filter = editResult?.editedData.filter
         let value = editResult?.editedData.filterValue
@@ -202,6 +207,7 @@ open class PhotoEditorViewController: BaseViewController {
         view.addTip("FilterView")
         return view
     }()
+    
     lazy var chartletView: EditorChartletView = {
         let view = EditorChartletView(config: config.chartlet, editorType: .photo)
         view.delegate = self
@@ -212,10 +218,11 @@ open class PhotoEditorViewController: BaseViewController {
     
     var topViewIsHidden: Bool = false
     
-    @objc func singleTap() {
+    @objc func handleSingleTap() {
         if state == .cropping {
             return
         }
+        
         photoEditView.deselectedSticker()
         func resetOtherOption() {
             if let option = currentToolOption {
@@ -317,7 +324,7 @@ open class PhotoEditorViewController: BaseViewController {
     }
     open override func deviceOrientationWillChanged(notify: Notification) {
         if showChartlet {
-            singleTap()
+            handleSingleTap()
         }
         photoEditView.undoAllDraw()
         if toolOptions.contains(.graffiti) {
@@ -342,12 +349,12 @@ open class PhotoEditorViewController: BaseViewController {
     }
     
     func setupViews() {
-        let singleTap = UITapGestureRecognizer.init(target: self, action: #selector(singleTap))
+        let singleTap = UITapGestureRecognizer.init(target: self, action: #selector(handleSingleTap))
         singleTap.delegate = self
         view.addGestureRecognizer(singleTap)
         
         /*
-         A Boolean value that indicates whether the receiver handles touch events exclusively.
+            A Boolean value that indicates whether the receiver handles touch events exclusively.
          */
         view.isExclusiveTouch = true
         view.backgroundColor = .black
@@ -355,17 +362,19 @@ open class PhotoEditorViewController: BaseViewController {
         
         view.addSubview(photoEditView)
         view.addSubview(toolView)
+        
         if toolOptions.contains(.cropping) {
             view.addSubview(cropConfirmView)
             view.addSubview(cropToolView)
         }
+        
         if config.fixedCropState {
             state = .cropping
             toolView.alpha = 0
             toolView.isHidden = true
             topView.alpha = 0
             topView.isHidden = true
-        }else {
+        } else {
             state = config.state
             if toolOptions.contains(.graffiti) {
                 view.addSubview(brushColorView)
@@ -380,18 +389,20 @@ open class PhotoEditorViewController: BaseViewController {
                 view.addSubview(filterView)
             }
         }
+        
         view.layer.addSublayer(topMaskLayer)
         view.addSubview(topView)
     }
     
+    // 在 LayoutSubViews 里面, 对于各个 View, 进行了布局控制.
     open override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        toolView.frame = CGRect(
-            x: 0,
-            y: view.height - UIDevice.bottomMargin - 50,
-            width: view.width,
-            height: 50 + UIDevice.bottomMargin
-        )
+        
+        // Top
+        toolView.frame = CGRect( x: 0,
+                                 y: view.height - UIDevice.bottomMargin - 50,
+                                 width: view.width,
+                                 height: 50 + UIDevice.bottomMargin)
         toolView.reloadContentInset()
         topView.width = view.width
         topView.height = navigationController?.navigationBar.height ?? 44
@@ -406,6 +417,8 @@ open class PhotoEditorViewController: BaseViewController {
             topView.y = UIDevice.generalStatusBarHeight
         }
         topMaskLayer.frame = CGRect(x: 0, y: 0, width: view.width, height: topView.frame.maxY + 10)
+        
+        // Crop
         let cropToolFrame = CGRect(x: 0, y: cropConfirmView.y - 60, width: view.width, height: 60)
         if toolOptions.contains(.cropping) {
             cropConfirmView.frame = toolView.frame
@@ -424,6 +437,8 @@ open class PhotoEditorViewController: BaseViewController {
         if toolOptions.contains(.filter) {
             setFilterViewFrame()
         }
+        
+        // PhotoEdit
         if !photoEditView.frame.equalTo(view.bounds) && !photoEditView.frame.isEmpty && !imageViewDidChange {
             photoEditView.frame = view.bounds
             photoEditView.reset(false)
@@ -435,7 +450,6 @@ open class PhotoEditorViewController: BaseViewController {
         if !imageInitializeCompletion {
             if !needRequest || image != nil {
                 photoEditView.setImage(image)
-                //                setFilterImage()
                 if let editedData = editResult?.editedData {
                     photoEditView.setEditedData(editedData: editedData)
                     if toolOptions.contains(.graffiti) {
@@ -452,6 +466,7 @@ open class PhotoEditorViewController: BaseViewController {
                 imageInitializeCompletion = true
             }
         }
+        
         if orientationDidChange {
             photoEditView.orientationDidChange()
             if config.fixedCropState {
@@ -461,6 +476,7 @@ open class PhotoEditorViewController: BaseViewController {
             imageViewDidChange = true
         }
     }
+    
     func setChartletViewFrame() {
         var viewHeight = config.chartlet.viewHeight
         if viewHeight > view.height {
@@ -478,6 +494,7 @@ open class PhotoEditorViewController: BaseViewController {
                                         height: viewHeight + UIDevice.bottomMargin)
         }
     }
+    
     func setFilterViewFrame() {
         if isFilter {
             filterView.frame = CGRect(
@@ -495,15 +512,19 @@ open class PhotoEditorViewController: BaseViewController {
             )
         }
     }
+    
     open override var prefersStatusBarHidden: Bool {
         return config.prefersStatusBarHidden
     }
+    
     open override var prefersHomeIndicatorAutoHidden: Bool {
         false
     }
+    
     open override var preferredScreenEdgesDeferringSystemGestures: UIRectEdge {
         .all
     }
+    
     open override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         if navigationController?.topViewController != self &&
@@ -511,6 +532,7 @@ open class PhotoEditorViewController: BaseViewController {
             navigationController?.setNavigationBarHidden(false, animated: true)
         }
     }
+    
     open override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         if navigationController?.viewControllers.count == 1 {
@@ -840,7 +862,7 @@ extension PhotoEditorViewController: EditorChartletViewDelegate {
         }
     }
     func chartletView(backClick chartletView: EditorChartletView) {
-        singleTap()
+        handleSingleTap()
     }
     
     // 在 PhotoEditVC 里面, 也会将这些, 代理给外界. 或者, 使用默认的一些数据.
@@ -870,6 +892,6 @@ extension PhotoEditorViewController: EditorChartletViewDelegate {
                        imageData: Data?) {
         let item = EditorStickerItem(image: image, imageData: imageData, text: nil )
         photoEditView.addSticker( item: item, isSelected: false )
-        singleTap()
+        handleSingleTap()
     }
 }
