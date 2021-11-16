@@ -15,9 +15,9 @@ protocol PhotoEditorDrawViewDelegate: AnyObject {
 class PhotoEditorDrawView: UIView, UIGestureRecognizerDelegate {
     
     weak var delegate: PhotoEditorDrawViewDelegate?
-     
+    
     var linePaths: [PhotoEditorBrushPath] = []
-    var points: [CGPoint] = []
+    var currentPathPoints: [CGPoint] = []
     var shapeLayers: [CAShapeLayer] = []
     
     var lineColor: UIColor = .white
@@ -49,10 +49,16 @@ class PhotoEditorDrawView: UIView, UIGestureRecognizerDelegate {
         }
         return false
     }
+    
+    /*
+        Pan 开始的时候, 创建一个新的 Path, 一个新的 Shape, 开始重新记录 Points.
+        拖动的过程中, 不断的修改 Path, Shape, 记录 points.
+        结束, 将 Points 赋值到相应的数据结构. 
+     */
     @objc func panGesureRecognizerClick(panGR: UIPanGestureRecognizer) {
         switch panGR.state {
         case .began:
-            points.removeAll()
+            currentPathPoints.removeAll()
             let point = panGR.location(in: self)
             isTouching = false
             let path = PhotoEditorBrushPath()
@@ -62,7 +68,7 @@ class PhotoEditorDrawView: UIView, UIGestureRecognizerDelegate {
             path.move(to: point)
             path.color = lineColor
             linePaths.append(path)
-            points.append(CGPoint(x: point.x / width, y: point.y / height))
+            currentPathPoints.append(CGPoint(x: point.x / width, y: point.y / height))
             let shapeLayer = createdShapeLayer(path: path)
             layer.addSublayer(shapeLayer)
             shapeLayers.append(shapeLayer)
@@ -72,21 +78,22 @@ class PhotoEditorDrawView: UIView, UIGestureRecognizerDelegate {
             if path?.currentPoint.equalTo(point) == false {
                 delegate?.drawView(beganDraw: self)
                 isTouching = true
-                
+                // 在交互过程中, 也是通过, 不断的给 Path 拼接 Point, 来实现的 Path 的绘制.
                 path?.addLine(to: point)
-                points.append(CGPoint(x: point.x / width, y: point.y / height))
+                currentPathPoints.append(CGPoint(x: point.x / width, y: point.y / height))
                 let shapeLayer = shapeLayers.last
+                // 修改 ShapeLayer 的 Path, 就是修改 ShapeLayer 的展示.
                 shapeLayer?.path = path?.cgPath
             }
         case .failed, .cancelled, .ended:
             if isTouching {
                 let path = linePaths.last
-                path?.points = points
+                path?.points = currentPathPoints
                 delegate?.drawView(endDraw: self)
             }else {
                 undo()
             }
-            points.removeAll()
+            currentPathPoints.removeAll()
             isTouching = false
         default:
             break
@@ -98,6 +105,9 @@ class PhotoEditorDrawView: UIView, UIGestureRecognizerDelegate {
     }
     
     func createdShapeLayer(path: PhotoEditorBrushPath) -> CAShapeLayer {
+        /*
+            A layer that draws a cubic Bezier spline in its coordinate space.
+         */
         let shapeLayer = CAShapeLayer()
         shapeLayer.path = path.cgPath
         shapeLayer.backgroundColor = UIColor.clear.cgColor
@@ -109,6 +119,7 @@ class PhotoEditorDrawView: UIView, UIGestureRecognizerDelegate {
         return shapeLayer
     }
     
+    // Undo 就是删除最后一个 Path.
     func undo() {
         if shapeLayers.isEmpty {
             return
@@ -126,6 +137,13 @@ class PhotoEditorDrawView: UIView, UIGestureRecognizerDelegate {
         shapeLayers.removeAll()
     }
     
+    /*
+        UIBezierPath 是一个, 平台相关的数据.
+        提交给服务器, 是通用的数据. 所以, 在绘制的过程里面, 不断的记录 Point 的意图就在这里, 颜色值, 宽度值, 都是有着统一的记录的方案.
+        但是路径, 只能是把一个个点记录起来. 然后提交给后端进行存储.
+        相应的, 从数据反序列化并展示 View 的过程, 就是根据上面的数据, 拼接 Path 的过程.
+        这个过程没有太大的问题, 因为, 通过 Gesture 来进行处理的时候, 也是 Path 不断的拼接 Point 来实现的.
+     */
     func getBrushData() -> [PhotoEditorBrushData] {
         var brushsData: [PhotoEditorBrushData] = []
         for path in linePaths {
@@ -137,6 +155,11 @@ class PhotoEditorDrawView: UIView, UIGestureRecognizerDelegate {
         return brushsData
     }
     
+    /*
+        这个过程, 其实就是根据存储的数据, 还原原本的路径的过程.
+        其实就是, 遍历 Point, 回复原有 Path 的过程.
+        最终, 根据 Path 创建出相应的 Layer, 添加到屏幕上.
+     */
     func setBrushData(_ brushsData: [PhotoEditorBrushData], viewSize: CGSize) {
         for brushData in brushsData {
             let path = PhotoEditorBrushPath()
@@ -161,6 +184,11 @@ class PhotoEditorDrawView: UIView, UIGestureRecognizerDelegate {
     }
 }
 
+/*
+    PhotoEditorBrushPath: UIBezierPath 是没有办法序列化的, 能够序列化的只能是基本的数据类型.
+    PhotoEditorBrushData 这个类, 就是为了序列化存在的.
+    应该添加一个 PhotoEditorBrushData 和 PhotoEditorBrushPath 的相互转化的工厂方法才好.
+ */
 struct PhotoEditorBrushData {
     let color: UIColor
     let points: [CGPoint]
