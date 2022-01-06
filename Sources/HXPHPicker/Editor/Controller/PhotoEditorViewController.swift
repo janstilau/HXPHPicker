@@ -42,11 +42,9 @@ open class PhotoEditorViewController: BaseViewController {
     ///   - image: 对应的 UIImage
     ///   - editResult: 上一次编辑结果
     ///   - config: 编辑配置
-    public init(
-        image: UIImage,
-        editResult: PhotoEditResult? = nil,
-        config: PhotoEditorConfiguration
-    ) {
+    public init( image: UIImage,
+                 editResult: PhotoEditResult? = nil,
+                 config: PhotoEditorConfiguration ) {
         PhotoManager.shared.appearanceStyle = config.appearanceStyle
         PhotoManager.shared.createLanguageBundle(languageType: config.languageType)
         sourceType = .local
@@ -94,11 +92,9 @@ open class PhotoEditorViewController: BaseViewController {
     ///   - networkImageURL: 对应的网络地址
     ///   - editResult: 上一次编辑结果
     ///   - config: 编辑配置
-    public init(
-        networkImageURL: URL,
-        editResult: PhotoEditResult? = nil,
-        config: PhotoEditorConfiguration
-    ) {
+    public init( networkImageURL: URL,
+                 editResult: PhotoEditResult? = nil,
+                 config: PhotoEditorConfiguration ) {
         PhotoManager.shared.appearanceStyle = config.appearanceStyle
         PhotoManager.shared.createLanguageBundle(languageType: config.languageType)
         sourceType = .network
@@ -166,8 +162,9 @@ open class PhotoEditorViewController: BaseViewController {
         view.currentColorIndex = config.defaultBrushColorIndex
         view.alpha = 0
         view.isHidden = true
+        
         view.addBorderLine()
-        view.addTip("BrushColorVIEW")
+        view.addTip("BrushColorView")
         return view
     }()
     

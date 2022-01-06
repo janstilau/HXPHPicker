@@ -7,12 +7,16 @@
 
 import UIKit
 
+// CollecitonView, 没有控制 Cell 被点击之后的回调. 是 Cell 上面有一个 Button, 点击之后, 触发 Cell 的 Delegate.
+// 感觉没有必要, 增加这样的一层.
 protocol EditorToolViewCellDelegate: AnyObject {
     func toolViewCell(didClick cell: EditorToolViewCell)
 }
 
 class EditorToolViewCell: UICollectionViewCell {
+    
     weak var delegate: EditorToolViewCellDelegate?
+    
     lazy var boxView: SelectBoxView = {
         let view = SelectBoxView.init(frame: CGRect(x: 0, y: 0, width: 12, height: 12))
         view.isHidden = true
@@ -41,6 +45,7 @@ class EditorToolViewCell: UICollectionViewCell {
             boxView.isHidden = !showBox
         }
     }
+    
     var boxColor: UIColor! {
         didSet {
             boxView.config.selectedBackgroundColor = boxColor
@@ -54,10 +59,11 @@ class EditorToolViewCell: UICollectionViewCell {
             button.setImage(image, for: .normal)
         }
     }
+    
     var selectedColor: UIColor?
-    var isSelectedImageView: Bool = false {
+    var isSelectedToolOption: Bool = false {
         didSet {
-            button.tintColor = isSelectedImageView ? selectedColor : .white
+            button.tintColor = isSelectedToolOption ? selectedColor : .white
         }
     }
     
