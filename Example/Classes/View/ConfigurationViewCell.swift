@@ -117,8 +117,8 @@ class ConfigurationViewCell: UITableViewCell {
         tagsButton.setTitle(rowType.detailTitle, for: .normal)
         contentLabel.text = content
         colorView.isHidden = true
-        
     }
+    
     public func setupColorData(_ rowType: ConfigRowTypeRule, _ color: UIColor?) {
         titleLabel.text = rowType.title
         tagsButton.setTitle(rowType.detailTitle, for: .normal)

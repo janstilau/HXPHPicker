@@ -30,6 +30,7 @@ extension EditorConfigurationViewController {
                 return "VideoOptions"
             }
         }
+        
         var allRowCase: [ConfigRowTypeRule] {
             switch self {
             case .editorType:
@@ -42,6 +43,10 @@ extension EditorConfigurationViewController {
         }
     }
     
+    /*
+     getFunction 这一层, 其实每一次都和 EditorConfigurationViewController 绑定在了一起.
+     现在, 就是把分发的逻辑, 放到了 Type 的内部.
+     */
     enum EditorTypeRow: String, CaseIterable, ConfigRowTypeRule {
         
         case type
@@ -207,20 +212,18 @@ extension PhotoEditorViewController.State {
     }
 }
 
-
 class EditorConfigurationViewController: UITableViewController {
     
     var photoConfig: PhotoEditorConfiguration = .init()
     var videoConfig: VideoEditorConfiguration = .init()
     var showOpenEditorButton: Bool = true
-    let videoURL: URL = URL.init(fileURLWithPath: Bundle.main.path(forResource: "videoeditormatter", ofType: "MP4")!)
-    
     var editorType = 0
     var assetType = 0
     
+    let videoURL: URL = URL.init(fileURLWithPath: Bundle.main.path(forResource: "videoeditormatter", ofType: "MP4")!)
+    
     override init(nibName: String?, bundle: Bundle?) {
         super.init(nibName: nibName, bundle: bundle)
-        print(" EditorConfigurationViewController Inited ")
     }
     
     override init(style: UITableView.Style) {
@@ -239,12 +242,11 @@ class EditorConfigurationViewController: UITableViewController {
         tableView.cellLayoutMarginsFollowReadableWidth = true
         tableView.register(ConfigurationViewCell.self, forCellReuseIdentifier: ConfigurationViewCell.reuseIdentifier)
         tableView.tableFooterView = UIView(frame: .zero)
-        navigationItem.rightBarButtonItem = UIBarButtonItem(
-            title: showOpenEditorButton ? "打开编辑器" : "确定",
-            style: .done,
-            target: self,
-            action: #selector(backClick)
-        )
+        let titleName = showOpenEditorButton ? "打开编辑器" : "确定"
+        navigationItem.rightBarButtonItem = UIBarButtonItem( title: titleName,
+                                                             style: .done,
+                                                             target: self,
+                                                             action: #selector(backClick) )
     }
     
     @objc func backClick() {
@@ -307,9 +309,10 @@ class EditorConfigurationViewController: UITableViewController {
 
 extension EditorConfigurationViewController {
     
+    // 使用 EditorSection 这种方式也有问题. 只能是每次都进行逻辑判断.
+    // 如果是使用数据驱动的方式, 数据只配置一次就好了.
     override func numberOfSections(in tableView: UITableView) -> Int {
         return showOpenEditorButton ?
-        
         EditorSection.allCases.count : EditorSection.allCases.count - 1
     }
     
@@ -556,7 +559,9 @@ extension EditorConfigurationViewController: VideoEditorViewControllerDelegate {
 
 extension EditorConfigurationViewController {
     
+    // 根据, Cell 的 Type 值, 返回不同的提示文本.
     func getRowContent(_ rowType: ConfigRowTypeRule) -> String {
+        
         if let rowType = rowType as? EditorTypeRow {
             switch rowType {
             case .type:
@@ -565,6 +570,7 @@ extension EditorConfigurationViewController {
                 return assetType == 0 ? "本地" : "网络"
             }
         }
+        
         if let rowType = rowType as? PhotoEditorRow {
             switch rowType {
             case .state:
@@ -588,6 +594,7 @@ extension EditorConfigurationViewController {
                 }
             }
         }
+        
         if let rowType = rowType as? VideoEditorRow {
             switch rowType {
             case .exportPresetName:
@@ -615,6 +622,7 @@ extension EditorConfigurationViewController {
                 return String(Int(videoConfig.cropping.minimumVideoCroppingTime))
             }
         }
+        
         return ""
     }
     
