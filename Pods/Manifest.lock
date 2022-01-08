@@ -18,16 +18,13 @@ PODS:
   - HXPHPicker/Picker (1.2.1):
     - HXPHPicker/Core
   - Kingfisher (6.3.1)
-  - SwiftLint (0.45.1)
 
 DEPENDENCIES:
   - HXPHPicker (from `./`)
-  - SwiftLint
 
 SPEC REPOS:
   trunk:
     - Kingfisher
-    - SwiftLint
 
 EXTERNAL SOURCES:
   HXPHPicker:
@@ -36,8 +33,7 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   HXPHPicker: a5541ec3eb74833b0f77675c480d315c1a31f247
   Kingfisher: 016c8b653a35add51dd34a3aba36b580041acc74
-  SwiftLint: 06ac37e4d38c7068e0935bb30cda95f093bec761
 
-PODFILE CHECKSUM: fa2fecaa083194d6ae502412be15fa39069b0182
+PODFILE CHECKSUM: ed98fe81250a905dfd8e7f99700b56d71b093907
 
 COCOAPODS: 1.10.1

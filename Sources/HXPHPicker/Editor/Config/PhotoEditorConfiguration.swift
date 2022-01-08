@@ -7,9 +7,6 @@
 
 import UIKit
 
-/// 旋转会重置所有编辑效果
-///
-
 // 所有的成员变量, 在初始话的时候, 都会进行默认值的赋值.
 open class PhotoEditorConfiguration: EditorConfiguration {
     

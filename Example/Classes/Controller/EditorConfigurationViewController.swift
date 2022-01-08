@@ -214,6 +214,11 @@ extension PhotoEditorViewController.State {
 
 class EditorConfigurationViewController: UITableViewController {
     
+    /*
+     这个类的所有数据部分, 都在这里.
+     TableView 的各种操作, 其实都是在改变这些成员变量的值.
+     成员变量的值, 最后在打开编辑器的时候, 会真正的被使用.
+     */
     var photoConfig: PhotoEditorConfiguration = .init()
     var videoConfig: VideoEditorConfiguration = .init()
     var showOpenEditorButton: Bool = true
@@ -238,7 +243,6 @@ class EditorConfigurationViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.title = "Editor"
-//        videoConfig.music = .init(infos: musics)
         
         tableView.cellLayoutMarginsFollowReadableWidth = true
         tableView.register(ConfigurationViewCell.self, forCellReuseIdentifier: ConfigurationViewCell.reuseIdentifier)
@@ -253,41 +257,29 @@ class EditorConfigurationViewController: UITableViewController {
     @objc func backClick() {
         if showOpenEditorButton {
             if editorType == 0 {
+                // 普遍编辑
                 if assetType == 0 {
-                    let image = UIImage(
-                        contentsOfFile: Bundle.main.path(
-                            forResource: "picker_example_image",
-                            ofType: ".JPG"
-                        )!
-                    )!
+                    // 本地数据, 直接读取 Bundle 里面的数据, 进行弹出操作.
+                    let image = UIImage( contentsOfFile: Bundle.main.path( forResource: "picker_example_image", ofType: ".JPG" )!)!
                     let vc = EditorController.init(image: image, config: photoConfig)
                     vc.photoEditorDelegate = self
+                    vc.modalPresentationStyle = .fullScreen
                     present(vc, animated: true, completion: nil)
                 }else {
 #if canImport(Kingfisher)
-                    let networkURL = URL(
-                        string:
-                            "https://wx4.sinaimg.cn/large/a6a681ebgy1gojng2qw07g208c093qv6.gif"
-                    )!
-                    let vc = EditorController(
-                        networkImageURL: networkURL,
-                        config: photoConfig
-                    )
+                    let networkURL = URL(string:"https://wx4.sinaimg.cn/large/a6a681ebgy1gojng2qw07g208c093qv6.gif")!
+                    let vc = EditorController( networkImageURL: networkURL, config: photoConfig )
                     vc.photoEditorDelegate = self
                     present(vc, animated: true, completion: nil)
 #else
-                    let image = UIImage(
-                        contentsOfFile: Bundle.main.path(
-                            forResource: "picker_example_image",
-                            ofType: ".JPG"
-                        )!
-                    )!
+                    let image = UIImage( contentsOfFile: Bundle.main.path( forResource: "picker_example_image", ofType: ".JPG" )! )!
                     let vc = EditorController.init(image: image, config: photoConfig)
                     vc.photoEditorDelegate = self
                     present(vc, animated: true, completion: nil)
 #endif
                 }
-            }else {
+            } else {
+                // 视频编辑
                 if assetType == 0 {
                     let vc = EditorController.init(videoURL: exampleVideoUrl, config: videoConfig)
                     vc.videoEditorDelegate = self
@@ -302,7 +294,7 @@ class EditorConfigurationViewController: UITableViewController {
                     present(vc, animated: true, completion: nil)
                 }
             }
-        }else {
+        } else {
             dismiss(animated: true, completion: nil)
         }
     }
@@ -328,11 +320,9 @@ extension EditorConfigurationViewController {
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(
-            withIdentifier: ConfigurationViewCell.reuseIdentifier,
-            for: indexPath
-        ) as! ConfigurationViewCell
+        let cell = tableView.dequeueReusableCell(withIdentifier: ConfigurationViewCell.reuseIdentifier, for: indexPath) as! ConfigurationViewCell
         let index: Int
+        
         if showOpenEditorButton {
             index = indexPath.section
         }else {
@@ -342,9 +332,11 @@ extension EditorConfigurationViewController {
         cell.setupData(rowType, getRowContent(rowType))
         return cell
     }
+    
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         54
     }
+    
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         let index: Int
@@ -354,6 +346,7 @@ extension EditorConfigurationViewController {
             index = indexPath.section + 1
         }
         let rowType = EditorSection.allCases[index].allRowCase[indexPath.row]
+        // 使用 getFunction 将分发的过程, 交给了各个 Type 值.
         rowType.getFunction(self)(indexPath)
     }
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
@@ -561,6 +554,7 @@ extension EditorConfigurationViewController: VideoEditorViewControllerDelegate {
 extension EditorConfigurationViewController {
     
     // 根据, Cell 的 Type 值, 返回不同的提示文本.
+    // 根据, 当前的成员变量的值, 返回不同的数据.
     func getRowContent(_ rowType: ConfigRowTypeRule) -> String {
         
         if let rowType = rowType as? EditorTypeRow {
@@ -627,17 +621,25 @@ extension EditorConfigurationViewController {
         return ""
     }
     
+    /*
+     各种操作, 中心思想就是改变成员变量的数据值. 然后, 根据数据值来重新刷新相应的 View.
+     ViewState 的保持, 是一个很难的事情, 控制数据, 要比控制 View 要好用的多.
+     */
     func editorTypeAction(_ indexPath: IndexPath) {
+        // 改变数据后重绘.
         editorType = editorType == 0 ? 1 : 0
         tableView.reloadRows(at: [indexPath], with: .fade)
     }
     
     func assetTypeAction(_ indexPath: IndexPath) {
+        // 改变数据后重绘.
         assetType = assetType == 0 ? 1 : 0
         tableView.reloadRows(at: [indexPath], with: .fade)
     }
     
+    // 以下的各种操作, 都是上面您的操作的类似使用.
     func stateAction(_ indexPath: IndexPath) {
+        // 弹框改变数据后重绘.
         let alert = UIAlertController.init(title: "state", message: nil, preferredStyle: .alert)
         let titles = ["normal", "cropping"]
         for title in titles {
@@ -657,6 +659,7 @@ extension EditorConfigurationViewController {
         alert.addAction(UIAlertAction.init(title: "取消", style: .cancel, handler: nil))
         present(alert, animated: true, completion: nil)
     }
+    
     func fixedCropStateAction(_ indexPath: IndexPath) {
         photoConfig.fixedCropState = !photoConfig.fixedCropState
         tableView.reloadRows(at: [indexPath], with: .fade)
