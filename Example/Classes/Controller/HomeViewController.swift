@@ -9,65 +9,17 @@ import UIKit
 import HXPHPicker
 import CoreLocation
 
-class HomeViewController: UITableViewController {
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        navigationItem.title = "Photo Picker"
-        tableView.cellLayoutMarginsFollowReadableWidth = true
-        tableView.register(UITableViewCell.self, forCellReuseIdentifier: UITableViewCell.reuseIdentifier)
-        tableView.tableFooterView = UIView(frame: .zero)
-    }
-    
-    // MARK: - Table view data source
-    
-    override func numberOfSections(in tableView: UITableView) -> Int {
-        return Section.allCases.count
-    }
-
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return Section.allCases[section].allRowCase.count
-    }
-
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: UITableViewCell.reuseIdentifier, for: indexPath)
-        let rowType = Section.allCases[indexPath.section].allRowCase[indexPath.row]
-        cell.textLabel?.text = rowType.title
-        cell.accessoryType = .disclosureIndicator
-        return cell
-    }
-
-    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        tableView.deselectRow(at: indexPath, animated: true)
-        let rowType = Section.allCases[indexPath.section].allRowCase[indexPath.row]
-        if let rowType = rowType as? HomeRowType {
-            if rowType == .camera {
-                let camerController = rowType.controller as! CameraController
-                camerController.autoDismiss = false
-                camerController.cameraDelegate = self
-                present(camerController, animated: true, completion: nil)
-                return
-            }
-        }
-        if let rowType = rowType as? ApplicationRowType {
-            if rowType == .customCell {
-                let vc = rowType.controller as! PhotoPickerController
-                vc.pickerDelegate = self
-                present(vc, animated: true, completion: nil)
-                return
-            }
-        }
-        navigationController?.pushViewController(rowType.controller, animated: true)
-    }
-
-    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        return Section.allCases[section].title
-    }
-}
-
-extension HomeViewController {
+/*
+ 这是一种, 更好地代码组织的方式.
+ 如果, 完全用代码来控制, 相当于在 TableView 的 Delegate, Datasource 里面, 要有大量的 if, switch 的判断.
+ 所以, 组织数据来判断, 是更加好的组织代码的方式.
+ 
+ 这里, 注册专门的类型, 是更加好的数据组织方式.
+ */
+private extension HomeViewController {
     
     enum Section: Int, CaseIterable {
+        
         case module
         case application
         
@@ -89,7 +41,9 @@ extension HomeViewController {
             }
         }
     }
+    
     enum HomeRowType: CaseIterable, HomeRowTypeRule {
+        
         case picker
         case editor
         case camera
@@ -124,7 +78,9 @@ extension HomeViewController {
             }
         }
     }
+    
     enum ApplicationRowType: CaseIterable, HomeRowTypeRule {
+        
         case avatarPicker
         case preselectAsset
         case collectionView
@@ -191,6 +147,66 @@ extension HomeViewController {
     }
 }
 
+class HomeViewController: UITableViewController {
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        navigationItem.title = "Photo Picker"
+        
+        tableView.cellLayoutMarginsFollowReadableWidth = true
+        tableView.register(UITableViewCell.self,
+                           forCellReuseIdentifier: UITableViewCell.reuseIdentifier)
+        tableView.tableFooterView = UIView(frame: .zero)
+    }
+    
+    // MARK: - Table view data source
+    
+    override func numberOfSections(in tableView: UITableView) -> Int {
+        return Section.allCases.count
+    }
+
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return Section.allCases[section].allRowCase.count
+    }
+
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: UITableViewCell.reuseIdentifier, for: indexPath)
+        let rowType = Section.allCases[indexPath.section].allRowCase[indexPath.row]
+        cell.textLabel?.text = rowType.title
+        cell.accessoryType = .disclosureIndicator
+        return cell
+    }
+
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+        let rowType = Section.allCases[indexPath.section].allRowCase[indexPath.row]
+        
+        // 特殊的, 提前判断, 通用逻辑, 使用 rowType.controller 进行.
+        if let rowType = rowType as? HomeRowType {
+            if rowType == .camera {
+                let camerController = rowType.controller as! CameraController
+                camerController.autoDismiss = false
+                camerController.cameraDelegate = self
+                present(camerController, animated: true, completion: nil)
+                return
+            }
+        }
+        if let rowType = rowType as? ApplicationRowType {
+            if rowType == .customCell {
+                let vc = rowType.controller as! PhotoPickerController
+                vc.pickerDelegate = self
+                present(vc, animated: true, completion: nil)
+                return
+            }
+        }
+        navigationController?.pushViewController(rowType.controller, animated: true)
+    }
+
+    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        return Section.allCases[section].title
+    }
+}
+
 extension HomeViewController: PhotoPickerControllerDelegate {
     func pickerController(_ pickerController: PhotoPickerController, didFinishSelection result: PickerResult) {
         pickerController.dismiss(animated: true) {
@@ -211,11 +227,11 @@ extension UITableViewCell {
         return String(describing: Self.self)
     }
 }
+
 extension HomeViewController: CameraControllerDelegate {
-    func cameraController(
-        _ cameraController: CameraController,
-        didFinishWithResult result: CameraController.Result,
-        location: CLLocation?) {
+    func cameraController( _ cameraController: CameraController,
+                           didFinishWithResult result: CameraController.Result,
+                           location: CLLocation?) {
         cameraController.dismiss(animated: true) {
             let photoAsset: PhotoAsset
             switch result {

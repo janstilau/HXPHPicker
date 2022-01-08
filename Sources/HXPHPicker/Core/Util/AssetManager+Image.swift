@@ -9,13 +9,11 @@ import UIKit
 import Photos
 
 public typealias ImageResultHandler = (UIImage?, [AnyHashable: Any]?) -> Void
-
 /*
- 
  PHImageManager 已经设计好一套 API, 作为取图逻辑的集合.
  */
+
  public extension AssetManager {
-    
     /// 请求获取缩略图
     /// - Parameters:
     ///   - asset: 资源对象
@@ -23,7 +21,9 @@ public typealias ImageResultHandler = (UIImage?, [AnyHashable: Any]?) -> Void
     ///   - completion: 完成
     /// - Returns: 请求ID
     @discardableResult
-    static func requestThumbnailImage( for asset: PHAsset, targetWidth: CGFloat, completion: ImageResultHandler? ) -> PHImageRequestID {
+    static func requestThumbnailImage( for asset: PHAsset,
+                                       targetWidth: CGFloat,
+                                       completion: ImageResultHandler? ) -> PHImageRequestID {
         let options = PHImageRequestOptions.init()
         options.resizeMode = .fast
         return requestImage(
