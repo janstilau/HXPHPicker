@@ -16,7 +16,6 @@ open class PhotoEditorViewController: BaseViewController {
     
     public weak var delegate: PhotoEditorViewControllerDelegate?
     
-    /// 配置
     /*
         这种必传项, 应该在 init 方法内, 进行赋值.
      */
@@ -36,6 +35,12 @@ open class PhotoEditorViewController: BaseViewController {
     
     /// 确认/取消之后自动退出界面
     public var autoBack: Bool = true
+    
+    var filterHDImage: UIImage?
+    var mosaicImage: UIImage?
+    var thumbnailImage: UIImage!
+    var needRequest: Bool = false
+    var requestType: Int = 0
     
     /// 编辑image
     /// - Parameters:
@@ -107,166 +112,11 @@ open class PhotoEditorViewController: BaseViewController {
     }
 #endif
     
-    var filterHDImage: UIImage?
-    var mosaicImage: UIImage?
-    var thumbnailImage: UIImage!
-    var needRequest: Bool = false
-    var requestType: Int = 0
-    
     required public init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    lazy var photoEditView: PhotoEditorView = {
-        let imageView = PhotoEditorView.init(config: config)
-        imageView.editorDelegate = self
-        imageView.addBorderline(inWidth: 4, color: UIColor.red)
-        return imageView
-    }()
-    
-    /// 裁剪确认视图
-    public lazy var cropConfirmView: EditorCropConfirmView = {
-        let cropConfirmView = EditorCropConfirmView.init(config: config.cropConfimView, showReset: true)
-        cropConfirmView.alpha = 0
-        cropConfirmView.isHidden = true
-        cropConfirmView.delegate = self
-        cropConfirmView.addBorderline(inWidth: 2, color: UIColor.random())
-        cropConfirmView.addTip("CropConfirmView")
-        return cropConfirmView
-    }()
-    
-    public lazy var toolView: EditorToolView = {
-        let toolView = EditorToolView.init(config: config.toolView)
-        toolView.delegate = self
-        return toolView
-    }()
-    
-    public lazy var topView: UIView = {
-        let view = UIView.init(frame: CGRect(x: 0, y: 0, width: 0, height: 44))
-        let cancelBtn = UIButton.init(frame: CGRect(x: 0, y: 0, width: 57, height: 44))
-        cancelBtn.setImage(UIImage.image(for: "hx_editor_back"), for: .normal)
-        cancelBtn.addTarget(self, action: #selector(didBackButtonClick), for: .touchUpInside)
-        view.addSubview(cancelBtn)
-        return view
-    }()
-    
-    public lazy var topMaskLayer: CAGradientLayer = {
-        let layer = PhotoTools.getGradientShadowLayer(true)
-        return layer
-    }()
-    
-    public lazy var brushColorView: PhotoEditorBrushColorView = {
-        let view = PhotoEditorBrushColorView.init(frame: .zero)
-        view.delegate = self
-        view.brushColors = config.brushColors
-        view.currentColorIndex = config.defaultBrushColorIndex
-        view.alpha = 0
-        view.isHidden = true
-        
-        view.addBorderLine()
-        view.addTip("BrushColorView")
-        return view
-    }()
-    
-    public lazy var cropToolView: PhotoEditorCropToolView = {
-        var showRatios = true
-        if config.cropping.fixedRatio || config.cropping.isRoundCrop {
-            showRatios = false
-        }
-        let view = PhotoEditorCropToolView.init(showRatios: showRatios)
-        view.delegate = self
-        view.themeColor = config.cropping.aspectRatioSelectedColor
-        view.alpha = 0
-        view.isHidden = true
-        view.addBorderLine()
-        view.addTip("CropToolView")
-        return view
-    }()
-    
-    lazy var mosaicToolView: PhotoEditorMosaicToolView = {
-        let view = PhotoEditorMosaicToolView(selectedColor: config.toolView.toolSelectedColor)
-        view.delegate = self
-        view.alpha = 0
-        view.isHidden = true
-        view.addBorderLine()
-        view.addTip("MosaicToolView")
-        return view
-    }()
-    
-    lazy var filterView: PhotoEditorFilterView = {
-        let filter = editResult?.editedData.filter
-        let value = editResult?.editedData.filterValue
-        let view = PhotoEditorFilterView.init(filterConfig: config.filter,
-                                              sourceIndex: filter?.sourceIndex ?? -1,
-                                              value: value ?? 0)
-        view.delegate = self
-        view.addBorderLine()
-        view.addTip("FilterView")
-        return view
-    }()
-    
-    lazy var chartletView: EditorChartletView = {
-        let view = EditorChartletView(config: config.chartlet, editorType: .photo)
-        view.delegate = self
-        view.addBorderLine()
-        view.addTip("ChartletView")
-        return view
-    }()
-    
     var topViewIsHidden: Bool = false
-    
-    @objc func handleSingleTap() {
-        if state == .cropping {
-            return
-        }
-        
-        photoEditView.deselectedSticker()
-        func resetOtherOption() {
-            if let option = currentToolOption {
-                if option.type == .graffiti {
-                    photoEditView.drawEnabled = true
-                }else if option.type == .mosaic {
-                    photoEditView.mosaicEnabled = true
-                }
-            }
-            showTopView()
-        }
-        if isFilter {
-            isFilter = false
-            resetOtherOption()
-            hiddenFilterView()
-            return
-        }
-        if showChartlet {
-            photoEditView.isEnabled = true
-            showChartlet = false
-            resetOtherOption()
-            hiddenChartletView()
-            return
-        }
-        if topViewIsHidden {
-            showTopView()
-        }else {
-            hidenTopView()
-        }
-    }
-    
-    @objc func didBackButtonClick() {
-        didBackClick(true)
-    }
-    
-    func didBackClick(_ isCancel: Bool = false) {
-        if isCancel {
-            delegate?.photoEditorViewController(didCancel: self)
-        }
-        if autoBack {
-            if let navigationController = navigationController, navigationController.viewControllers.count > 1 {
-                navigationController.popViewController(animated: true)
-            }else {
-                dismiss(animated: true, completion: nil)
-            }
-        }
-    }
     
     var showChartlet: Bool = false
     
@@ -350,9 +200,6 @@ open class PhotoEditorViewController: BaseViewController {
         singleTap.delegate = self
         view.addGestureRecognizer(singleTap)
         
-        /*
-            A Boolean value that indicates whether the receiver handles touch events exclusively.
-         */
         view.isExclusiveTouch = true
         view.backgroundColor = .black
         view.clipsToBounds = true
@@ -395,12 +242,14 @@ open class PhotoEditorViewController: BaseViewController {
     open override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         
-        // Top
+        // ToolView 的位置确认.
         toolView.frame = CGRect( x: 0,
                                  y: view.height - UIDevice.bottomMargin - 50,
                                  width: view.width,
                                  height: 50 + UIDevice.bottomMargin)
         toolView.reloadContentInset()
+        
+        // TopView 的位置确定.
         topView.width = view.width
         topView.height = navigationController?.navigationBar.height ?? 44
         let cancelButton = topView.subviews.first
@@ -435,7 +284,7 @@ open class PhotoEditorViewController: BaseViewController {
             setFilterViewFrame()
         }
         
-        // PhotoEdit
+        // 没有使用 AutoLyaout, 在这里, 进行了相关 View 的位置的确定.
         if !photoEditView.frame.equalTo(view.bounds) && !photoEditView.frame.isEmpty && !imageViewDidChange {
             photoEditView.frame = view.bounds
             photoEditView.reset(false)
@@ -542,6 +391,75 @@ open class PhotoEditorViewController: BaseViewController {
     func setImage(_ image: UIImage) {
         self.image = image
     }
+    
+    
+    lazy var photoEditView: PhotoEditorView = createPhotoEditorView()
+    public lazy var cropConfirmView: EditorCropConfirmView = createEditorCropConfirmView()
+    public lazy var toolView: EditorToolView = createEditorToolView()
+    // TopView, 模拟 NavBar 上面的返回按钮.
+    public lazy var topView: UIView = createTopView()
+    public lazy var topMaskLayer: CAGradientLayer = createTopMask()
+    public lazy var brushColorView: PhotoEditorBrushColorView = createPhotoEditorBrushColorView()
+    public lazy var cropToolView: PhotoEditorCropToolView = createPhotoEditorCropToolView()
+    lazy var mosaicToolView: PhotoEditorMosaicToolView = createPhotoEditorMosaicToolView()
+    lazy var filterView: PhotoEditorFilterView = createPhotoEditorFilterView()
+    lazy var chartletView: EditorChartletView = createEditorChartletView()
+}
+
+extension PhotoEditorViewController {
+    
+    @objc func handleSingleTap() {
+        if state == .cropping {
+            return
+        }
+        
+        photoEditView.deselectedSticker()
+        func resetOtherOption() {
+            if let option = currentToolOption {
+                if option.type == .graffiti {
+                    photoEditView.drawEnabled = true
+                }else if option.type == .mosaic {
+                    photoEditView.mosaicEnabled = true
+                }
+            }
+            showTopView()
+        }
+        if isFilter {
+            isFilter = false
+            resetOtherOption()
+            hiddenFilterView()
+            return
+        }
+        if showChartlet {
+            photoEditView.isEnabled = true
+            showChartlet = false
+            resetOtherOption()
+            hiddenChartletView()
+            return
+        }
+        if topViewIsHidden {
+            showTopView()
+        }else {
+            hidenTopView()
+        }
+    }
+    
+    @objc func didBackButtonClick() {
+        didBackClick(true)
+    }
+    
+    func didBackClick(_ isCancel: Bool = false) {
+        if isCancel {
+            delegate?.photoEditorViewController(didCancel: self)
+        }
+        if autoBack {
+            if let navigationController = navigationController, navigationController.viewControllers.count > 1 {
+                navigationController.popViewController(animated: true)
+            }else {
+                dismiss(animated: true, completion: nil)
+            }
+        }
+    }
 }
 
 /*
@@ -622,7 +540,12 @@ extension PhotoEditorViewController: EditorToolViewDelegate {
         }
     }
 }
+
+/*
+ BrushColorView 的代理方法, 当 BrushView 上面的按钮被点击之后, 触发相应的回调. 
+ */
 extension PhotoEditorViewController: PhotoEditorBrushColorViewDelegate {
+    
     func brushColorView(didUndoButton colorView: PhotoEditorBrushColorView) {
         photoEditView.undoDraw()
         brushColorView.canUndo = photoEditView.canUndoDraw
@@ -634,7 +557,6 @@ extension PhotoEditorViewController: PhotoEditorBrushColorViewDelegate {
 
 // MARK: EditorCropConfirmViewDelegate
 extension PhotoEditorViewController: EditorCropConfirmViewDelegate {
-    
     /// 点击完成按钮
     /// - Parameter cropConfirmView: 裁剪视图
     func cropConfirmView(didFinishButtonClick cropConfirmView: EditorCropConfirmView) {

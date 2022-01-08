@@ -81,10 +81,7 @@ extension String: HXPickerCompatibleValue {
     ///   - maxHeight: 最大高度
     /// - Returns: 字符串宽度
     func width(ofFont font: UIFont, maxHeight: CGFloat) -> CGFloat {
-        hx.width(
-            ofFont: font,
-            maxHeight: maxHeight
-        )
+        hx.width( ofFont: font, maxHeight: maxHeight )
     }
     
     /// 字符串高度

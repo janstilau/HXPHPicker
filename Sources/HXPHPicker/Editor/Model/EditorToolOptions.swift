@@ -15,8 +15,7 @@ public class EditorToolOptions {
     /// 类型
     public let type: `Type`
     
-    public init(imageName: String,
-                type: `Type`) {
+    public init(imageName: String, type: `Type`) {
         self.imageName = imageName
         self.type = type
     }

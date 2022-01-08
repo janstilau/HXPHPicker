@@ -49,8 +49,8 @@ extension PhotoEditorViewController {
         } completion: { (_) in
             guard let option = self.currentToolOption,
                   option.type == .graffiti else {
-                return
-            }
+                      return
+                  }
             self.brushColorView.isHidden = true
         }
     }
@@ -71,8 +71,8 @@ extension PhotoEditorViewController {
         } completion: { (_) in
             guard let option = self.currentToolOption,
                   option.type == .mosaic else {
-                return
-            }
+                      return
+                  }
             self.mosaicToolView.isHidden = true
         }
     }

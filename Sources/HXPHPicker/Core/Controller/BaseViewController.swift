@@ -12,6 +12,21 @@ import UIKit
  */
 open class BaseViewController: UIViewController {
     
+    public override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+        let clazzName = NSStringFromClass(Self.self)
+        print("ViewController \(clazzName) Created")
+    }
+    
+    required public init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    deinit {
+        let clazzName = NSStringFromClass(Self.self)
+        print("ViewController \(clazzName) Dealloced")
+    }
+    
     open override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -38,11 +53,5 @@ open class BaseViewController: UIViewController {
     
     @objc open func deviceOrientationWillChanged(notify: Notification) {
         
-    }
-    
-    deinit {
-        NotificationCenter.default.removeObserver(self)
-        let clazzName = NSStringFromClass(type(of: self))
-        debugPrint("\(clazzName) dealloc")
     }
 }

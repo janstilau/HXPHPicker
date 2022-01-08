@@ -16,6 +16,7 @@ protocol PhotoEditorBrushColorViewDelegate: AnyObject {
     PhotoEditorBrushColorView 是当涂抹按钮点击之后的 ToolView.
  */
 public class PhotoEditorBrushColorView: UIView {
+    
     weak var delegate: PhotoEditorBrushColorViewDelegate?
     
     var brushColors: [String] = []
@@ -46,10 +47,8 @@ public class PhotoEditorBrushColorView: UIView {
         if #available(iOS 11.0, *) {
             collectionView.contentInsetAdjustmentBehavior = .never
         }
-        collectionView.register(
-            PhotoEditorBrushColorViewCell.self,
-            forCellWithReuseIdentifier: "PhotoEditorBrushColorViewCellID"
-        )
+        collectionView.register(PhotoEditorBrushColorViewCell.self,
+                                forCellWithReuseIdentifier: "PhotoEditorBrushColorViewCellID")
         return collectionView
     }()
     
@@ -95,7 +94,8 @@ public class PhotoEditorBrushColorView: UIView {
 }
 
 extension PhotoEditorBrushColorView: UICollectionViewDataSource, UICollectionViewDelegate {
-    public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    public func collectionView(_ collectionView: UICollectionView,
+                               numberOfItemsInSection section: Int) -> Int {
         brushColors.count
     }
     
@@ -144,6 +144,7 @@ class PhotoEditorBrushColorViewCell: UICollectionViewCell {
         }
     }
     
+    // 当被选中之后, 会有一个简单的放大动画. 
     override var isSelected: Bool {
         didSet {
             UIView.animate(withDuration: 0.2) {

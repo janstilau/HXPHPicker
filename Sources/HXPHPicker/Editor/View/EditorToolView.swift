@@ -24,6 +24,7 @@ public class EditorToolView: UIView {
     
     var config: EditorToolViewConfiguration
     
+    // 这样的设计才对, 直接把渐隐 Layer 在内部进行了添加. 可以给外界一个控制隐藏与否的变量.
     public lazy var edgeMaskLayer: CAGradientLayer = {
         let layer = PhotoTools.getGradientShadowLayer(false)
         return layer
@@ -52,8 +53,8 @@ public class EditorToolView: UIView {
         }
         collectionView.register(EditorToolViewCell.self,
                                 forCellWithReuseIdentifier: "EditorToolViewCellID")
-        collectionView.addBorderLine()
-        collectionView.addTip("collectionView")
+        
+        collectionView.backgroundColor = UIColor.systemPink.withAlphaComponent(0.3)
         return collectionView
     }()
     
@@ -70,6 +71,14 @@ public class EditorToolView: UIView {
         finishButton.addTarget(self,
                                action: #selector(didFinishButtonClick(button:)),
                                for: .touchUpInside)
+        
+        let isDark = PhotoManager.isDark
+        let titleColor = isDark ? config.finishButtonTitleDarkColor : config.finishButtonTitleColor
+        finishButton.setTitleColor( titleColor, for: .normal )
+        let bgColor = isDark ?
+        config.finishButtonDarkBackgroundColor : config.finishButtonBackgroundColor
+        let bgImg = UIImage.image(for: bgColor, havingSize: .zero)
+        finishButton.setBackgroundImage(bgImg, for: .normal)
         return finishButton
     }()
     
@@ -89,18 +98,6 @@ public class EditorToolView: UIView {
         layer.addSublayer(edgeMaskLayer)
         addSubview(collectionView)
         addSubview(finishButton)
-        configColor()
-    }
-    
-    // 这个, 不应该放到 FinishButton 的懒加载里面吗
-    func configColor() {
-        let isDark = PhotoManager.isDark
-        let titleColor = isDark ? config.finishButtonTitleDarkColor : config.finishButtonTitleColor
-        finishButton.setTitleColor( titleColor, for: .normal )
-        let bgColor = isDark ?
-        config.finishButtonDarkBackgroundColor :config.finishButtonBackgroundColor
-        let bgImg = UIImage.image(for: bgColor, havingSize: .zero)
-        finishButton.setBackgroundImage(bgImg, for: .normal)
     }
     
     func deselected() {
@@ -151,23 +148,14 @@ public class EditorToolView: UIView {
         finishButton.height = 33
         finishButton.x = width - finishButton.width - 12 - UIDevice.rightMargin
         finishButton.centerY = 25
+        
+        // CollectionView 的宽度, 是依赖于 FinishButton 的位置.
         collectionView.width = finishButton.x - 12
-    }
-    
-    public override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        super.touchesBegan(touches, with: event)
-    }
-    
-    public override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
-        return super.hitTest(point, with: event)
-    }
-    
-    public override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
-        return super.point(inside: point, with: event)
     }
 }
 
 extension EditorToolView: UICollectionViewDataSource, UICollectionViewDelegate, EditorToolViewCellDelegate {
+    
     public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         config.toolOptions.count
     }
@@ -180,6 +168,7 @@ extension EditorToolView: UICollectionViewDataSource, UICollectionViewDelegate, 
             withReuseIdentifier: "EditorToolViewCellID",
             for: indexPath
         ) as! EditorToolViewCell
+        
         let model = config.toolOptions[indexPath.item]
         cell.delegate = self
         cell.boxColor = config.musicSelectedColor

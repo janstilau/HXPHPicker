@@ -375,7 +375,9 @@ public struct PhotoTools {
         return animation
     }
     
-    // 返回, 一个逐渐变化颜色的 Layer. 防止到 View 的边缘, 实现内容的坡度变化.
+    /*
+     基本上, 渐隐效果使用这个 GradientLayer 就可以了 
+     */
     static func getGradientShadowLayer(_ isTop: Bool) -> CAGradientLayer {
         let layer = CAGradientLayer()
         layer.contentsScale = UIScreen.main.scale

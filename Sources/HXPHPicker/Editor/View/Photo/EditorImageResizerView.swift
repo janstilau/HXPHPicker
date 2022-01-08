@@ -81,7 +81,7 @@ class EditorImageResizerView: UIView {
     
     let mosaicConfig: PhotoEditorConfiguration.MosaicConfig
     
-    // imageView 是真正的内容视图. 里面包括, 原始 Img, drawView, StickView,
+    // imageView 是真正的内容视图. 里面包括, 原始 ImgView, drawView, StickView
     lazy var imageView: PhotoEditorContentView = {
         let imageView = PhotoEditorContentView.init(mosaicConfig: mosaicConfig)
         imageView.itemViewMoveToCenter = { [weak self] rect -> Bool in

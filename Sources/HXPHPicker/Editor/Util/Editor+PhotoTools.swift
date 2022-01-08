@@ -94,6 +94,7 @@ extension PhotoTools {
         return getFrameDuration(from: gifInfo)
     }
     
+    // 默认的颜色值. 
     public static func defaultColors() -> [String] {
         ["#ffffff", "#2B2B2B", "#FA5150", "#FEC200", "#07C160", "#10ADFF", "#6467EF", "#000000", "#ff0000", "#00ff00", "0000ff"]
     }

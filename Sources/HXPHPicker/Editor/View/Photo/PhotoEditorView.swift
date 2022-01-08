@@ -8,6 +8,7 @@
 import UIKit
 
 protocol PhotoEditorViewDelegate: AnyObject {
+    
     func editorView(willBeginEditing editorView: PhotoEditorView)
     func editorView(didEndEditing editorView: PhotoEditorView)
     func editorView(willAppearCrop editorView: PhotoEditorView)
@@ -22,6 +23,7 @@ protocol PhotoEditorViewDelegate: AnyObject {
 
 // 没太明白, 直接继承 ScrollView 的意义. 
 class PhotoEditorView: UIScrollView, UIGestureRecognizerDelegate {
+    
     weak var editorDelegate: PhotoEditorViewDelegate?
     
     override var zoomScale: CGFloat {
@@ -127,7 +129,7 @@ class PhotoEditorView: UIScrollView, UIGestureRecognizerDelegate {
 
 extension PhotoEditorView {
     
-    // 确定, 最初的 ImageView 的位置. 
+    // 确定, 最初的 ImageView 的位置.
     func updateImageViewFrame() {
         let imageWidth = width
         var imageHeight: CGFloat
@@ -141,7 +143,7 @@ extension PhotoEditorView {
         if imageHeight < height {
             imageY = (height - imageHeight) * 0.5
             imageResizerView.setViewFrame(CGRect(x: 0, y: -imageY, width: width, height: height))
-        } else {  
+        } else {
             imageResizerView.setViewFrame(bounds)
         }
         contentSize = CGSize(width: imageWidth, height: imageHeight)

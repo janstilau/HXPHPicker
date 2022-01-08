@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		06B0B92D2789F5AE0014A972 /* PhotoEditorViewController+Views.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06B0B92C2789F5AE0014A972 /* PhotoEditorViewController+Views.swift */; };
 		7B02F2BC2656186500FA94CD /* Core+Data.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B02F2BB2656186500FA94CD /* Core+Data.swift */; };
 		7B09599125FB351A005DB27B /* PhotoPickerBaseViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B09599025FB351A005DB27B /* PhotoPickerBaseViewCell.swift */; };
 		7B09599425FB3548005DB27B /* PhotoPickerSelectableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B09599325FB3548005DB27B /* PhotoPickerSelectableViewCell.swift */; };
@@ -319,6 +320,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		06B0B92C2789F5AE0014A972 /* PhotoEditorViewController+Views.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PhotoEditorViewController+Views.swift"; sourceTree = "<group>"; };
 		673AAF6C9FC36AE5B6E9959D /* Pods_HXPHPicker.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_HXPHPicker.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		7B02F2BB2656186500FA94CD /* Core+Data.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Core+Data.swift"; sourceTree = "<group>"; };
 		7B09599025FB351A005DB27B /* PhotoPickerBaseViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoPickerBaseViewCell.swift; sourceTree = "<group>"; };
@@ -1243,6 +1245,7 @@
 				7BB8A2DF26DF6D160039D304 /* EditorControllerProtocol.swift */,
 				7BEB056525A93FBF00B39BE5 /* EditorController.swift */,
 				7BEB057625A94FD600B39BE5 /* PhotoEditorViewController.swift */,
+				06B0B92C2789F5AE0014A972 /* PhotoEditorViewController+Views.swift */,
 				7B76CA24269EBEE800F5590E /* PhotoEditorViewController+Request.swift */,
 				7B76CA26269EBF7F00F5590E /* PhotoEditorViewController+Export.swift */,
 				7B76CA28269EC0BB00F5590E /* PhotoEditorViewController+Animation.swift */,
@@ -1690,6 +1693,7 @@
 				7B4CA1CF265B9A9F009FEC18 /* PhotoAsset+Network.swift in Sources */,
 				7B6DE5392683317F00EE1B1D /* PhotoEditorFilter.swift in Sources */,
 				7BBBD59F25AEFE9100301DCC /* NotAuthorizedConfiguration.swift in Sources */,
+				06B0B92D2789F5AE0014A972 /* PhotoEditorViewController+Views.swift in Sources */,
 				7BBBD5A025AEFE9100301DCC /* PhotoPickerController.swift in Sources */,
 				7BBBD5A125AEFE9100301DCC /* AlbumViewController.swift in Sources */,
 				7B5D5B702627DF7200F94E01 /* PhotoEditorCropToolModel.swift in Sources */,

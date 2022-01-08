@@ -12,7 +12,15 @@ import AVKit
 import Kingfisher
 #endif
 
+/*
+ 图片编辑的入口类. 是一个 Nav 类.
+ 这个类的主要逻辑, 就是各个初始化方法.
+ 根据传入的数据的不同, 生成不同的 RootVC 进行展示
+ */
 open class EditorController: UINavigationController {
+    
+    public let editorType: EditorType
+    let config: EditorConfiguration
     
     public weak var photoEditorDelegate: PhotoEditorViewControllerDelegate? {
         didSet { photoEditor?.delegate = photoEditorDelegate }
@@ -30,28 +38,20 @@ open class EditorController: UINavigationController {
         viewControllers.first as? VideoEditorViewController
     }
     
-    /// 当前编辑类型
-    public let editorType: EditorType
-    
     /// 根据UIImage初始化
     /// - Parameters:
     ///   - image: 对应的UIImage
     ///   - editResult: 上一次编辑的结果，传入可在基础上进行编辑
     ///   - config: 编辑配置
-    public init(
-        image: UIImage,
-        editResult: PhotoEditResult? = nil,
-        config: PhotoEditorConfiguration,
-        delegate: PhotoEditorViewControllerDelegate? = nil
-    ) {
+    public init( image: UIImage,
+                 editResult: PhotoEditResult? = nil,
+                 config: PhotoEditorConfiguration,
+                 delegate: PhotoEditorViewControllerDelegate? = nil ) {
         editorType = .photo
         self.config = config
         super.init(nibName: nil, bundle: nil)
-        let photoEditorVC = PhotoEditorViewController(
-            image: image,
-            editResult: editResult,
-            config: config
-        )
+        // editResult 是上一次的编辑结果, 可以抽取里面的数据, 做一些初始化的操作. 
+        let photoEditorVC = PhotoEditorViewController( image: image, editResult: editResult, config: config )
         photoEditorVC.delegate = delegate
         self.viewControllers = [photoEditorVC]
     }
@@ -214,9 +214,6 @@ open class EditorController: UINavigationController {
     }
     #endif
     
-    /// 编辑器配置
-    let config: EditorConfiguration
-    
     open override var shouldAutorotate: Bool {
         config.shouldAutorotate
     }
@@ -225,7 +222,8 @@ open class EditorController: UINavigationController {
     }
     open override var childForScreenEdgesDeferringSystemGestures: UIViewController? {
         children.first
-    } 
+    }
+    
     required public init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
