@@ -9,7 +9,207 @@ import UIKit
 import HXPHPicker
 import AVFoundation
 
+/*
+ 在这个 Module 里面, 都是用的这种方式, 进行的 TableView 的数据管理.
+ */
+extension EditorConfigurationViewController {
+    
+    enum EditorSection: Int, CaseIterable {
+        
+        case editorType
+        case photoOptions
+        case videoOptions
+        
+        var title: String {
+            switch self {
+            case .editorType:
+                return "EditorType"
+            case .photoOptions:
+                return "PhotoOptions"
+            case .videoOptions:
+                return "VideoOptions"
+            }
+        }
+        var allRowCase: [ConfigRowTypeRule] {
+            switch self {
+            case .editorType:
+                return EditorTypeRow.allCases
+            case .photoOptions:
+                return PhotoEditorRow.allCases
+            case .videoOptions:
+                return VideoEditorRow.allCases
+            }
+        }
+    }
+    
+    enum EditorTypeRow: String, CaseIterable, ConfigRowTypeRule {
+        
+        case type
+        case assetType
+        
+        var title: String {
+            switch self {
+            case .type:
+                return "编辑类型"
+            case .assetType:
+                return "资源类型"
+            }
+        }
+        
+        var detailTitle: String {
+            return "." + self.rawValue
+        }
+        
+        func getFunction<T>(
+            _ controller: T) -> (
+                (IndexPath) -> Void
+            ) where T: UIViewController {
+                guard let controller = controller as? EditorConfigurationViewController else {
+                    return { _ in }
+                }
+                switch self {
+                case .type:
+                    return controller.editorTypeAction(_:)
+                case .assetType:
+                    return controller.assetTypeAction(_:)
+                }
+            }
+    }
+    
+    enum PhotoEditorRow: String, CaseIterable, ConfigRowTypeRule {
+        
+        case state
+        case fixedCropState
+        case isRoundCrop
+        case fixedRatio
+        case aspectRatioType
+        case maskType
+        
+        var title: String {
+            switch self {
+            case .state:
+                return "初始状态"
+            case .fixedCropState:
+                return "固定裁剪状态"
+            case .isRoundCrop:
+                return "圆形裁剪框"
+            case .fixedRatio:
+                return "固定比例"
+            case .aspectRatioType:
+                return "默认宽高比"
+            case .maskType:
+                return "裁剪时遮罩类型"
+            }
+        }
+        
+        var detailTitle: String {
+            switch self {
+            case .state, .fixedCropState:
+                return "." + rawValue
+            default: break
+            }
+            return ".cropping." + rawValue
+        }
+        
+        func getFunction<T>( _ controller: T) -> ( (IndexPath) -> Void )
+            where T: UIViewController {
+                guard let controller = controller as? EditorConfigurationViewController else {
+                    return { _ in }
+                }
+                switch self {
+                case .state:
+                    return controller.stateAction(_:)
+                case .fixedCropState:
+                    return controller.fixedCropStateAction(_:)
+                case .isRoundCrop:
+                    return controller.isRoundCropAction(_:)
+                case .fixedRatio:
+                    return controller.fixedRatioAction(_:)
+                case .aspectRatioType:
+                    return controller.aspectRatioTypeAction(_:)
+                case .maskType:
+                    return controller.maskTypeAction(_:)
+                }
+            }
+    }
+    
+    enum VideoEditorRow: String, CaseIterable, ConfigRowTypeRule {
+        
+        case exportPresetName
+        case defaultState
+        case mustBeTailored
+        case maximumVideoCroppingTime
+        case minimumVideoCroppingTime
+        
+        var title: String {
+            switch self {
+            case .exportPresetName:
+                return "编辑后导出的质量"
+            case .defaultState:
+                return "当前默认的状态"
+            case .mustBeTailored:
+                return "默认裁剪状态下必须裁剪视频"
+            case .maximumVideoCroppingTime:
+                return "视频最大裁剪时长"
+            case .minimumVideoCroppingTime:
+                return "视频最小裁剪时长"
+            }
+        }
+        
+        var detailTitle: String {
+            switch self {
+            case .maximumVideoCroppingTime, .minimumVideoCroppingTime:
+                return ".cropping." + self.rawValue
+            default:
+                break
+            }
+            return "." + self.rawValue
+        }
+        
+        func getFunction<T>(
+            _ controller: T) -> (
+                (IndexPath) -> Void
+            ) where T: UIViewController {
+                guard let controller = controller as? EditorConfigurationViewController else {
+                    return { _ in }
+                }
+                switch self {
+                case .exportPresetName:
+                    return controller.exportPresetNameAction(_:)
+                case .defaultState:
+                    return controller.defaultStateAction(_:)
+                case .mustBeTailored:
+                    return controller.mustBeTailoredAction(_:)
+                case .maximumVideoCroppingTime:
+                    return controller.maximumVideoCroppingTimeAction(_:)
+                case .minimumVideoCroppingTime:
+                    return controller.minimumVideoCroppingTimeAction(_:)
+                }
+            }
+    }
+}
+
+extension VideoEditorViewController.State {
+    var title: String {
+        if self == .cropping {
+            return "裁剪"
+        }
+        return "正常"
+    }
+}
+
+extension PhotoEditorViewController.State {
+    var title: String {
+        if self == .cropping {
+            return "裁剪"
+        }
+        return "正常"
+    }
+}
+
+
 class EditorConfigurationViewController: UITableViewController {
+    
     var photoConfig: PhotoEditorConfiguration = .init()
     var videoConfig: VideoEditorConfiguration = .init()
     var showOpenEditorButton: Bool = true
@@ -17,6 +217,20 @@ class EditorConfigurationViewController: UITableViewController {
     
     var editorType = 0
     var assetType = 0
+    
+    override init(nibName: String?, bundle: Bundle?) {
+        super.init(nibName: nibName, bundle: bundle)
+        print(" EditorConfigurationViewController Inited ")
+    }
+    
+    override init(style: UITableView.Style) {
+        super.init(style: style)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.title = "Editor"
@@ -47,7 +261,7 @@ class EditorConfigurationViewController: UITableViewController {
                     vc.photoEditorDelegate = self
                     present(vc, animated: true, completion: nil)
                 }else {
-                    #if canImport(Kingfisher)
+#if canImport(Kingfisher)
                     let networkURL = URL(
                         string:
                             "https://wx4.sinaimg.cn/large/a6a681ebgy1gojng2qw07g208c093qv6.gif"
@@ -58,7 +272,7 @@ class EditorConfigurationViewController: UITableViewController {
                     )
                     vc.photoEditorDelegate = self
                     present(vc, animated: true, completion: nil)
-                    #else
+#else
                     let image = UIImage(
                         contentsOfFile: Bundle.main.path(
                             forResource: "picker_example_image",
@@ -68,7 +282,7 @@ class EditorConfigurationViewController: UITableViewController {
                     let vc = EditorController.init(image: image, config: photoConfig)
                     vc.photoEditorDelegate = self
                     present(vc, animated: true, completion: nil)
-                    #endif
+#endif
                 }
             }else {
                 if assetType == 0 {
@@ -89,13 +303,16 @@ class EditorConfigurationViewController: UITableViewController {
             dismiss(animated: true, completion: nil)
         }
     }
+}
+
+extension EditorConfigurationViewController {
     
-    // MARK: - Table view data source
-
     override func numberOfSections(in tableView: UITableView) -> Int {
-        return showOpenEditorButton ? EditorSection.allCases.count : EditorSection.allCases.count - 1
+        return showOpenEditorButton ?
+        
+        EditorSection.allCases.count : EditorSection.allCases.count - 1
     }
-
+    
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         let index: Int
         if showOpenEditorButton {
@@ -105,7 +322,7 @@ class EditorConfigurationViewController: UITableViewController {
         }
         return EditorSection.allCases[index].allRowCase.count
     }
-
+    
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(
             withIdentifier: ConfigurationViewCell.reuseIdentifier,
@@ -145,11 +362,11 @@ class EditorConfigurationViewController: UITableViewController {
         return EditorSection.allCases[index].title
     }
 }
+
 extension EditorConfigurationViewController: PhotoEditorViewControllerDelegate {
-    func photoEditorViewController(
-        _ photoEditorViewController: PhotoEditorViewController,
-        didFinish result: PhotoEditResult
-    ) {
+    
+    func photoEditorViewController( _ photoEditorViewController: PhotoEditorViewController,
+                                    didFinish result: PhotoEditResult ) {
         let pickerResultVC = PickerResultViewController.init()
         let pickerConfig = PickerConfiguration.init()
         pickerConfig.photoEditor = photoConfig
@@ -161,13 +378,13 @@ extension EditorConfigurationViewController: PhotoEditorViewControllerDelegate {
             let photoAsset = PhotoAsset.init(localImageAsset: localImageAsset)
             photoAsset.photoEdit = result
             pickerResultVC.selectedAssets = [photoAsset]
-        #if canImport(Kingfisher)
+#if canImport(Kingfisher)
         case .network:
             let url = photoEditorViewController.networkImageURL!
             let photoAsset = PhotoAsset.init(networkImageAsset: .init(thumbnailURL: url, originalURL: url))
             photoAsset.photoEdit = result
             pickerResultVC.selectedAssets = [photoAsset]
-        #endif
+#endif
         default:
             break
         }
@@ -183,25 +400,27 @@ extension EditorConfigurationViewController: PhotoEditorViewControllerDelegate {
             let localImageAsset = LocalImageAsset.init(image: photoEditorViewController.image)
             let photoAsset = PhotoAsset.init(localImageAsset: localImageAsset)
             pickerResultVC.selectedAssets = [photoAsset]
-        #if canImport(Kingfisher)
+#if canImport(Kingfisher)
         case .network:
             let url = photoEditorViewController.networkImageURL!
             let photoAsset = PhotoAsset.init(networkImageAsset: .init(thumbnailURL: url, originalURL: url))
             pickerResultVC.selectedAssets = [photoAsset]
-        #endif
+#endif
         default:
             break
         }
         self.navigationController?.pushViewController(pickerResultVC, animated: true)
     }
 }
+
 extension EditorConfigurationViewController: VideoEditorViewControllerDelegate {
     func getMusicInfos() -> [VideoEditorMusicInfo] {
         var musics: [VideoEditorMusicInfo] = []
-//        let audioUrl1 = Bundle.main.url(forResource: "天外来物", withExtension: "mp3")!
+        //        let audioUrl1 = Bundle.main.url(forResource: "天外来物", withExtension: "mp3")!
         let lyricUrl1 = Bundle.main.url(forResource: "天外来物", withExtension: nil)!
         let lrc1 = try! String(contentsOfFile: lyricUrl1.path) // swiftlint:disable:this force_try
-        let music1 = VideoEditorMusicInfo.init(audioURL: URL(string: "http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/chartle/%E5%A4%A9%E5%A4%96%E6%9D%A5%E7%89%A9.mp3")!, // swiftlint:disable:this line_length
+        let audioURL = URL(string: "http://tsnrhapp.oss-cn-hangzhou.aliyuncs.com/chartle/%E5%A4%A9%E5%A4%96%E6%9D%A5%E7%89%A9.mp3")!
+        let music1 = VideoEditorMusicInfo.init(audioURL: audioURL,
                                                lrc: lrc1,
                                                urlType: .network)
         musics.append(music1)
@@ -256,10 +475,9 @@ extension EditorConfigurationViewController: VideoEditorViewControllerDelegate {
         musics.append(music8)
         return musics
     }
-    func videoEditorViewController(
-        _ videoEditorViewController: VideoEditorViewController,
-        loadMusic completionHandler: @escaping ([VideoEditorMusicInfo]
-        ) -> Void) -> Bool {
+    func videoEditorViewController( _ videoEditorViewController: VideoEditorViewController,
+                                    loadMusic completionHandler:
+                                    @escaping ([VideoEditorMusicInfo]) -> Void) -> Bool {
         // 模仿延迟加加载数据
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
             completionHandler(self.getMusicInfos())
@@ -335,7 +553,9 @@ extension EditorConfigurationViewController: VideoEditorViewControllerDelegate {
         self.navigationController?.pushViewController(pickerResultVC, animated: true)
     }
 }
+
 extension EditorConfigurationViewController {
+    
     func getRowContent(_ rowType: ConfigRowTypeRule) -> String {
         if let rowType = rowType as? EditorTypeRow {
             switch rowType {
@@ -397,14 +617,17 @@ extension EditorConfigurationViewController {
         }
         return ""
     }
+    
     func editorTypeAction(_ indexPath: IndexPath) {
         editorType = editorType == 0 ? 1 : 0
         tableView.reloadRows(at: [indexPath], with: .fade)
     }
+    
     func assetTypeAction(_ indexPath: IndexPath) {
         assetType = assetType == 0 ? 1 : 0
         tableView.reloadRows(at: [indexPath], with: .fade)
     }
+    
     func stateAction(_ indexPath: IndexPath) {
         let alert = UIAlertController.init(title: "state", message: nil, preferredStyle: .alert)
         let titles = ["normal", "cropping"]
@@ -452,15 +675,15 @@ extension EditorConfigurationViewController {
                 title: "确定",
                 style: .default,
                 handler: { (action) in
-            let widthTextFiled = alert.textFields?.first
-            let widthRatioStr = widthTextFiled?.text ?? "0"
-            let widthRatio = Int(widthRatioStr.count == 0 ? "0" : widthRatioStr)!
-            let heightTextFiled = alert.textFields?.last
-            let heightRatioStr = heightTextFiled?.text ?? "0"
-            let heightRatio = Int(heightRatioStr.count == 0 ? "0" : heightRatioStr)!
-            self.photoConfig.cropping.aspectRatioType = .custom(CGSize(width: widthRatio, height: heightRatio))
-            self.tableView.reloadRows(at: [indexPath], with: .fade)
-        }))
+                    let widthTextFiled = alert.textFields?.first
+                    let widthRatioStr = widthTextFiled?.text ?? "0"
+                    let widthRatio = Int(widthRatioStr.count == 0 ? "0" : widthRatioStr)!
+                    let heightTextFiled = alert.textFields?.last
+                    let heightRatioStr = heightTextFiled?.text ?? "0"
+                    let heightRatio = Int(heightRatioStr.count == 0 ? "0" : heightRatioStr)!
+                    self.photoConfig.cropping.aspectRatioType = .custom(CGSize(width: widthRatio, height: heightRatio))
+                    self.tableView.reloadRows(at: [indexPath], with: .fade)
+                }))
         alert.addAction(UIAlertAction.init(title: "取消", style: .cancel, handler: nil))
         present(alert, animated: true, completion: nil)
     }
@@ -544,11 +767,11 @@ extension EditorConfigurationViewController {
                 title: "确定",
                 style: .default,
                 handler: { (action) in
-            let textFiled = alert.textFields?.first
-            let time = Int(textFiled?.text ?? "0")!
-            self.videoConfig.cropping.maximumVideoCroppingTime = TimeInterval(time)
-            self.tableView.reloadRows(at: [indexPath], with: .fade)
-        }))
+                    let textFiled = alert.textFields?.first
+                    let time = Int(textFiled?.text ?? "0")!
+                    self.videoConfig.cropping.maximumVideoCroppingTime = TimeInterval(time)
+                    self.tableView.reloadRows(at: [indexPath], with: .fade)
+                }))
         alert.addAction(UIAlertAction.init(title: "取消", style: .cancel, handler: nil))
         present(alert, animated: true, completion: nil)
     }
@@ -564,192 +787,12 @@ extension EditorConfigurationViewController {
                 title: "确定",
                 style: .default,
                 handler: { (action) in
-            let textFiled = alert.textFields?.first
-            let time = Int(textFiled?.text ?? "0")!
-            self.videoConfig.cropping.minimumVideoCroppingTime = TimeInterval(time)
-            self.tableView.reloadRows(at: [indexPath], with: .fade)
-        }))
+                    let textFiled = alert.textFields?.first
+                    let time = Int(textFiled?.text ?? "0")!
+                    self.videoConfig.cropping.minimumVideoCroppingTime = TimeInterval(time)
+                    self.tableView.reloadRows(at: [indexPath], with: .fade)
+                }))
         alert.addAction(UIAlertAction.init(title: "取消", style: .cancel, handler: nil))
         present(alert, animated: true, completion: nil)
-    }
-}
-extension EditorConfigurationViewController {
-    enum EditorSection: Int, CaseIterable {
-        case editorType
-        case photoOptions
-        case videoOptions
-        var title: String {
-            switch self {
-            case .editorType:
-                 return "editorType"
-            case .photoOptions:
-                 return "PhotoOptions"
-            case .videoOptions:
-                 return "VideoOptions"
-            }
-        }
-        var allRowCase: [ConfigRowTypeRule] {
-            switch self {
-            case .editorType:
-                return EditorTypeRow.allCases
-            case .photoOptions:
-                return PhotoEditorRow.allCases
-            case .videoOptions:
-                return VideoEditorRow.allCases
-            }
-        }
-    }
-    enum EditorTypeRow: String, CaseIterable, ConfigRowTypeRule {
-        case type
-        case assetType
-        
-        var title: String {
-            switch self {
-            case .type:
-                return "编辑类型"
-            case .assetType:
-                return "资源类型"
-            }
-        }
-        var detailTitle: String {
-            return "." + self.rawValue
-        }
-        func getFunction<T>(
-            _ controller: T) -> (
-                (IndexPath) -> Void
-            ) where T: UIViewController {
-            guard let controller = controller as? EditorConfigurationViewController else {
-                return { _ in }
-            }
-            switch self {
-            case .type:
-                return controller.editorTypeAction(_:)
-            case .assetType:
-                return controller.assetTypeAction(_:)
-            }
-        }
-    }
-    enum PhotoEditorRow: String, CaseIterable, ConfigRowTypeRule {
-        case state
-        case fixedCropState
-        case isRoundCrop
-        case fixedRatio
-        case aspectRatioType
-        case maskType
-        var title: String {
-            switch self {
-            case .state:
-                return "初始状态"
-            case .fixedCropState:
-                return "固定裁剪状态"
-            case .isRoundCrop:
-                return "圆形裁剪框"
-            case .fixedRatio:
-                return "固定比例"
-            case .aspectRatioType:
-                return "默认宽高比"
-            case .maskType:
-                return "裁剪时遮罩类型"
-            }
-        }
-        var detailTitle: String {
-            switch self {
-            case .state, .fixedCropState:
-                return "." + rawValue
-            default: break
-            }
-            return ".cropping." + rawValue
-        }
-        func getFunction<T>(
-            _ controller: T) -> (
-                (IndexPath) -> Void
-            ) where T: UIViewController {
-            guard let controller = controller as? EditorConfigurationViewController else {
-                return { _ in }
-            }
-            switch self {
-            case .state:
-                return controller.stateAction(_:)
-            case .fixedCropState:
-                return controller.fixedCropStateAction(_:)
-            case .isRoundCrop:
-                return controller.isRoundCropAction(_:)
-            case .fixedRatio:
-                return controller.fixedRatioAction(_:)
-            case .aspectRatioType:
-                return controller.aspectRatioTypeAction(_:)
-            case .maskType:
-                return controller.maskTypeAction(_:)
-            }
-        }
-    }
-    enum VideoEditorRow: String, CaseIterable, ConfigRowTypeRule {
-        case exportPresetName
-        case defaultState
-        case mustBeTailored
-        case maximumVideoCroppingTime
-        case minimumVideoCroppingTime
-        var title: String {
-            switch self {
-            case .exportPresetName:
-                return "编辑后导出的质量"
-            case .defaultState:
-                return "当前默认的状态"
-            case .mustBeTailored:
-                return "默认裁剪状态下必须裁剪视频"
-            case .maximumVideoCroppingTime:
-                return "视频最大裁剪时长"
-            case .minimumVideoCroppingTime:
-                return "视频最小裁剪时长"
-            }
-        }
-        var detailTitle: String {
-            switch self {
-            case .maximumVideoCroppingTime, .minimumVideoCroppingTime:
-                return ".cropping." + self.rawValue
-            default:
-                break
-            }
-            return "." + self.rawValue
-        }
-        
-        func getFunction<T>(
-            _ controller: T) -> (
-                (IndexPath) -> Void
-            ) where T: UIViewController {
-            guard let controller = controller as? EditorConfigurationViewController else {
-                return { _ in }
-            }
-            switch self {
-            case .exportPresetName:
-                return controller.exportPresetNameAction(_:)
-            case .defaultState:
-                return controller.defaultStateAction(_:)
-            case .mustBeTailored:
-                return controller.mustBeTailoredAction(_:)
-            case .maximumVideoCroppingTime:
-                return controller.maximumVideoCroppingTimeAction(_:)
-            case .minimumVideoCroppingTime:
-                return controller.minimumVideoCroppingTimeAction(_:)
-            }
-        }
-    }
-}
-
-extension VideoEditorViewController.State {
-    var title: String {
-        if self == .cropping {
-            return "裁剪"
-        }
-        return "正常"
-    }
-}
-
-extension PhotoEditorViewController.State {
-    var title: String {
-        if self == .cropping {
-            return "裁剪"
-        }
-        return "正常"
     }
 }
