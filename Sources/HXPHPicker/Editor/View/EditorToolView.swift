@@ -19,10 +19,12 @@ public class EditorToolScrollView: UICollectionView {
 }
 
 public class EditorToolView: UIView {
+    
     weak var delegate: EditorToolViewDelegate?
+    
     var config: EditorToolViewConfiguration
     
-    public lazy var maskLayer: CAGradientLayer = {
+    public lazy var edgeMaskLayer: CAGradientLayer = {
         let layer = PhotoTools.getGradientShadowLayer(false)
         return layer
     }()
@@ -37,10 +39,8 @@ public class EditorToolView: UIView {
     }()
     
     public lazy var collectionView: EditorToolScrollView = {
-        let collectionView = EditorToolScrollView(
-            frame: CGRect(x: 0, y: 0, width: 0, height: 50),
-            collectionViewLayout: flowLayout
-        )
+        let collectionView = EditorToolScrollView(frame: CGRect(x: 0, y: 0, width: 0, height: 50),
+                                                  collectionViewLayout: flowLayout)
         collectionView.delaysContentTouches = false
         collectionView.backgroundColor = .clear
         collectionView.dataSource = self
@@ -50,7 +50,10 @@ public class EditorToolView: UIView {
         if #available(iOS 11.0, *) {
             collectionView.contentInsetAdjustmentBehavior = .never
         }
-        collectionView.register(EditorToolViewCell.self, forCellWithReuseIdentifier: "EditorToolViewCellID")
+        collectionView.register(EditorToolViewCell.self,
+                                forCellWithReuseIdentifier: "EditorToolViewCellID")
+        collectionView.addBorderLine()
+        collectionView.addTip("collectionView")
         return collectionView
     }()
     
@@ -64,14 +67,18 @@ public class EditorToolView: UIView {
         finishButton.titleLabel?.font = UIFont.mediumPingFang(ofSize: 16)
         finishButton.layer.cornerRadius = 3
         finishButton.layer.masksToBounds = true
-        finishButton.addTarget(self, action: #selector(didFinishButtonClick(button:)), for: .touchUpInside)
+        finishButton.addTarget(self,
+                               action: #selector(didFinishButtonClick(button:)),
+                               for: .touchUpInside)
         return finishButton
     }()
     
     @objc func didFinishButtonClick(button: UIButton) {
+        // 完成按钮点击之后, 通知外界完成后续的操作.
         delegate?.toolView(didFinishButtonClick: self)
     }
     
+    // stretchMask 就是为了, 扩大 MaskLayer 的显示区域.
     var stretchMask: Bool = false
     var currentSelectedIndexPath: IndexPath?
     var musicCellShowBox: Bool = false
@@ -79,42 +86,40 @@ public class EditorToolView: UIView {
     init(config: EditorToolViewConfiguration) {
         self.config = config
         super.init(frame: .zero)
-        layer.addSublayer(maskLayer)
+        layer.addSublayer(edgeMaskLayer)
         addSubview(collectionView)
         addSubview(finishButton)
         configColor()
     }
+    
+    // 这个, 不应该放到 FinishButton 的懒加载里面吗
     func configColor() {
         let isDark = PhotoManager.isDark
-        finishButton.setTitleColor(
-            isDark ? config.finishButtonTitleDarkColor : config.finishButtonTitleColor,
-            for: .normal
-        )
-        finishButton.setBackgroundImage(
-            UIImage.image(
-                for: isDark ? config.finishButtonDarkBackgroundColor : config.finishButtonBackgroundColor,
-                havingSize: .zero
-            ),
-            for: .normal
-        )
+        let titleColor = isDark ? config.finishButtonTitleDarkColor : config.finishButtonTitleColor
+        finishButton.setTitleColor( titleColor, for: .normal )
+        let bgColor = isDark ?
+        config.finishButtonDarkBackgroundColor :config.finishButtonBackgroundColor
+        let bgImg = UIImage.image(for: bgColor, havingSize: .zero)
+        finishButton.setBackgroundImage(bgImg, for: .normal)
     }
+    
     func deselected() {
         if let indexPath = currentSelectedIndexPath {
             let cell = collectionView.cellForItem(at: indexPath) as? EditorToolViewCell
-            cell?.isSelectedImageView = false
+            cell?.isSelectedToolOption = false
         }
     }
     
     func selected(indexPath: IndexPath) {
         deselected()
         let cell = collectionView.cellForItem(at: indexPath) as? EditorToolViewCell
-        cell?.isSelectedImageView = true
+        cell?.isSelectedToolOption = true
     }
     
     func reloadMusic(isSelected: Bool) {
         musicCellShowBox = isSelected
         for (index, option) in config.toolOptions.enumerated() where
-            option.type == .music {
+        option.type == .music {
             collectionView.reloadItems(
                 at: [
                     IndexPath(item: index, section: 0)
@@ -130,15 +135,15 @@ public class EditorToolView: UIView {
     
     public override func layoutSubviews() {
         super.layoutSubviews()
-        maskLayer.frame = CGRect(
+        edgeMaskLayer.frame = CGRect(
             x: 0,
             y: stretchMask ? -70 : -10,
             width: width,
             height: stretchMask ? height + 70 : height + 10
         )
         var finishWidth = (finishButton.currentTitle?.width(
-                            ofFont: finishButton.titleLabel!.font,
-                            maxHeight: 33) ?? 0) + 20
+            ofFont: finishButton.titleLabel!.font,
+            maxHeight: 33) ?? 0) + 20
         if finishWidth < 60 {
             finishWidth = 60
         }
@@ -147,6 +152,18 @@ public class EditorToolView: UIView {
         finishButton.x = width - finishButton.width - 12 - UIDevice.rightMargin
         finishButton.centerY = 25
         collectionView.width = finishButton.x - 12
+    }
+    
+    public override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesBegan(touches, with: event)
+    }
+    
+    public override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+        return super.hitTest(point, with: event)
+    }
+    
+    public override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
+        return super.point(inside: point, with: event)
     }
 }
 
@@ -176,12 +193,12 @@ extension EditorToolView: UICollectionViewDataSource, UICollectionViewDelegate, 
         if model.type == .graffiti || model.type == .mosaic {
             if let selectedIndexPath = currentSelectedIndexPath,
                selectedIndexPath.item == indexPath.item {
-                cell.isSelectedImageView = true
+                cell.isSelectedToolOption = true
             }else {
-                cell.isSelectedImageView = false
+                cell.isSelectedToolOption = false
             }
         }else {
-            cell.isSelectedImageView = false
+            cell.isSelectedToolOption = false
         }
         return cell
     }

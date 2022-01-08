@@ -8,14 +8,18 @@
 
 import UIKit
 
-public final class SelectBoxView: UIControl {
-    
+extension SelectBoxView {
     public enum Style: Int {
-        /// 数字
         case number
-        /// 勾勾
         case tick
     }
+}
+
+public final class SelectBoxView: UIControl {
+    
+    lazy var config: SelectBoxConfiguration = {
+        return SelectBoxConfiguration.init()
+    }()
     
     public var text: String = "0" {
         didSet {
@@ -25,9 +29,6 @@ public final class SelectBoxView: UIControl {
         }
     }
     
-    /*
-        当, isSelected 变化的时候, 触发整体的 View 的变化.
-     */
     public override var isSelected: Bool {
         didSet {
             if !isSelected {
@@ -38,10 +39,6 @@ public final class SelectBoxView: UIControl {
     }
     
     var textSize: CGSize = CGSize.zero
-    
-    lazy var config: SelectBoxConfiguration = {
-        return SelectBoxConfiguration.init()
-    }()
     
     lazy var backgroundLayer: CAShapeLayer = {
         let backgroundLayer = CAShapeLayer.init()
@@ -69,18 +66,17 @@ public final class SelectBoxView: UIControl {
         layer.addSublayer(backgroundLayer)
         layer.addSublayer(textLayer)
         layer.addSublayer(tickLayer)
-        self.addBorderLine()
     }
     
     // 画圆.
     private func backgroundPath() -> CGPath {
         let strokePath = UIBezierPath( roundedRect: CGRect(
-                x: 0,
-                y: 0,
-                width: width,
-                height: height
-            ),
-            cornerRadius: height / 2
+            x: 0,
+            y: 0,
+            width: width,
+            height: height
+        ),
+                                       cornerRadius: height / 2
         )
         return strokePath.cgPath
     }
@@ -174,9 +170,9 @@ public final class SelectBoxView: UIControl {
         return numerator / 30 * height
     }
     
-    // 扩大点击区域. 
     public override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
-        if isUserInteractionEnabled && CGRect(x: -15, y: -15, width: width + 30, height: height + 30).contains(point) {
+        let magnifiedRect = CGRect(x: -15, y: -15, width: width + 30, height: height + 30)
+        if isUserInteractionEnabled && magnifiedRect.contains(point) {
             return self
         }
         return super.hitTest(point, with: event)

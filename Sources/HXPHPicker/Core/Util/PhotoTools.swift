@@ -361,12 +361,11 @@ public struct PhotoTools {
         return 0
     }
     
-    static func getBasicAnimation(
-        _ keyPath: String,
-        _ fromValue: Any?,
-        _ toValue: Any?,
-        _ duration: TimeInterval
-    ) -> CABasicAnimation {
+    // 简单的, 对于 BaseAnimation 的封装处理
+    static func getBasicAnimation( _ keyPath: String,
+                                   _ fromValue: Any?,
+                                   _ toValue: Any?,
+                                   _ duration: TimeInterval ) -> CABasicAnimation {
         let animation = CABasicAnimation.init(keyPath: keyPath)
         animation.fromValue = fromValue
         animation.toValue = toValue
@@ -376,10 +375,13 @@ public struct PhotoTools {
         return animation
     }
     
+    // 返回, 一个逐渐变化颜色的 Layer. 防止到 View 的边缘, 实现内容的坡度变化.
     static func getGradientShadowLayer(_ isTop: Bool) -> CAGradientLayer {
         let layer = CAGradientLayer()
         layer.contentsScale = UIScreen.main.scale
         let blackColor = UIColor.black
+//         调试, 改为了 GreenColor
+//        let blackColor = UIColor.green
         layer.colors = [blackColor.withAlphaComponent(0).cgColor,
                         blackColor.withAlphaComponent(0.2).cgColor,
                         blackColor.withAlphaComponent(0.4).cgColor,
