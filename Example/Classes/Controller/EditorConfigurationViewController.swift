@@ -220,7 +220,8 @@ class EditorConfigurationViewController: UITableViewController {
     var editorType = 0
     var assetType = 0
     
-    let videoURL: URL = URL.init(fileURLWithPath: Bundle.main.path(forResource: "videoeditormatter", ofType: "MP4")!)
+    let exampleVideoUrl: URL = URL.init(fileURLWithPath:
+                                            Bundle.main.path(forResource: "videoeditormatter", ofType: "MP4")!)
     
     override init(nibName: String?, bundle: Bundle?) {
         super.init(nibName: nibName, bundle: bundle)
@@ -288,7 +289,7 @@ class EditorConfigurationViewController: UITableViewController {
                 }
             }else {
                 if assetType == 0 {
-                    let vc = EditorController.init(videoURL: videoURL, config: videoConfig)
+                    let vc = EditorController.init(videoURL: exampleVideoUrl, config: videoConfig)
                     vc.videoEditorDelegate = self
                     present(vc, animated: true, completion: nil)
                 }else {
@@ -518,7 +519,7 @@ extension EditorConfigurationViewController: VideoEditorViewControllerDelegate {
         
         switch videoEditorViewController.sourceType {
         case .local:
-            let photoAsset = PhotoAsset.init(localVideoAsset: .init(videoURL: videoURL))
+            let photoAsset = PhotoAsset.init(localVideoAsset: .init(videoURL: exampleVideoUrl))
             photoAsset.videoEdit = result
             pickerResultVC.selectedAssets = [photoAsset]
         case .network:
@@ -541,7 +542,7 @@ extension EditorConfigurationViewController: VideoEditorViewControllerDelegate {
         pickerResultVC.config = pickerConfig
         switch videoEditorViewController.sourceType {
         case .local:
-            let photoAsset = PhotoAsset(localVideoAsset: .init(videoURL: videoURL))
+            let photoAsset = PhotoAsset(localVideoAsset: .init(videoURL: exampleVideoUrl))
             pickerResultVC.selectedAssets = [photoAsset]
         case .network:
             let photoAsset = PhotoAsset(
