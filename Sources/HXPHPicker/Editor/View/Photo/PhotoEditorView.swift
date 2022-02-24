@@ -21,7 +21,10 @@ protocol PhotoEditorViewDelegate: AnyObject {
     func editorView(_ editorView: PhotoEditorView, updateStickerText item: EditorStickerItem)
 }
 
-// 没太明白, 直接继承 ScrollView 的意义. 
+/*
+ 整个, EditView 只有一个 Subview. 就是 imageResizerView
+ 在 imageResizerView 上面, 有这个原始的 ImageView, StickerView, DrawView 等各种 View. 统一的收到放大缩小的影响.
+ */
 class PhotoEditorView: UIScrollView, UIGestureRecognizerDelegate {
     
     weak var editorDelegate: PhotoEditorViewDelegate?
@@ -34,9 +37,11 @@ class PhotoEditorView: UIScrollView, UIGestureRecognizerDelegate {
     
     var state: State = .normal
     var imageScale: CGFloat = 1
-    private var canZoom = true
     var cropSize: CGSize = .zero
     
+    /*
+     以下的各种状态, 都是代理给了 imageResizerView
+     */
     var image: UIImage? { imageResizerView.imageView.image }
     
     var isEnabled: Bool = false {
@@ -69,6 +74,8 @@ class PhotoEditorView: UIScrollView, UIGestureRecognizerDelegate {
     var hasSticker: Bool { imageResizerView.imageView.stickerView.count > 0 }
     var hasFilter: Bool { imageResizerView.filter != nil }
     
+    private var canZoom = true
+    
     init(config: PhotoEditorConfiguration) {
         self.config = config
         super.init(frame: .zero)
@@ -86,21 +93,21 @@ class PhotoEditorView: UIScrollView, UIGestureRecognizerDelegate {
         addSubview(imageResizerView)
     }
     
-    override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
-        let view = super.hitTest(point, with: event)
-        if state != .cropping && imageResizerView == view {
-            if imageResizerView.drawEnabled {
-                return imageResizerView.imageView.drawView
-            }
-            if imageResizerView.mosaicEnabled {
-                return imageResizerView.imageView.mosaicView
-            }
-            return self
-        } else if state == .cropping && self == view {
-            return imageResizerView
-        }
-        return view
-    }
+//    override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+//        let view = super.hitTest(point, with: event)
+//        if state != .cropping && imageResizerView == view {
+//            if imageResizerView.drawEnabled {
+//                return imageResizerView.imageView.drawView
+//            }
+//            if imageResizerView.mosaicEnabled {
+//                return imageResizerView.imageView.mosaicView
+//            }
+//            return self
+//        } else if state == .cropping && self == view {
+//            return imageResizerView
+//        }
+//        return view
+//    }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -119,10 +126,6 @@ class PhotoEditorView: UIScrollView, UIGestureRecognizerDelegate {
         imageResizerView.imageView.drawView.lineWidth = config.brushLineWidth
         imageResizerView.delegate = self
         imageResizerView.imageView.delegate = self
-        
-        imageResizerView.addBorderline(inWidth: 2, color: UIColor.purple)
-        imageResizerView.addTip("ResizeView")
-        
         return imageResizerView
     }()
 }
@@ -378,9 +381,8 @@ extension PhotoEditorView: UIScrollViewDelegate {
     }
     
     func scrollViewDidZoom(_ scrollView: UIScrollView) {
-        if !canZoom {
-            return
-        }
+        if !canZoom { return }
+        
         let offsetX = (scrollView.width > scrollView.contentSize.width) ?
         (scrollView.width - scrollView.contentSize.width) * 0.5 : 0
         let offsetY = (scrollView.height > scrollView.contentSize.height) ?

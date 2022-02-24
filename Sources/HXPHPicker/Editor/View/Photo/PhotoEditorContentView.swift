@@ -53,6 +53,7 @@ class PhotoEditorContentView: UIView {
     // 涂抹面板
     lazy var drawView: PhotoEditorDrawView = {
         let drawView = PhotoEditorDrawView.init(frame: .zero)
+        drawView.backgroundColor = UIColor.blue.withAlphaComponent(0.3)
         drawView.delegate = self
         return drawView
     }()
@@ -60,6 +61,7 @@ class PhotoEditorContentView: UIView {
     // 马赛克面板
     lazy var mosaicView: PhotoEditorMosaicView = {
         let view = PhotoEditorMosaicView(mosaicConfig: mosaicConfig)
+        view.backgroundColor = UIColor.green.withAlphaComponent(0.3)
         view.delegate = self
         return view
     }()
@@ -67,9 +69,8 @@ class PhotoEditorContentView: UIView {
     // 贴图面板
     lazy var stickerView: EditorStickerView = {
         let view = EditorStickerView(frame: .zero)
+        view.backgroundColor = UIColor.red.withAlphaComponent(0.3)
         view.delegate = self
-        view.addBorderline(inWidth: 2, color: .green)
-        view.addTip("StickerContainer")
         return view
     }()
     
@@ -88,6 +89,7 @@ class PhotoEditorContentView: UIView {
     func setMosaicOriginalImage(_ image: UIImage?) {
         mosaicView.originalImage = image
     }
+    
     func setImage(_ image: UIImage) {
 #if canImport(Kingfisher)
         let view = imageView as! AnimatedImageView

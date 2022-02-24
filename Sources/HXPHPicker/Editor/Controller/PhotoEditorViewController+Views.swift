@@ -13,7 +13,7 @@ extension PhotoEditorViewController {
         let imageView = PhotoEditorView.init(config: config)
         imageView.editorDelegate = self
         
-        imageView.addBorderline(inWidth: 4, color: UIColor.red)
+//        imageView.addBorderline(inWidth: 4, color: UIColor.red)
         return imageView
     }
     
@@ -22,8 +22,9 @@ extension PhotoEditorViewController {
         cropConfirmView.alpha = 0
         cropConfirmView.isHidden = true
         cropConfirmView.delegate = self
-        cropConfirmView.addBorderline(inWidth: 2, color: UIColor.random())
-        cropConfirmView.addTip("CropConfirmView")
+        
+//        cropConfirmView.addBorderline(inWidth: 2, color: UIColor.random())
+//        cropConfirmView.addTip("CropConfirmView")
         return cropConfirmView
     }
     
@@ -31,8 +32,8 @@ extension PhotoEditorViewController {
         let toolView = EditorToolView.init(config: config.toolView)
         toolView.delegate = self
         
-        toolView.addBorderline(inWidth: 2, color: UIColor.blue)
-        toolView.addTip("ToolView")
+//        toolView.addBorderline(inWidth: 2, color: UIColor.blue)
+//        toolView.addTip("ToolView")
         return toolView
     }
     
@@ -43,8 +44,8 @@ extension PhotoEditorViewController {
         cancelBtn.addTarget(self, action: #selector(didBackButtonClick), for: .touchUpInside)
         view.addSubview(cancelBtn)
         
-        view.addBorderline(inWidth: 2, color: UIColor.brown)
-        view.addTip("TopView")
+//        view.addBorderline(inWidth: 2, color: UIColor.brown)
+//        view.addTip("TopView")
         return view
     }
     
@@ -61,8 +62,8 @@ extension PhotoEditorViewController {
         view.alpha = 0
         view.isHidden = true
         
-        view.addBorderLine()
-        view.addTip("BrushColorView")
+//        view.addBorderLine()
+//        view.addTip("BrushColorView")
         return view
     }
     
@@ -76,8 +77,9 @@ extension PhotoEditorViewController {
         view.themeColor = config.cropping.aspectRatioSelectedColor
         view.alpha = 0
         view.isHidden = true
-        view.addBorderLine()
-        view.addTip("CropToolView")
+        
+//        view.addBorderLine()
+//        view.addTip("CropToolView")
         return view
     }
     
@@ -86,8 +88,9 @@ extension PhotoEditorViewController {
         view.delegate = self
         view.alpha = 0
         view.isHidden = true
-        view.addBorderLine()
-        view.addTip("MosaicToolView")
+        
+//        view.addBorderLine()
+//        view.addTip("MosaicToolView")
         return view
     }
     
@@ -98,16 +101,18 @@ extension PhotoEditorViewController {
                                               sourceIndex: filter?.sourceIndex ?? -1,
                                               value: value ?? 0)
         view.delegate = self
-        view.addBorderLine()
-        view.addTip("FilterView")
+        
+//        view.addBorderLine()
+//        view.addTip("FilterView")
         return view
     }
     
     func createEditorChartletView() -> EditorChartletView {
         let view = EditorChartletView(config: config.chartlet, editorType: .photo)
         view.delegate = self
-        view.addBorderLine()
-        view.addTip("ChartletView")
+        
+//        view.addBorderLine()
+//        view.addTip("ChartletView")
         return view
     }
 }
